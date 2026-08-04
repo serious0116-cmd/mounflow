@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MOUNFLOW v4.4</title>
+  <title>MOUNFLOW v4.5</title>
 
   <!-- iOS PWA Options -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -107,7 +107,11 @@
     .ios-btn-blue { background: linear-gradient(135deg, #007aff, #0056b3); box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3); }
     .ios-btn-green { background: linear-gradient(135deg, #34c759, #28a745); box-shadow: 0 4px 15px rgba(52, 199, 89, 0.3); }
     .ios-btn-purple { background: linear-gradient(135deg, #af52de, #8e44ad); box-shadow: 0 4px 15px rgba(175, 82, 222, 0.3); }
-    .ios-btn:active { transform: scale(0.98); opacity: 0.85; }
+    .ios-btn-secondary {
+      background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #60a5fa;
+      padding: 8px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%;
+    }
+    .ios-btn:active, .ios-btn-secondary:active { transform: scale(0.98); opacity: 0.85; }
 
     .tags-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
     .tag-chip {
@@ -116,11 +120,9 @@
     }
     .tag-chip.active { background: rgba(88, 86, 214, 0.4); border-color: #5e5ce6; color: #fff; box-shadow: 0 0 10px rgba(94, 92, 230, 0.3); }
 
-    /* 圖表容器與動態圖例勾選 */
+    /* 圖表區 */
     .chart-header { display: flex; flex-direction: column; gap: 8px; margin-bottom: 6px; }
-    .chart-legend-grid {
-      display: flex; flex-wrap: wrap; gap: 6px; font-size: 10px; font-weight: 700;
-    }
+    .chart-legend-grid { display: flex; flex-wrap: wrap; gap: 6px; font-size: 10px; font-weight: 700; }
     .legend-tag {
       padding: 4px 8px; border-radius: 8px; background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s ease;
@@ -180,7 +182,7 @@
   <div class="glass-card">
     <div class="flex-between">
       <div class="brand-title">MOUNFLOW</div>
-      <span class="version-badge" onclick="forceReload()" title="點擊刷新">v4.4</span>
+      <span class="version-badge" onclick="forceReload()" title="點擊刷新">v4.5</span>
     </div>
     <div class="data-grid">
       <div class="data-box">
@@ -253,6 +255,8 @@
 
     <!-- 體組成完整量化數據 Form -->
     <div id="formWeight" style="display:none;">
+      <button class="ios-btn-secondary" onclick="fillSampleInBody()">⚡ 一鍵載入我的 7/30 Starbia 診所報告</button>
+
       <div class="form-grid" style="margin-bottom:6px;">
         <div class="input-group">
           <label>測量日期</label>
@@ -260,7 +264,7 @@
         </div>
         <div class="input-group">
           <label>體重 (kg)</label>
-          <input type="number" step="0.01" id="weightVal" placeholder="99.0">
+          <input type="number" step="0.01" id="weightVal" placeholder="例如 99.0">
         </div>
       </div>
 
@@ -344,7 +348,7 @@
     </div>
   </div>
 
-  <!-- 3. 可動態勾選線條的圖表卡片 -->
+  <!-- 3. 動態圖表區 -->
   <div class="glass-card">
     <div class="chart-header">
       <div class="sub-label">📈 動態趨勢對比 (點擊開關線條)</div>
@@ -361,7 +365,7 @@
         <div class="legend-tag active" style="color:#bf5af2;" onclick="toggleLine('mMuscle', this)">
           <span class="legend-dot" style="background:#bf5af2;"></span>肌肉量(kg)
         </div>
-        <div class="legend-tag" style="color:#ff453a;" onclick="toggleLine('vfatArea', this)">
+        <div class="legend-tag active" style="color:#ff453a;" onclick="toggleLine('vfatArea', this)">
           <span class="legend-dot" style="background:#ff453a;"></span>內臟脂肪
         </div>
       </div>
@@ -397,7 +401,7 @@
 </div>
 
 <script>
-  const APP_VERSION = "4.4";
+  const APP_VERSION = "4.5";
   
   function forceReload() {
     window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
@@ -418,7 +422,7 @@
     weight: true,
     pFat: true,
     mMuscle: true,
-    vfatArea: false
+    vfatArea: true
   };
 
   function toggleLine(key, el) {
@@ -433,6 +437,24 @@
       document.getElementById('form' + x.charAt(0).toUpperCase() + x.slice(1)).style.display = (x === t) ? 'block' : 'none';
       document.getElementById('tab' + x.charAt(0).toUpperCase() + x.slice(1)).className = 'segment-btn ' + (x === t ? 'active' : '');
     });
+  }
+
+  // 快捷帶入按鈕
+  function fillSampleInBody() {
+    document.getElementById('weightDate').value = "2026-07-30";
+    document.getElementById('weightVal').value = "99.0";
+    document.getElementById('pFat').value = "36.35";
+    document.getElementById('mMuscle').value = "59.61";
+    document.getElementById('mLimb').value = "27.44";
+    document.getElementById('mLeg').value = "19.84";
+    document.getElementById('mFat').value = "36.0";
+    document.getElementById('mStoreFat').value = "33.03";
+    document.getElementById('vfatArea').value = "164.13";
+    document.getElementById('mBone').value = "3.43";
+    document.getElementById('dBone').value = "1.33";
+    document.getElementById('valBMR').value = "1819";
+    document.getElementById('valBMI').value = "32.34";
+    document.getElementById('valWTR').value = "0.38";
   }
 
   function addDose() {
@@ -574,13 +596,12 @@ END:VCALENDAR`;
     const diffHours = (nextDoseTime - now) / (3600 * 1000);
     let daysNext = diffHours > 0 ? (diffHours / 24).toFixed(1) + '天' : '今日應施打';
 
-    // 計算最新一筆藥劑的殘容量
     let penRemainStr = '-- mg';
     if (lastDose.penTotalCap) {
       let totalUsedInPen = 0;
       for (let i = doses.length - 1; i >= 0; i--) {
         totalUsedInPen += doses[i].mg;
-        if (doses[i].penTotalCap && i !== doses.length - 1) break; // 若遇到上一筆重新買筆
+        if (doses[i].penTotalCap && i !== doses.length - 1) break;
       }
       let rem = Math.max(0, lastDose.penTotalCap - totalUsedInPen);
       penRemainStr = rem.toFixed(1) + ' mg';
@@ -621,9 +642,9 @@ END:VCALENDAR`;
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, w, h);
 
-    if (data.length < 2) {
+    if (data.length < 2 && weights.length < 2) {
       ctx.fillStyle = '#8e8e93'; ctx.font = '12px sans-serif';
-      ctx.fillText('新增打針或體組成紀錄後繪製趨勢圖', 15, h / 2);
+      ctx.fillText('新增紀錄後將自動繪製趨勢圖', 15, h / 2);
       return;
     }
 
@@ -634,8 +655,8 @@ END:VCALENDAR`;
     const chartW = w - paddingLeft - paddingRight;
     const chartH = h - paddingTop - paddingBottom;
 
-    let minT = data[0].t;
-    let maxT = data[data.length - 1].t;
+    let minT = data.length > 0 ? data[0].t : (weights.length > 0 ? weights[0].time : Date.now());
+    let maxT = data.length > 0 ? data[data.length - 1].t : (weights.length > 0 ? weights[weights.length - 1].time : Date.now());
 
     ctx.font = '9px -apple-system, sans-serif';
     ctx.fillStyle = '#71717a';
