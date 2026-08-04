@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MounFlow 2.0 Pro</title>
+  <title>MounFlow v3.1.0</title>
+
+  <!-- App Version Meta -->
+  <meta name="app-version" content="3.1.0">
 
   <!-- iOS PWA Options -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -38,15 +41,17 @@
     }
     
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
-    .app-title { font-size: 19px; font-weight: 700; color: #60a5fa; letter-spacing: -0.3px; }
+    .app-title { font-size: 19px; font-weight: 700; color: #60a5fa; letter-spacing: -0.3px; display: flex; align-items: center; gap: 6px; }
+    .version-badge { font-size: 9px; font-weight: 700; background: rgba(96, 165, 250, 0.2); color: #60a5fa; padding: 2px 6px; border-radius: 6px; border: 1px solid rgba(96, 165, 250, 0.3); }
     .sub-label { font-size: 10px; color: #71717a; font-weight: 600; text-transform: uppercase; }
     
-    /* 數據面板 */
-    .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
-    .data-box { background: #1c1c1e; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-    .data-val { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
+    /* 數據面板 3格 */
+    .data-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 8px; }
+    .data-box { background: #1c1c1e; padding: 8px 6px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
+    .data-val { font-size: 16px; font-weight: 900; letter-spacing: -0.5px; margin-top: 2px; }
     .color-blue { color: #64d2ff; }
     .color-green { color: #30d158; }
+    .color-purple { color: #bf5af2; }
 
     /* Segmented Control */
     .segmented-control {
@@ -65,7 +70,7 @@
     label { font-size: 10px; color: #8e8e93; font-weight: 500; }
     input, select {
       width: 100%; background: #2c2c2e; color: #fff; border: 1px solid rgba(255,255,255,0.1);
-      padding: 10px 12px; border-radius: 12px; font-size: 13px; font-weight: 500; outline: none;
+      padding: 10px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; outline: none;
       -webkit-appearance: none;
     }
 
@@ -90,7 +95,7 @@
     .chart-container { width: 100%; height: 160px; position: relative; margin-top: 6px; }
     canvas { width: 100% !important; height: 100% !important; display: block; }
 
-    /* 優化後的歷史紀錄分類與清單 */
+    /* 歷史紀錄與篩選 */
     .filter-bar { display: flex; gap: 4px; margin-bottom: 10px; }
     .filter-chip {
       background: #1c1c1e; color: #8e8e93; border: 1px solid rgba(255,255,255,0.05);
@@ -113,36 +118,42 @@
     .tag-side { background: rgba(175, 82, 222, 0.2); color: #bf5af2; }
 
     .log-date { font-size: 11px; color: #8e8e93; font-weight: 500; }
-    .log-val { font-size: 13px; font-weight: 700; color: #f1f5f9; }
+    .log-val { font-size: 12px; font-weight: 700; color: #f1f5f9; text-align: right; }
     
-    .btn-delete { color: #ff453a; background: none; border: none; font-size: 14px; padding: 4px; cursor: pointer; opacity: 0.7; }
-    .btn-delete:active { opacity: 1; }
+    .btn-action { background: none; border: none; font-size: 13px; padding: 4px; cursor: pointer; opacity: 0.8; }
+    .btn-action:active { opacity: 1; }
 
-    /* 數據備份與還原工具 */
-    .backup-tools { display: flex; gap: 8px; margin-top: 10px; }
-    .btn-tool { flex: 1; background: #2c2c2e; color: #8e8e93; border: 1px solid rgba(255,255,255,0.08); padding: 8px; border-radius: 10px; font-size: 10px; font-weight: 600; cursor: pointer; }
+    .backup-tools { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .btn-tool { flex: 1; background: #2c2c2e; color: #8e8e93; border: 1px solid rgba(255,255,255,0.08); padding: 8px; border-radius: 10px; font-size: 10px; font-weight: 600; cursor: pointer; text-align: center; }
   </style>
 </head>
 <body>
 
 <div class="app-shell">
 
-  <!-- 1. 精準 PK 數據面板 -->
+  <!-- 1. 精準 PK 數據面板 (帶版本號) -->
   <div class="card">
     <div class="flex-between">
       <div>
-        <div class="app-title">💉 MounFlow 2.0</div>
-        <div class="sub-label">雙相動力學 PK 模型</div>
+        <div class="app-title">
+          💉 MounFlow 
+          <span class="version-badge">v3.1.0</span>
+        </div>
+        <div class="sub-label">雙相 PK 動力學 & 雙軸對比</div>
       </div>
     </div>
     <div class="data-grid">
       <div class="data-box">
-        <div class="sub-label">當前估計血藥量</div>
-        <div class="data-val color-blue" id="currentLevel">0.00 <span style="font-size:12px;">mg</span></div>
+        <div class="sub-label">當前估計血藥</div>
+        <div class="data-val color-blue" id="currentLevel">0.00mg</div>
       </div>
       <div class="data-box">
-        <div class="sub-label">估計谷值 (最低殘留)</div>
-        <div class="data-val color-green" id="troughLevel">0.00 <span style="font-size:12px;">mg</span></div>
+        <div class="sub-label">估計谷值</div>
+        <div class="data-val color-green" id="troughLevel">0.00mg</div>
+      </div>
+      <div class="data-box">
+        <div class="sub-label">下次打針倒數</div>
+        <div class="data-val color-purple" id="nextDoseCountdown">--天</div>
       </div>
     </div>
   </div>
@@ -173,6 +184,16 @@
             <option value="15.0">15.0 mg</option>
           </select>
         </div>
+      </div>
+      <div class="input-group" style="margin-bottom:10px;">
+        <label id="lastSiteTip">注射部位輪替</label>
+        <select id="doseSite">
+          <option value="左腹部">左腹部</option>
+          <option value="右腹部">右腹部</option>
+          <option value="左大腿">左大腿</option>
+          <option value="右大腿">右大腿</option>
+          <option value="手臂">手臂</option>
+        </select>
       </div>
       <button class="ios-btn ios-btn-blue" onclick="addDose()">新增打針紀錄</button>
     </div>
@@ -207,22 +228,23 @@
     </div>
   </div>
 
-  <!-- 3. 高畫質動力學趨勢圖 -->
+  <!-- 3. 動力學趨勢與體重對比圖 -->
   <div class="card">
-    <div class="sub-label" style="color:#a1a1aa;">📈 血藥濃度衰減模型 (預測未來7天)</div>
+    <div class="flex-between">
+      <div class="sub-label" style="color:#a1a1aa;">📈 濃度趨勢(藍) 與 體重走勢(綠)</div>
+    </div>
     <div class="chart-container">
       <canvas id="cvs"></canvas>
     </div>
   </div>
 
-  <!-- 4. 歷史紀錄管理 (優化版) -->
+  <!-- 4. 歷史紀錄管理與日曆同步工具 -->
   <div class="card">
     <div class="flex-between" style="margin-bottom:8px;">
       <div class="sub-label" style="color:#a1a1aa;">📋 歷史日誌</div>
       <a href="javascript:void(0)" onclick="clearAll()" style="color:#ff453a; font-size:10px; text-decoration:none; font-weight:600;">清空全部</a>
     </div>
 
-    <!-- 紀錄分類篩選 -->
     <div class="filter-bar">
       <button class="filter-chip active" onclick="setLogFilter('all', this)">全部</button>
       <button class="filter-chip" onclick="setLogFilter('dose', this)">💉 針劑</button>
@@ -230,18 +252,19 @@
       <button class="filter-chip" onclick="setLogFilter('side', this)">🩹 體感</button>
     </div>
 
-    <!-- 日誌內容列表 -->
     <div class="logs-wrapper" id="logs"></div>
 
     <div class="backup-tools">
-      <button class="btn-tool" onclick="exportData()">📥 匯出 JSON 備份</button>
-      <button class="btn-tool" onclick="importData()">📤 匯入備份檔案</button>
+      <button class="btn-tool" onclick="addCalendarReminder()" style="flex:100%; background:#2c2c2e; color:#64d2ff; margin-bottom:4px;">📅 同步下週打針至 iPhone 日曆</button>
+      <button class="btn-tool" onclick="exportData()">📥 匯出 JSON</button>
+      <button class="btn-tool" onclick="importData()">📤 匯入備份</button>
     </div>
   </div>
 
 </div>
 
 <script>
+  const APP_VERSION = "3.1.0";
   const nowStr = new Date().toISOString();
   document.getElementById('doseTime').value = nowStr.slice(0, 16);
   document.getElementById('weightDate').value = nowStr.slice(0, 10);
@@ -262,8 +285,9 @@
   function addDose() {
     let time = document.getElementById('doseTime').value;
     let mg = parseFloat(document.getElementById('doseMg').value);
+    let site = document.getElementById('doseSite').value;
     if (!time) return alert('請選擇打針時間');
-    doses.push({ id: Date.now(), time: new Date(time).getTime(), mg });
+    doses.push({ id: Date.now(), time: new Date(time).getTime(), mg, site });
     doses.sort((a, b) => a.time - b.time);
     localStorage.setItem('mf_doses', JSON.stringify(doses));
     refresh();
@@ -313,7 +337,7 @@
   }
 
   function clearAll() {
-    if (confirm('確定要清空所有數據嗎？此動作無法復原。')) {
+    if (confirm('確定要清空所有數據嗎？')) {
       localStorage.clear(); doses = []; weights = []; sides = []; refresh();
     }
   }
@@ -325,15 +349,57 @@
     renderLogs();
   }
 
-  // 二房室/雙相 PK 計算模型
+  // 匯出 iOS 日曆事件行程 (.ics)
+  function addCalendarReminder() {
+    if (doses.length === 0) return alert('請先新增至少一筆打針紀錄');
+    
+    let lastDose = doses[doses.length - 1];
+    let nextTime = new Date(lastDose.time + 7 * 24 * 3600 * 1000);
+    
+    let formatTime = (date) => date.toISOString().replace(/-|:|\.\d+/g, '');
+    let startTime = formatTime(nextTime);
+    let endTime = formatTime(new Date(nextTime.getTime() + 30 * 60 * 1000));
+
+    let icsContent = 
+`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//MounFlow App//v${APP_VERSION}//EN
+BEGIN:VEVENT
+SUMMARY:💉 MounFlow 打針提醒 (${lastDose.mg}mg)
+DESCRIPTION:每週 Tirzepatide 劑量施打提醒。請開啟 App 記錄：https://serious0116-cmd.github.io/mounflow/
+DTSTART:${startTime}
+DTEND:${endTime}
+BEGIN:VALARM
+TRIGGER:-PT15M
+ACTION:DISPLAY
+DESCRIPTION:提醒
+END:VALARM
+END:VEVENT
+END:VCALENDAR`;
+
+    let blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    let link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.setAttribute('download', 'mounflow_reminder.ics');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  // 二房室/雙相 PK 計算
   function calculatePKData() {
-    if (doses.length === 0) return { chartData: [], current: 0, trough: 0 };
+    if (doses.length === 0) return { chartData: [], current: 0, trough: 0, daysNext: '--' };
 
     const ka = 0.04;
     const ke = 0.00578;
     const now = Date.now();
     const start = doses[0].time;
-    const end = now + 7 * 24 * 3600 * 1000;
+    const lastDose = doses[doses.length - 1];
+    const nextDoseTime = lastDose.time + 7 * 24 * 3600 * 1000;
+    const diffHours = (nextDoseTime - now) / (3600 * 1000);
+    let daysNext = diffHours > 0 ? (diffHours / 24).toFixed(1) + '天' : '今日應施打';
+
+    const end = Math.max(now, nextDoseTime) + 3 * 24 * 3600 * 1000;
 
     let chartData = [];
     let current = 0;
@@ -355,9 +421,10 @@
       if (t > now && level < trough) trough = level;
     }
 
-    return { chartData, current: current.toFixed(2), trough: trough === 999 ? 0 : trough.toFixed(2) };
+    return { chartData, current: current.toFixed(2), trough: trough === 999 ? 0 : trough.toFixed(2), daysNext };
   }
 
+  // Canvas 雙軸繪圖
   function drawCanvasChart(data) {
     let cvs = document.getElementById('cvs');
     let ctx = cvs.getContext('2d');
@@ -370,14 +437,16 @@
 
     if (data.length < 2) {
       ctx.fillStyle = '#636366'; ctx.font = '12px sans-serif';
-      ctx.fillText('新增第一筆打針紀錄後自動計算趨勢圖', 10, h / 2);
+      ctx.fillText('新增打針紀錄後將自動算血藥與體重曲線', 10, h / 2);
       return;
     }
 
+    let minT = data[0].t;
+    let maxT = data[data.length - 1].t;
     let maxVal = Math.max(...data.map(d => d.v), 5);
 
     let grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, 'rgba(100, 210, 255, 0.35)');
+    grad.addColorStop(0, 'rgba(100, 210, 255, 0.3)');
     grad.addColorStop(1, 'rgba(100, 210, 255, 0.0)');
 
     ctx.beginPath();
@@ -390,20 +459,53 @@
     ctx.fillStyle = grad; ctx.fill();
 
     ctx.beginPath();
-    ctx.strokeStyle = '#64d2ff'; ctx.lineWidth = 2.5;
+    ctx.strokeStyle = '#64d2ff'; ctx.lineWidth = 2;
     data.forEach((d, i) => {
       let x = (i / (data.length - 1)) * (w - 20) + 10;
       let y = h - 12 - (d.v / maxVal) * (h - 24);
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     });
     ctx.stroke();
+
+    if (weights.length > 0) {
+      let minW = Math.min(...weights.map(w => w.val)) - 1;
+      let maxW = Math.max(...weights.map(w => w.val)) + 1;
+
+      ctx.beginPath();
+      ctx.strokeStyle = '#30d158'; ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 3]);
+
+      let first = true;
+      weights.forEach(wItem => {
+        let wtTime = wItem.time || new Date(wItem.date).getTime();
+        if (wtTime >= minT && wtTime <= maxT) {
+          let x = ((wtTime - minT) / (maxT - minT)) * (w - 20) + 10;
+          let y = h - 12 - ((wItem.val - minW) / (maxW - minW)) * (h - 24);
+          if (first) { ctx.moveTo(x, y); first = false; } else { ctx.lineTo(x, y); }
+        }
+      });
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      weights.forEach(wItem => {
+        let wtTime = wItem.time || new Date(wItem.date).getTime();
+        if (wtTime >= minT && wtTime <= maxT) {
+          let x = ((wtTime - minT) / (maxT - minT)) * (w - 20) + 10;
+          let y = h - 12 - ((wItem.val - minW) / (maxW - minW)) * (h - 24);
+          ctx.beginPath();
+          ctx.arc(x, y, 3, 0, Math.PI * 2);
+          ctx.fillStyle = '#30d158';
+          ctx.fill();
+        }
+      });
+    }
   }
 
   function renderLogs() {
     let list = [];
 
     if(currentLogFilter === 'all' || currentLogFilter === 'dose') {
-      doses.forEach(d => list.push({ type: 'dose', id: d.id, time: d.time, title: '注射針劑', val: `${d.mg} mg`, tagClass: 'tag-dose' }));
+      doses.forEach(d => list.push({ type: 'dose', id: d.id, time: d.time, title: '注射針劑', val: `${d.mg}mg (${d.site||'未標記'})`, tagClass: 'tag-dose' }));
     }
     if(currentLogFilter === 'all' || currentLogFilter === 'weight') {
       weights.forEach(w => list.push({ type: 'weight', id: w.id, time: w.time || new Date(w.date).getTime(), title: '測量體重', val: `${w.val} kg`, tagClass: 'tag-weight' }));
@@ -412,7 +514,6 @@
       sides.forEach(s => list.push({ type: 'side', id: s.id, time: s.time || new Date(s.date).getTime(), title: '體感記錄', val: s.tags.join(', '), tagClass: 'tag-side' }));
     }
 
-    // 時間倒序排列（最新在最前）
     list.sort((a,b) => b.time - a.time);
 
     let h = '';
@@ -424,9 +525,9 @@
             <span class="log-tag ${item.tagClass}">${item.title}</span>
             <span class="log-date">${dateStr}</span>
           </div>
-          <div style="display:flex; align-items:center; gap:10px;">
+          <div style="display:flex; align-items:center; gap:8px;">
             <span class="log-val">${item.val}</span>
-            <button class="btn-delete" onclick="deleteLog('${item.type}', ${item.id})">🗑️</button>
+            <button class="btn-action" onclick="deleteLog('${item.type}', ${item.id})">🗑️</button>
           </div>
         </div>
       `;
@@ -437,18 +538,25 @@
 
   function refresh() {
     let pk = calculatePKData();
-    document.getElementById('currentLevel').innerText = pk.current + ' mg';
-    document.getElementById('troughLevel').innerText = pk.trough + ' mg';
+    document.getElementById('currentLevel').innerText = pk.current + 'mg';
+    document.getElementById('troughLevel').innerText = pk.trough + 'mg';
+    document.getElementById('nextDoseCountdown').innerText = pk.daysNext;
+
+    if(doses.length > 0) {
+      let last = doses[doses.length - 1];
+      document.getElementById('lastSiteTip').innerText = `注射部位 (上次: ${last.site || '無'})`;
+    }
+
     drawCanvasChart(pk.chartData);
     renderLogs();
   }
 
   function exportData() {
-    let data = { doses, weights, sides };
+    let data = { doses, weights, sides, version: APP_VERSION };
     let blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
     let a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `mounflow_backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.download = `mounflow_backup_v${APP_VERSION}_${new Date().toISOString().slice(0,10)}.json`;
     a.click();
   }
 
