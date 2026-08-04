@@ -1,165 +1,367 @@
-<!DOCTYPE html>
+# Generate the single-file HTML for iPhone-native app "MounFlow"
+html_content = """<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>MounFlow</title>
 
-  <!-- iOS PWA 全螢幕與桌面圖示設定 -->
+  <!-- iOS PWA Fullscreen & Web App Native Options -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="MounFlow">
   <meta name="theme-color" content="#000000">
   <link rel="apple-touch-icon" href="https://img.icons8.com/isometric/512/syringe.png">
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-      background-color: #000000; 
-      color: #f1f5f9; 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-      padding: 16px; 
-      padding-top: max(16px, env(safe-area-inset-top));
-      user-select: none;
+    /* Reset & Base System Styles */
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
     }
-    .container { max-width: 600px; margin: 0 auto; }
-    .card { 
-      background: #121212; 
-      border: 1px solid #2a2a2a; 
-      border-radius: 20px; 
-      padding: 18px; 
-      margin-bottom: 14px; 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    }
-    .flex-between { display: flex; justify-content: space-between; align-items: center; }
-    .app-title { font-size: 20px; font-weight: bold; color: #60a5fa; display: flex; align-items: center; gap: 6px; }
-    .sub-text { font-size: 11px; color: #71717a; margin-top: 2px; }
-    .mg-val { font-size: 24px; font-weight: 900; color: #34d399; letter-spacing: -0.5px; }
-    
-    .tabs { display: flex; border-bottom: 1px solid #222222; margin-bottom: 14px; }
-    .tab-btn { 
-      flex: 1; text-align: center; padding: 10px; font-size: 12px; color: #71717a; 
-      background: none; border: none; font-weight: 600; cursor: pointer;
-    }
-    .tab-btn.active { color: #60a5fa; border-bottom: 2px solid #60a5fa; }
-    
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-    label { font-size: 11px; color: #a1a1aa; display: block; margin-bottom: 4px; }
-    input, select { 
-      width: 100%; background: #1a1a1a; color: #ffffff; border: 1px solid #333333; 
-      padding: 10px; border-radius: 12px; font-size: 13px; outline: none;
-    }
-    .action-btn { 
-      width: 100%; padding: 12px; border-radius: 14px; border: none; 
-      font-weight: bold; font-size: 13px; color: #ffffff; cursor: pointer;
-    }
-    .btn-blue { background: #2563eb; }
-    .btn-green { background: #059669; }
-    .btn-purple { background: #9333ea; }
-    .action-btn:active { transform: scale(0.98); opacity: 0.9; }
 
-    .tag-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-    .tag-btn { 
-      background: #1a1a1a; border: 1px solid #2e2e2e; color: #d4d4d8; 
-      padding: 10px 4px; border-radius: 12px; font-size: 11px; text-align: center; cursor: pointer;
+    html, body {
+      background-color: #000000;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
-    .tag-btn.selected { background: #581c87; border-color: #a855f7; color: #f3e8ff; }
 
-    canvas { width: 100% !important; height: 200px !important; display: block; }
-    .log-item { 
-      background: #1a1a1a; border: 1px solid #262626; padding: 10px 14px; 
-      border-radius: 12px; font-size: 11px; display: flex; justify-content: space-between; margin-bottom: 8px; 
+    body {
+      /* Native iPhone Safe Areas (Notch, Dynamic Island, Home Bar) */
+      padding-top: max(12px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
     }
+
+    .app-shell {
+      max-width: 430px; /* iPhone 15/16 Pro Max Ultra Width limit */
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* iOS Native Card Styling */
+    .card {
+      background: rgba(22, 22, 24, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 14px 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .app-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #60a5fa;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sub-label {
+      font-size: 10px;
+      color: #71717a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    .mg-display {
+      font-size: 26px;
+      font-weight: 900;
+      color: #34d399;
+      letter-spacing: -0.8px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* iOS Segmented Control Tabs */
+    .segmented-control {
+      display: flex;
+      background: #1c1c1e;
+      border-radius: 12px;
+      padding: 2px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .segment-btn {
+      flex: 1;
+      padding: 7px 0;
+      font-size: 11px;
+      font-weight: 600;
+      color: #8e8e93;
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .segment-btn.active {
+      background: #2c2c2e;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    /* iOS Form Elements */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    label {
+      font-size: 10px;
+      color: #8e8e93;
+      font-weight: 500;
+      padding-left: 2px;
+    }
+
+    input, select {
+      width: 100%;
+      background: #2c2c2e;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      -webkit-appearance: none;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus {
+      border-color: #0a84ff;
+    }
+
+    /* Primary Action Buttons with Native Haptic feel */
+    .ios-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: none;
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.2px;
+      cursor: pointer;
+      transition: opacity 0.15s ease, transform 0.1s ease;
+    }
+
+    .ios-btn-blue { background: #007aff; }
+    .ios-btn-green { background: #34c759; }
+    .ios-btn-purple { background: #af52de; }
+
+    .ios-btn:active {
+      opacity: 0.75;
+      transform: scale(0.985);
+    }
+
+    /* Tags Grid for Side Effects */
+    .tags-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .tag-chip {
+      background: #2c2c2e;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #d1d1d6;
+      padding: 9px 2px;
+      border-radius: 10px;
+      font-size: 10.5px;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tag-chip.active {
+      background: #5856d6;
+      border-color: #5e5ce6;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* Chart Container (Fixed Height Aspect for Mobile) */
+    .chart-container {
+      width: 100%;
+      height: 150px;
+      position: relative;
+      margin-top: 4px;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+
+    /* History Log List */
+    .logs-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 130px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .log-card {
+      background: #1c1c1e;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .log-date { color: #8e8e93; font-weight: 500; }
+    .log-val-blue { color: #64d2ff; font-weight: 700; }
+    .log-val-green { color: #30d158; font-weight: 700; }
+    .log-val-purple { color: #bf5af2; font-weight: 600; }
+
+    /* Custom Scrollbar for iOS */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: #3a3a3c; border-radius: 4px; }
   </style>
 </head>
 <body>
 
-<div class="container">
+<div class="app-shell">
 
-  <!-- 1. 頂部藥量狀態 -->
+  <!-- 1. Header Card (Current Estimated Level) -->
   <div class="card">
     <div class="flex-between">
       <div>
         <div class="app-title">💉 MounFlow</div>
-        <div class="sub-text">半衰期 5 天 PK 模型動態計算</div>
+        <div class="sub-label">Tirzepatide 半衰期 PK 模型</div>
       </div>
       <div style="text-align: right;">
-        <div class="sub-text">體內當前估計藥量</div>
-        <div class="mg-val" id="currentLevel">0.0 mg</div>
+        <div class="sub-label">體內預估殘留量</div>
+        <div class="mg-display" id="currentLevel">0.0 mg</div>
       </div>
     </div>
   </div>
 
-  <!-- 2. 操作分頁卡片 -->
+  <!-- 2. Interactive Input Controls -->
   <div class="card">
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('dose')" id="tabDose">💉 打針紀錄</button>
-      <button class="tab-btn" onclick="switchTab('weight')" id="tabWeight">⚖️ 體重紀錄</button>
-      <button class="tab-btn" onclick="switchTab('side')" id="tabSide">🩹 副作用標籤</button>
+    <!-- iOS Segmented Control -->
+    <div class="segmented-control">
+      <button class="segment-btn active" onclick="switchTab('dose')" id="tabDose">💉 打針紀錄</button>
+      <button class="segment-btn" onclick="switchTab('weight')" id="tabWeight">⚖️ 體重紀錄</button>
+      <button class="segment-btn" onclick="switchTab('side')" id="tabSide">🩹 體感標籤</button>
     </div>
 
-    <!-- 打針表單 -->
+    <!-- Dose Form -->
     <div id="formDose">
       <div class="form-grid">
-        <div><label>時間</label><input type="datetime-local" id="doseTime"></div>
-        <div><label>劑量</label>
+        <div class="input-group">
+          <label>打針日期時間</label>
+          <input type="datetime-local" id="doseTime">
+        </div>
+        <div class="input-group">
+          <label>注射劑量</label>
           <select id="doseMg">
             <option value="2.5">2.5 mg</option>
             <option value="5.0" selected>5.0 mg</option>
             <option value="7.5">7.5 mg</option>
             <option value="10.0">10.0 mg</option>
+            <option value="12.5">12.5 mg</option>
+            <option value="15.0">15.0 mg</option>
           </select>
         </div>
       </div>
-      <button class="action-btn btn-blue" onclick="addDose()">新增打針紀錄</button>
+      <button class="ios-btn ios-btn-blue" onclick="addDose()">儲存打針紀錄</button>
     </div>
 
-    <!-- 體重表單 -->
+    <!-- Weight Form -->
     <div id="formWeight" style="display:none;">
       <div class="form-grid">
-        <div><label>日期</label><input type="date" id="weightDate"></div>
-        <div><label>體重 (kg)</label><input type="number" step="0.01" id="weightVal" placeholder="例: 98.35"></div>
+        <div class="input-group">
+          <label>測量日期</label>
+          <input type="date" id="weightDate">
+        </div>
+        <div class="input-group">
+          <label>當天體重 (kg)</label>
+          <input type="number" step="0.01" id="weightVal" placeholder="例如 78.5">
+        </div>
       </div>
-      <button class="action-btn btn-green" onclick="addWeight()">儲存體重紀錄</button>
+      <button class="ios-btn ios-btn-green" onclick="addWeight()">儲存體重紀錄</button>
     </div>
 
-    <!-- 副作用表單 -->
+    <!-- Side Effect Form -->
     <div id="formSide" style="display:none;">
-      <label style="margin-bottom:8px;">點擊選擇今日體感：</label>
-      <div class="tag-grid">
-        <button class="tag-btn" onclick="toggleTag(this, '胃脹/排空慢')">🤢 胃脹排空慢</button>
-        <button class="tag-btn" onclick="toggleTag(this, '餐後頭痛')">🤕 餐後頭痛</button>
-        <button class="tag-btn" onclick="toggleTag(this, '食慾極低')">🤐 食慾極低</button>
-        <button class="tag-btn" onclick="toggleTag(this, '輕微飢餓')">😋 輕微飢餓</button>
-        <button class="tag-btn" onclick="toggleTag(this, '精神充沛')">⚡ 精神充沛</button>
-        <button class="tag-btn" onclick="toggleTag(this, '需多補水')">💧 需多補水</button>
+      <label style="display:block; margin-bottom:6px;">選擇今日體感點擊紀錄：</label>
+      <div class="tags-grid">
+        <button class="tag-chip" onclick="toggleTag(this, '🤢 胃脹/排空慢')">🤢 胃脹排空慢</button>
+        <button class="tag-chip" onclick="toggleTag(this, '🤕 餐後頭痛')">🤕 餐後頭痛</button>
+        <button class="tag-chip" onclick="toggleTag(this, '🤐 食慾極低')">🤐 食慾極低</button>
+        <button class="tag-chip" onclick="toggleTag(this, '😋 輕微飢餓')">😋 輕微飢餓</button>
+        <button class="tag-chip" onclick="toggleTag(this, '⚡ 精神充沛')">⚡ 精神充沛</button>
+        <button class="tag-chip" onclick="toggleTag(this, '💧 口乾需補水')">💧 口乾需補水</button>
       </div>
-      <button class="action-btn btn-purple" onclick="saveSide()">儲存體感紀錄</button>
+      <button class="ios-btn ios-btn-purple" onclick="saveSide()">儲存體感日誌</button>
     </div>
   </div>
 
-  <!-- 3. 動態圖表卡片 -->
+  <!-- 3. Dynamic PK Concentration Chart -->
   <div class="card">
-    <div class="sub-text" style="margin-bottom:12px; color:#cccccc; font-weight:600;">📈 血藥濃度趨勢圖</div>
-    <canvas id="cvs"></canvas>
+    <div class="sub-label" style="color:#a1a1aa; margin-bottom:6px;">📈 血藥濃度動態趨勢 (mg)</div>
+    <div class="chart-container">
+      <canvas id="cvs"></canvas>
+    </div>
   </div>
 
-  <!-- 4. 歷史日誌卡片 -->
+  <!-- 4. History Logs Card -->
   <div class="card">
-    <div class="flex-between" style="margin-bottom:10px;">
-      <div class="sub-text" style="color:#cccccc; font-weight:600;">📋 歷史日誌</div>
-      <a href="#" onclick="clearAll()" style="color:#ef4444; font-size:11px; text-decoration:none;">清除全部資料</a>
+    <div class="flex-between" style="margin-bottom:8px;">
+      <div class="sub-label" style="color:#a1a1aa;">📋 歷史紀錄</div>
+      <a href="javascript:void(0)" onclick="clearAll()" style="color:#ff453a; font-size:10px; text-decoration:none; font-weight:600;">清除全部</a>
     </div>
-    <div id="logs"></div>
+    <div class="logs-wrapper" id="logs"></div>
   </div>
 
 </div>
 
 <script>
-  // 設定時間預設值
-  document.getElementById('doseTime').value = new Date().toISOString().slice(0,16);
-  document.getElementById('weightDate').value = new Date().toISOString().slice(0,10);
+  // Setup Default Timestamps
+  const nowStr = new Date().toISOString();
+  document.getElementById('doseTime').value = nowStr.slice(0, 16);
+  document.getElementById('weightDate').value = nowStr.slice(0, 10);
 
   let doses = JSON.parse(localStorage.getItem('mf_doses') || '[]');
   let weights = JSON.parse(localStorage.getItem('mf_weights') || '[]');
@@ -167,18 +369,18 @@
   let selectedTags = [];
 
   function switchTab(t) {
-    ['dose','weight','side'].forEach(x => {
-      document.getElementById('form'+x.charAt(0).toUpperCase()+x.slice(1)).style.display = (x===t)?'block':'none';
-      document.getElementById('tab'+x.charAt(0).toUpperCase()+x.slice(1)).className = 'tab-btn ' + (x===t?'active':'');
+    ['dose', 'weight', 'side'].forEach(x => {
+      document.getElementById('form' + x.charAt(0).toUpperCase() + x.slice(1)).style.display = (x === t) ? 'block' : 'none';
+      document.getElementById('tab' + x.charAt(0).toUpperCase() + x.slice(1)).className = 'segment-btn ' + (x === t ? 'active' : '');
     });
   }
 
   function addDose() {
     let time = document.getElementById('doseTime').value;
     let mg = parseFloat(document.getElementById('doseMg').value);
-    if(!time) return alert('請選擇打針時間');
+    if (!time) return alert('請先選擇打針時間');
     doses.push({ time: new Date(time).getTime(), mg });
-    doses.sort((a,b)=>a.time-b.time);
+    doses.sort((a, b) => a.time - b.time);
     localStorage.setItem('mf_doses', JSON.stringify(doses));
     refresh();
   }
@@ -186,86 +388,90 @@
   function addWeight() {
     let date = document.getElementById('weightDate').value;
     let val = parseFloat(document.getElementById('weightVal').value);
-    if(!date || isNaN(val)) return alert('請輸入完整體重');
-    weights = weights.filter(w=>w.date!==date);
+    if (!date || isNaN(val)) return alert('請輸入正確的體重數字');
+    weights = weights.filter(w => w.date !== date);
     weights.push({ date, val });
-    weights.sort((a,b)=>new Date(a.date)-new Date(b.date));
+    weights.sort((a, b) => new Date(a.date) - new Date(b.date));
     localStorage.setItem('mf_weights', JSON.stringify(weights));
     document.getElementById('weightVal').value = '';
     refresh();
   }
 
   function toggleTag(btn, tag) {
-    if(selectedTags.includes(tag)) {
-      selectedTags = selectedTags.filter(x=>x!==tag);
-      btn.classList.remove('selected');
+    if (selectedTags.includes(tag)) {
+      selectedTags = selectedTags.filter(x => x !== tag);
+      btn.classList.remove('active');
     } else {
       selectedTags.push(tag);
-      btn.classList.add('selected');
+      btn.classList.add('active');
     }
   }
 
   function saveSide() {
-    if(selectedTags.length===0) return alert('請先選擇體感標籤');
-    let date = new Date().toISOString().slice(0,10);
-    sides = sides.filter(s=>s.date!==date);
+    if (selectedTags.length === 0) return alert('請先選擇至少一個體感標籤');
+    let date = new Date().toISOString().slice(0, 10);
+    sides = sides.filter(s => s.date !== date);
     sides.push({ date, tags: [...selectedTags] });
     localStorage.setItem('mf_sides', JSON.stringify(sides));
-    alert('今日體感已儲存！');
+    alert('體感紀錄已成功儲存！');
     refresh();
   }
 
   function clearAll() {
-    if(confirm('確定要清除所有資料嗎？')) { 
-      localStorage.clear(); doses=[]; weights=[]; sides=[]; refresh(); 
+    if (confirm('確定要清除所有資料嗎？此動作無法復原。')) {
+      localStorage.clear(); doses = []; weights = []; sides = []; refresh();
     }
   }
 
-  // 原生 Canvas 繪圖 Engine
+  // Native Canvas High-DPI Chart Engine
   function drawCanvasChart(data) {
     let cvs = document.getElementById('cvs');
     let ctx = cvs.getContext('2d');
-    let w = cvs.width = cvs.offsetWidth * 2; // 高解析度適應 Retina
-    let h = cvs.height = cvs.offsetHeight * 2;
-    ctx.scale(2, 2);
-    let rw = w / 2, rh = h / 2;
+    
+    let dpr = window.devicePixelRatio || 2;
+    let w = cvs.offsetWidth;
+    let h = cvs.offsetHeight;
+    
+    cvs.width = w * dpr;
+    cvs.height = h * dpr;
+    ctx.scale(dpr, dpr);
 
-    ctx.clearRect(0,0,rw,rh);
+    ctx.clearRect(0, 0, w, h);
 
-    if(data.length < 2) {
-      ctx.fillStyle = '#555555'; 
+    if (data.length < 2) {
+      ctx.fillStyle = '#636366'; 
       ctx.font = '12px -apple-system, sans-serif';
-      ctx.fillText('新增打針紀錄後，此處將顯示動態藥量曲線', 20, rh/2);
+      ctx.fillText('輸入第一筆打針紀錄後，此處將自動產生動態曲線', 10, h / 2);
       return;
     }
 
-    let maxVal = Math.max(...data.map(d=>d.v), 10);
+    let maxVal = Math.max(...data.map(d => d.v), 10);
 
-    // 繪製漸層面積
-    let grad = ctx.createLinearGradient(0, 0, 0, rh);
-    grad.addColorStop(0, 'rgba(96, 165, 250, 0.35)');
-    grad.addColorStop(1, 'rgba(96, 165, 250, 0.0)');
+    // Gradient Fill Under Curve
+    let grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, 'rgba(100, 210, 255, 0.35)');
+    grad.addColorStop(1, 'rgba(100, 210, 255, 0.0)');
 
     ctx.beginPath();
     data.forEach((d, i) => {
-      let x = (i / (data.length - 1)) * (rw - 20) + 10;
-      let y = rh - 20 - (d.v / maxVal) * (rh - 40);
-      if(i===0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      let x = (i / (data.length - 1)) * (w - 20) + 10;
+      let y = h - 12 - (d.v / maxVal) * (h - 24);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     });
-    ctx.lineTo(rw - 10, rh - 20);
-    ctx.lineTo(10, rh - 20);
+    ctx.lineTo(w - 10, h - 12);
+    ctx.lineTo(10, h - 12);
     ctx.closePath();
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // 繪製折線
+    // Sharp Smooth Blue Line
     ctx.beginPath();
-    ctx.strokeStyle = '#60a5fa'; 
+    ctx.strokeStyle = '#64d2ff'; 
     ctx.lineWidth = 2.5;
     data.forEach((d, i) => {
-      let x = (i / (data.length - 1)) * (rw - 20) + 10;
-      let y = rh - 20 - (d.v / maxVal) * (rh - 40);
-      if(i===0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      let x = (i / (data.length - 1)) * (w - 20) + 10;
+      let y = h - 12 - (d.v / maxVal) * (h - 24);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     });
     ctx.stroke();
   }
@@ -274,38 +480,45 @@
     let current = 0;
     let chartData = [];
 
-    if(doses.length > 0) {
+    if (doses.length > 0) {
       let now = Date.now();
-      let k = Math.log(2) / 120; // 5天半衰期 (120小時)
+      let k = Math.log(2) / 120; // Half-life = 5 days (120 hrs)
       let start = doses[0].time;
-      let end = now + 7*24*3600*1000;
+      let end = now + 7 * 24 * 3600 * 1000; // Forecast 7 days ahead
 
-      for(let t=start; t<=end; t+=12*3600*1000) {
+      for (let t = start; t <= end; t += 12 * 3600 * 1000) {
         let level = 0;
-        doses.forEach(d=>{
-          if(t>=d.time) {
-            let hrs = (t-d.time)/(3600*1000);
-            level += d.mg * ((hrs<24)? (hrs/24)*Math.exp(-k*hrs) : Math.exp(-k*hrs));
+        doses.forEach(d => {
+          if (t >= d.time) {
+            let hrs = (t - d.time) / (3600 * 1000);
+            level += d.mg * ((hrs < 24) ? (hrs / 24) * Math.exp(-k * hrs) : Math.exp(-k * hrs));
           }
         });
         chartData.push({ t, v: level });
-        if(Math.abs(t-now) < 6*3600*1000) current = level.toFixed(2);
+        if (Math.abs(t - now) < 6 * 3600 * 1000) current = level.toFixed(2);
       }
     }
 
     document.getElementById('currentLevel').innerText = current + ' mg';
     drawCanvasChart(chartData);
 
-    // 渲染歷史日誌
+    // Render Log Cards
     let h = '';
-    doses.forEach(d=> h+=`<div class="log-item"><span>💉 打針: ${new Date(d.time).toLocaleDateString()}</span><span style="color:#60a5fa; font-weight:bold;">${d.mg} mg</span></div>`);
-    weights.forEach(w=> h+=`<div class="log-item"><span>⚖️ 體重: ${w.date}</span><span style="color:#34d399; font-weight:bold;">${w.val} kg</span></div>`);
-    sides.forEach(s=> h+=`<div class="log-item"><span>🩹 體感: ${s.date}</span><span style="color:#c084fc;">${s.tags.join(', ')}</span></div>`);
-    document.getElementById('logs').innerHTML = h || '<div style="color:#555555; text-align:center; padding:10px;">尚無紀錄</div>';
+    doses.forEach(d => h += `<div class="log-card"><span class="log-date">💉 打針: ${new Date(d.time).toLocaleDateString('zh-TW', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'})}</span><span class="log-val-blue">${d.mg} mg</span></div>`);
+    weights.forEach(w => h += `<div class="log-card"><span class="log-date">⚖️ 體重: ${w.date}</span><span class="log-val-green">${w.val} kg</span></div>`);
+    sides.forEach(s => h += `<div class="log-card"><span class="log-date">🩹 體感: ${s.date}</span><span class="log-val-purple">${s.tags.join(', ')}</span></div>`);
+    document.getElementById('logs').innerHTML = h || '<div style="color:#636366; text-align:center; padding:8px; font-size:11px;">尚無紀錄</div>';
   }
 
+  window.addEventListener('resize', refresh);
   refresh();
 </script>
 
 </body>
-</html>
+</html>"""
+
+# Save file directly
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print("iPhone Native index.html updated successfully.")
