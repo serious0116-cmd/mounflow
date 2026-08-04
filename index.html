@@ -3,13 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MOUNFLOW v4.7</title>
+  <title>MOUNFLOW v5.0</title>
 
   <!-- iOS PWA Options -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="MOUNFLOW">
   <meta name="theme-color" content="#000000">
+
+  <!-- 引入穩定高相容性的 Chart.js 庫 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -116,19 +119,8 @@
     }
     .tag-chip.active { background: rgba(88, 86, 214, 0.4); border-color: #5e5ce6; color: #fff; box-shadow: 0 0 10px rgba(94, 92, 230, 0.3); }
 
-    /* 圖表區 */
-    .chart-header { display: flex; flex-direction: column; gap: 8px; margin-bottom: 6px; }
-    .chart-legend-grid { display: flex; flex-wrap: wrap; gap: 6px; font-size: 10px; font-weight: 700; }
-    .legend-tag {
-      padding: 4px 8px; border-radius: 8px; background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s ease;
-      display: flex; align-items: center; gap: 4px; color: #8e8e93;
-    }
-    .legend-tag.active { color: #fff; border-color: currentColor; background: rgba(255,255,255,0.12); }
-    .legend-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
-
-    .chart-container { width: 100%; height: 200px; position: relative; margin-top: 4px; }
-    canvas { width: 100% !important; height: 100% !important; display: block; }
+    /* Chart.js 容器 */
+    .chart-container { width: 100%; height: 220px; position: relative; margin-top: 8px; }
 
     /* 歷史紀錄與篩選 */
     .filter-bar { display: flex; gap: 6px; margin-bottom: 12px; }
@@ -178,7 +170,7 @@
   <div class="glass-card">
     <div class="flex-between">
       <div class="brand-title">MOUNFLOW</div>
-      <span class="version-badge" onclick="forceReload()" title="點擊刷頁">v4.7</span>
+      <span class="version-badge" onclick="forceReload()" title="點擊刷頁">v5.0</span>
     </div>
     <div class="data-grid">
       <div class="data-box">
@@ -204,7 +196,7 @@
       <button class="segment-btn" onclick="switchTab('side')" id="tabSide">體感</button>
     </div>
 
-    <!-- 打針與藥劑設定 Form -->
+    <!-- 打針與藥劑 Form -->
     <div id="formDose">
       <div class="form-grid">
         <div class="input-group">
@@ -342,30 +334,13 @@
     </div>
   </div>
 
-  <!-- 3. 動態圖表區 -->
+  <!-- 3. 動態圖表區 (Chart.js) -->
   <div class="glass-card">
-    <div class="chart-header">
-      <div class="sub-label">📈 動態趨勢對比 (點擊開關線條)</div>
-      <div class="chart-legend-grid">
-        <div class="legend-tag active" style="color:#64d2ff;" onclick="toggleLine('pk', this)">
-          <span class="legend-dot" style="background:#64d2ff;"></span>血藥(mg)
-        </div>
-        <div class="legend-tag active" style="color:#30d158;" onclick="toggleLine('weight', this)">
-          <span class="legend-dot" style="background:#30d158;"></span>體重(kg)
-        </div>
-        <div class="legend-tag active" style="color:#ff9f0a;" onclick="toggleLine('pFat', this)">
-          <span class="legend-dot" style="background:#ff9f0a;"></span>體脂率(%)
-        </div>
-        <div class="legend-tag active" style="color:#bf5af2;" onclick="toggleLine('mMuscle', this)">
-          <span class="legend-dot" style="background:#bf5af2;"></span>肌肉量(kg)
-        </div>
-        <div class="legend-tag active" style="color:#ff453a;" onclick="toggleLine('vfatArea', this)">
-          <span class="legend-dot" style="background:#ff453a;"></span>內臟脂肪
-        </div>
-      </div>
+    <div class="flex-between">
+      <div class="sub-label">📈 動態趨勢對比 (點擊上方圖例可隱藏/顯示線條)</div>
     </div>
     <div class="chart-container">
-      <canvas id="cvs"></canvas>
+      <canvas id="chartCanvas"></canvas>
     </div>
   </div>
 
@@ -395,7 +370,8 @@
 </div>
 
 <script>
-  const APP_VERSION = "4.7";
+  const APP_VERSION = "5.0";
+  let myChart = null;
   
   function forceReload() {
     window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
@@ -410,15 +386,6 @@
   let sides = JSON.parse(localStorage.getItem('mf_sides') || '[]');
   let selectedTags = [];
   let currentLogFilter = 'all';
-
-  let lineVisible = { pk: true, weight: true, pFat: true, mMuscle: true, vfatArea: true };
-
-  function toggleLine(key, el) {
-    lineVisible[key] = !lineVisible[key];
-    if(lineVisible[key]) el.classList.add('active');
-    else el.classList.remove('active');
-    refresh();
-  }
 
   function switchTab(t) {
     ['dose', 'weight', 'side'].forEach(x => {
@@ -533,42 +500,8 @@
     renderLogs();
   }
 
-  function addCalendarReminder() {
-    if (doses.length === 0) return alert('請先新增至少一筆打針紀錄');
-    let lastDose = doses[doses.length - 1];
-    let nextTime = new Date(lastDose.time + 7 * 24 * 3600 * 1000);
-    let formatTime = (date) => date.toISOString().replace(/-|:|\.\d+/g, '');
-    let startTime = formatTime(nextTime);
-    let endTime = formatTime(new Date(nextTime.getTime() + 30 * 60 * 1000));
-
-    let icsContent = 
-`BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//MOUNFLOW//v${APP_VERSION}//EN
-BEGIN:VEVENT
-SUMMARY:MOUNFLOW 打針提醒 (${lastDose.mg}mg)
-DESCRIPTION:每週 Tirzepatide 劑量施打提醒。
-DTSTART:${startTime}
-DTEND:${endTime}
-BEGIN:VALARM
-TRIGGER:-PT15M
-ACTION:DISPLAY
-DESCRIPTION:提醒
-END:VALARM
-END:VEVENT
-END:VCALENDAR`;
-
-    let blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-    let link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.setAttribute('download', 'mounflow_reminder.ics');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-
   function calculatePKData() {
-    if (doses.length === 0) return { chartData: [], current: '0.00', trough: '0.00', daysNext: '--', penRemainStr: '-- mg' };
+    if (doses.length === 0) return { labels: [], pkValues: [], current: '0.00', trough: '0.00', daysNext: '--', penRemainStr: '-- mg' };
 
     const ka = 0.04;
     const ke = 0.00578;
@@ -592,11 +525,12 @@ END:VCALENDAR`;
 
     const end = Math.max(now, nextDoseTime) + 3 * 24 * 3600 * 1000;
 
-    let chartData = [];
+    let labels = [];
+    let pkValues = [];
     let current = 0;
     let trough = 999;
 
-    for (let t = start; t <= end; t += 6 * 3600 * 1000) {
+    for (let t = start; t <= end; t += 12 * 3600 * 1000) { // 每 12 小時一個點
       let level = 0;
       doses.forEach(d => {
         if (t >= d.time) {
@@ -606,127 +540,128 @@ END:VCALENDAR`;
         }
       });
 
-      chartData.push({ t, v: level });
+      let d = new Date(t);
+      labels.push(`${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:00`);
+      pkValues.push(level.toFixed(2));
 
-      if (Math.abs(t - now) < 3 * 3600 * 1000) current = level;
+      if (Math.abs(t - now) < 6 * 3600 * 1000) current = level;
       if (t > now && level < trough) trough = level;
     }
 
-    return { chartData, current: current.toFixed(2), trough: trough === 999 ? '0.00' : trough.toFixed(2), daysNext, penRemainStr };
+    return { labels, pkValues, current: current.toFixed(2), trough: trough === 999 ? '0.00' : trough.toFixed(2), daysNext, penRemainStr };
   }
 
-  function drawCanvasChart(pkResult) {
-    let cvs = document.getElementById('cvs');
-    let ctx = cvs.getContext('2d');
-    let dpr = window.devicePixelRatio || 2;
-    let w = cvs.offsetWidth, h = cvs.offsetHeight;
-    
-    cvs.width = w * dpr; cvs.height = h * dpr;
-    ctx.scale(dpr, dpr);
-    ctx.clearRect(0, 0, w, h);
+  // 使用 Chart.js 渲染圖表，確保 100% 能顯示
+  function updateChart(pkData) {
+    const ctx = document.getElementById('chartCanvas').getContext('2d');
 
-    let data = pkResult.chartData;
+    // 配對體組成數據點到 X 軸時間
+    let weightSeries = new Array(pkData.labels.length).fill(null);
+    let fatSeries = new Array(pkData.labels.length).fill(null);
+    let muscleSeries = new Array(pkData.labels.length).fill(null);
+    let vfatSeries = new Array(pkData.labels.length).fill(null);
 
-    if (doses.length === 0 && weights.length === 0) {
-      ctx.fillStyle = '#8e8e93'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('輸入打針或體組成紀錄後將自動繪製曲線', w / 2, h / 2);
-      return;
+    weights.forEach(w => {
+      let wDateStr = new Date(w.time || w.date).toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' });
+      let index = pkData.labels.findIndex(lbl => lbl.startsWith(wDateStr));
+      if (index !== -1) {
+        weightSeries[index] = w.val;
+        if (w.extra) {
+          if (w.extra.pFat) fatSeries[index] = w.extra.pFat;
+          if (w.extra.mMuscle) muscleSeries[index] = w.extra.mMuscle;
+          if (w.extra.vfatArea) vfatSeries[index] = w.extra.vfatArea;
+        }
+      }
+    });
+
+    if (myChart) {
+      myChart.destroy();
     }
 
-    const paddingLeft = 30;
-    const paddingRight = 10;
-    const paddingTop = 15;
-    const paddingBottom = 22;
-    const chartW = w - paddingLeft - paddingRight;
-    const chartH = h - paddingTop - paddingBottom;
-
-    let minT = data.length > 0 ? data[0].t : (weights.length > 0 ? weights[0].time : Date.now());
-    let maxT = data.length > 0 ? data[data.length - 1].t : (weights.length > 0 ? weights[weights.length - 1].time : Date.now());
-
-    ctx.font = '9px -apple-system, sans-serif';
-    ctx.fillStyle = '#71717a';
-    ctx.textAlign = 'center';
-    let labelStep = Math.max(1, Math.floor(data.length / 4));
-    for (let i = 0; i < data.length; i += labelStep) {
-      let x = paddingLeft + (i / Math.max(1, data.length - 1)) * chartW;
-      let d = new Date(data[i].t);
-      let dateLabel = `${d.getMonth() + 1}/${d.getDate()}`;
-      ctx.fillText(dateLabel, x, h - 5);
-    }
-
-    if (lineVisible.pk && data.length > 0) {
-      let maxVal = Math.max(...data.map(d => d.v), 5);
-
-      let grad = ctx.createLinearGradient(0, paddingTop, 0, h - paddingBottom);
-      grad.addColorStop(0, 'rgba(100, 210, 255, 0.35)');
-      grad.addColorStop(1, 'rgba(100, 210, 255, 0.0)');
-
-      ctx.beginPath();
-      data.forEach((d, i) => {
-        let x = paddingLeft + (i / (data.length - 1)) * chartW;
-        let y = paddingTop + chartH * (1 - (d.v / maxVal));
-        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      });
-      ctx.lineTo(paddingLeft + chartW, paddingTop + chartH);
-      ctx.lineTo(paddingLeft, paddingTop + chartH);
-      ctx.closePath();
-      ctx.fillStyle = grad; ctx.fill();
-
-      ctx.beginPath();
-      ctx.strokeStyle = '#64d2ff'; ctx.lineWidth = 2.2;
-      data.forEach((d, i) => {
-        let x = paddingLeft + (i / (data.length - 1)) * chartW;
-        let y = paddingTop + chartH * (1 - (d.v / maxVal));
-        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      });
-      ctx.stroke();
-    }
-
-    function drawMetricLine(key, color, isDash = true) {
-      let validItems = weights.filter(w => {
-        let wtTime = w.time || new Date(w.date).getTime();
-        let val = (key === 'weight') ? w.val : (w.extra ? w.extra[key] : null);
-        return wtTime >= minT && wtTime <= maxT && val !== null && val !== undefined;
-      });
-
-      if (validItems.length === 0) return;
-
-      let vals = validItems.map(w => (key === 'weight') ? w.val : w.extra[key]);
-      let minV = Math.min(...vals) * 0.95;
-      let maxV = Math.max(...vals) * 1.05;
-      if (minV === maxV) { minV -= 1; maxV += 1; }
-
-      ctx.beginPath();
-      ctx.strokeStyle = color; ctx.lineWidth = 1.8;
-      if (isDash) ctx.setLineDash([4, 4]); else ctx.setLineDash([]);
-
-      let first = true;
-      validItems.forEach(wItem => {
-        let wtTime = wItem.time || new Date(wItem.date).getTime();
-        let val = (key === 'weight') ? wItem.val : wItem.extra[key];
-        let x = paddingLeft + ((wtTime - minT) / Math.max(1, maxT - minT)) * chartW;
-        let y = paddingTop + chartH * (1 - ((val - minV) / (maxV - minV)));
-        if (first) { ctx.moveTo(x, y); first = false; } else { ctx.lineTo(x, y); }
-      });
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      validItems.forEach(wItem => {
-        let wtTime = wItem.time || new Date(wItem.date).getTime();
-        let val = (key === 'weight') ? wItem.val : wItem.extra[key];
-        let x = paddingLeft + ((wtTime - minT) / Math.max(1, maxT - minT)) * chartW;
-        let y = paddingTop + chartH * (1 - ((val - minV) / (maxV - minV)));
-        ctx.beginPath();
-        ctx.arc(x, y, 3, 0, Math.PI * 2);
-        ctx.fillStyle = color;
-        ctx.fill();
-      });
-    }
-
-    if (lineVisible.weight) drawMetricLine('weight', '#30d158', true);
-    if (lineVisible.pFat) drawMetricLine('pFat', '#ff9f0a', false);
-    if (lineVisible.mMuscle) drawMetricLine('mMuscle', '#bf5af2', false);
-    if (lineVisible.vfatArea) drawMetricLine('vfatArea', '#ff453a', true);
+    myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: pkData.labels,
+        datasets: [
+          {
+            label: '血藥濃度 (mg)',
+            data: pkData.pkValues,
+            borderColor: '#64d2ff',
+            backgroundColor: 'rgba(100, 210, 255, 0.15)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            yAxisID: 'y'
+          },
+          {
+            label: '體重 (kg)',
+            data: weightSeries,
+            borderColor: '#30d158',
+            backgroundColor: '#30d158',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            spanGaps: true,
+            yAxisID: 'y1'
+          },
+          {
+            label: '體脂率 (%)',
+            data: fatSeries,
+            borderColor: '#ff9f0a',
+            backgroundColor: '#ff9f0a',
+            borderWidth: 2,
+            spanGaps: true,
+            yAxisID: 'y1'
+          },
+          {
+            label: '肌肉量 (kg)',
+            data: muscleSeries,
+            borderColor: '#bf5af2',
+            backgroundColor: '#bf5af2',
+            borderWidth: 2,
+            spanGaps: true,
+            yAxisID: 'y1'
+          },
+          {
+            label: '內臟脂肪 (cm²)',
+            data: vfatSeries,
+            borderColor: '#ff453a',
+            backgroundColor: '#ff453a',
+            borderWidth: 2,
+            spanGaps: true,
+            yAxisID: 'y1'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            display: true,
+            labels: { color: '#8e8e93', font: { size: 10 } }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#71717a', font: { size: 9 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 5 },
+            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+          },
+          y: {
+            type: 'linear', display: true, position: 'left',
+            title: { display: true, text: '血藥 (mg)', color: '#64d2ff', font: { size: 9 } },
+            ticks: { color: '#64d2ff', font: { size: 9 } },
+            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+          },
+          y1: {
+            type: 'linear', display: true, position: 'right',
+            title: { display: true, text: '體組成數值', color: '#30d158', font: { size: 9 } },
+            ticks: { color: '#30d158', font: { size: 9 } },
+            grid: { drawOnChartArea: false }
+          }
+        }
+      }
+    });
   }
 
   function renderLogs() {
@@ -819,7 +754,7 @@ END:VCALENDAR`;
       document.getElementById('lastSiteTip').innerText = `注射部位 (上次: ${last.site || '無'})`;
     }
 
-    drawCanvasChart(pk);
+    updateChart(pk);
     renderLogs();
   }
 
