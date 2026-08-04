@@ -3,16 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MOUNFLOW v5.0</title>
+  <title>MOUNFLOW v5.1</title>
 
-  <!-- iOS PWA Options -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="MOUNFLOW">
   <meta name="theme-color" content="#000000">
-
-  <!-- 引入穩定高相容性的 Chart.js 庫 -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -46,23 +42,15 @@
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
     
     .brand-title {
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: 2.5px;
+      font-size: 20px; font-weight: 900; letter-spacing: 2.5px;
       background: linear-gradient(135deg, #ffffff 30%, #a1a1aa 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-transform: uppercase;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase;
     }
     
     .version-badge {
-      font-size: 9px; font-weight: 800;
-      background: linear-gradient(135deg, rgba(96, 165, 250, 0.25), rgba(168, 85, 247, 0.25));
-      color: #60a5fa; padding: 3px 9px; border-radius: 20px;
-      border: 1px solid rgba(96, 165, 250, 0.35);
-      box-shadow: 0 0 12px rgba(96, 165, 250, 0.15);
+      font-size: 9px; font-weight: 800; background: linear-gradient(135deg, rgba(96, 165, 250, 0.25), rgba(168, 85, 247, 0.25));
+      color: #60a5fa; padding: 3px 9px; border-radius: 20px; border: 1px solid rgba(96, 165, 250, 0.35);
       cursor: pointer; transition: transform 0.15s ease, opacity 0.15s ease;
-      letter-spacing: 0.5px;
     }
     .version-badge:active { transform: scale(0.92); opacity: 0.7; }
     
@@ -70,11 +58,7 @@
 
     /* 數據格 */
     .data-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
-    .data-box {
-      background: rgba(10, 10, 12, 0.6);
-      padding: 10px 6px; border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.05); text-align: center;
-    }
+    .data-box { background: rgba(10, 10, 12, 0.6); padding: 10px 6px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.05); text-align: center; }
     .data-val { font-size: 17px; font-weight: 900; letter-spacing: -0.5px; margin-top: 4px; }
     .color-blue { color: #64d2ff; text-shadow: 0 0 10px rgba(100, 210, 255, 0.25); }
     .color-green { color: #30d158; text-shadow: 0 0 10px rgba(48, 209, 88, 0.25); }
@@ -82,14 +66,8 @@
     .color-orange { color: #ff9f0a; text-shadow: 0 0 10px rgba(255, 159, 10, 0.25); }
 
     /* Segmented Control */
-    .segmented-control {
-      display: flex; background: rgba(10, 10, 12, 0.7); border-radius: 14px; padding: 3px; margin-bottom: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    .segment-btn {
-      flex: 1; padding: 8px 0; font-size: 11.5px; font-weight: 700; color: #8e8e93;
-      background: transparent; border: none; border-radius: 11px; cursor: pointer; transition: all 0.2s ease;
-    }
+    .segmented-control { display: flex; background: rgba(10, 10, 12, 0.7); border-radius: 14px; padding: 3px; margin-bottom: 12px; border: 1px solid rgba(255, 255, 255, 0.06); }
+    .segment-btn { flex: 1; padding: 8px 0; font-size: 11.5px; font-weight: 700; color: #8e8e93; background: transparent; border: none; border-radius: 11px; cursor: pointer; transition: all 0.2s ease; }
     .segment-btn.active { background: rgba(255, 255, 255, 0.12); color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
 
     /* 表單 */
@@ -97,98 +75,71 @@
     .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px; }
     .input-group { display: flex; flex-direction: column; gap: 4px; }
     label { font-size: 10px; color: #8e8e93; font-weight: 600; }
-    input, select {
-      width: 100%; background: rgba(255, 255, 255, 0.06); color: #fff; border: 1px solid rgba(255,255,255,0.12);
-      padding: 10px 10px; border-radius: 12px; font-size: 12.5px; font-weight: 600; outline: none;
-      -webkit-appearance: none;
-    }
+    input, select { width: 100%; background: rgba(255, 255, 255, 0.06); color: #fff; border: 1px solid rgba(255,255,255,0.12); padding: 10px 10px; border-radius: 12px; font-size: 12.5px; font-weight: 600; outline: none; -webkit-appearance: none; }
 
-    .ios-btn {
-      width: 100%; padding: 13px; border-radius: 16px; border: none; font-size: 13.5px; font-weight: 800; color: #fff;
-      cursor: pointer; transition: transform 0.1s ease, opacity 0.15s ease;
-    }
+    .ios-btn { width: 100%; padding: 13px; border-radius: 16px; border: none; font-size: 13.5px; font-weight: 800; color: #fff; cursor: pointer; transition: transform 0.1s ease, opacity 0.15s ease; }
     .ios-btn-blue { background: linear-gradient(135deg, #007aff, #0056b3); box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3); }
     .ios-btn-green { background: linear-gradient(135deg, #34c759, #28a745); box-shadow: 0 4px 15px rgba(52, 199, 89, 0.3); }
     .ios-btn-purple { background: linear-gradient(135deg, #af52de, #8e44ad); box-shadow: 0 4px 15px rgba(175, 82, 222, 0.3); }
-    .ios-btn:active { transform: scale(0.98); opacity: 0.85; }
+    .ios-btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 12px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .ios-btn:active, .ios-btn-secondary:active { transform: scale(0.98); opacity: 0.85; }
 
     .tags-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
-    .tag-chip {
-      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.08); color: #d1d1d6;
-      padding: 10px 2px; border-radius: 12px; font-size: 11px; font-weight: 600; text-align: center; cursor: pointer;
-    }
+    .tag-chip { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.08); color: #d1d1d6; padding: 10px 2px; border-radius: 12px; font-size: 11px; font-weight: 600; text-align: center; cursor: pointer; }
     .tag-chip.active { background: rgba(88, 86, 214, 0.4); border-color: #5e5ce6; color: #fff; box-shadow: 0 0 10px rgba(94, 92, 230, 0.3); }
 
-    /* Chart.js 容器 */
-    .chart-container { width: 100%; height: 220px; position: relative; margin-top: 8px; }
+    /* SVG 圖表容器 */
+    .svg-chart-wrapper { width: 100%; height: 200px; position: relative; margin-top: 12px; background: rgba(0,0,0,0.2); border-radius: 12px; overflow: hidden; }
+    .svg-chart { width: 100%; height: 100%; display: block; }
+    .chart-labels { position: absolute; bottom: 4px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 12px; font-size: 9px; color: #71717a; pointer-events: none; }
+    
+    .chart-legend-grid { display: flex; flex-wrap: wrap; gap: 6px; font-size: 10px; font-weight: 700; margin-top: 6px; }
+    .legend-tag { padding: 4px 8px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 4px; color: #8e8e93; }
+    .legend-tag.active { color: #fff; border-color: currentColor; background: rgba(255,255,255,0.12); }
+    .legend-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
 
     /* 歷史紀錄與篩選 */
     .filter-bar { display: flex; gap: 6px; margin-bottom: 12px; }
-    .filter-chip {
-      background: rgba(255, 255, 255, 0.05); color: #8e8e93; border: 1px solid rgba(255,255,255,0.06);
-      padding: 5px 12px; border-radius: 10px; font-size: 10.5px; font-weight: 700; cursor: pointer;
-    }
+    .filter-chip { background: rgba(255, 255, 255, 0.05); color: #8e8e93; border: 1px solid rgba(255,255,255,0.06); padding: 5px 12px; border-radius: 10px; font-size: 10.5px; font-weight: 700; cursor: pointer; }
     .filter-chip.active { background: rgba(255, 255, 255, 0.15); color: #fff; }
-
     .logs-wrapper { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; padding-right: 2px; }
-    
-    .log-card {
-      background: rgba(10, 10, 12, 0.5); border: 1px solid rgba(255,255,255,0.08); padding: 11px 14px;
-      border-radius: 14px; display: flex; flex-direction: column; gap: 6px;
-    }
+    .log-card { background: rgba(10, 10, 12, 0.5); border: 1px solid rgba(255,255,255,0.08); padding: 11px 14px; border-radius: 14px; display: flex; flex-direction: column; gap: 6px; }
     .log-header { display: flex; justify-content: space-between; align-items: center; }
     .log-left { display: flex; align-items: center; gap: 8px; }
-    .log-tag {
-      display: inline-block; font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 6px; width: fit-content;
-    }
+    .log-tag { display: inline-block; font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 6px; width: fit-content; }
     .tag-dose { background: rgba(0, 122, 255, 0.25); color: #64d2ff; }
     .tag-weight { background: rgba(52, 199, 89, 0.25); color: #30d158; }
     .tag-side { background: rgba(175, 82, 222, 0.25); color: #bf5af2; }
-
     .log-date { font-size: 11px; color: #8e8e93; font-weight: 500; }
     .log-val { font-size: 13px; font-weight: 800; color: #f1f5f9; }
-    
-    .comp-details-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
-      background: rgba(255,255,255,0.03); padding: 8px; border-radius: 10px;
-      font-size: 10px; color: #a1a1aa; border: 1px solid rgba(255,255,255,0.04);
-    }
+    .comp-details-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 10px; font-size: 10px; color: #a1a1aa; border: 1px solid rgba(255,255,255,0.04); }
     .comp-item span { color: #fff; font-weight: 700; }
-
     .btn-action { background: none; border: none; font-size: 13px; padding: 2px; cursor: pointer; opacity: 0.7; }
-    .btn-action:active { opacity: 1; }
-
+    
     .backup-tools { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
     .btn-tool { flex: 1; background: rgba(255, 255, 255, 0.06); color: #8e8e93; border: 1px solid rgba(255,255,255,0.08); padding: 9px; border-radius: 12px; font-size: 10.5px; font-weight: 700; cursor: pointer; text-align: center; }
+    
+    .pen-active-card { background: rgba(255,159,10,0.15); border: 1px solid rgba(255,159,10,0.3); border-radius: 12px; padding: 12px; margin-bottom: 12px; display: none; }
+    .pen-active-text { color: #ff9f0a; font-size: 11.5px; font-weight: 700; display: flex; justify-content: space-between; }
   </style>
 </head>
 <body>
 
 <div class="app-shell">
-
-  <!-- 1. 儀表板卡片 -->
+  <!-- 儀表板 -->
   <div class="glass-card">
     <div class="flex-between">
       <div class="brand-title">MOUNFLOW</div>
-      <span class="version-badge" onclick="forceReload()" title="點擊刷頁">v5.0</span>
+      <span class="version-badge" onclick="forceReload()">v5.1</span>
     </div>
     <div class="data-grid">
-      <div class="data-box">
-        <div class="sub-label">當前估計血藥</div>
-        <div class="data-val color-blue" id="currentLevel">0.00mg</div>
-      </div>
-      <div class="data-box">
-        <div class="sub-label">針筆剩餘容量</div>
-        <div class="data-val color-orange" id="penRemain">-- mg</div>
-      </div>
-      <div class="data-box">
-        <div class="sub-label">下劑倒數</div>
-        <div class="data-val color-purple" id="nextDoseCountdown">--天</div>
-      </div>
+      <div class="data-box"><div class="sub-label">當前估計血藥</div><div class="data-val color-blue" id="currentLevel">0.00mg</div></div>
+      <div class="data-box"><div class="sub-label">針筆剩餘容量</div><div class="data-val color-orange" id="penRemain">-- mg</div></div>
+      <div class="data-box"><div class="sub-label">下劑倒數</div><div class="data-val color-purple" id="nextDoseCountdown">--天</div></div>
     </div>
   </div>
 
-  <!-- 2. 輸入面板 -->
+  <!-- 輸入面板 -->
   <div class="glass-card">
     <div class="segmented-control">
       <button class="segment-btn active" onclick="switchTab('dose')" id="tabDose">打針與藥劑</button>
@@ -196,13 +147,10 @@
       <button class="segment-btn" onclick="switchTab('side')" id="tabSide">體感</button>
     </div>
 
-    <!-- 打針與藥劑 Form -->
+    <!-- 打針 Form -->
     <div id="formDose">
       <div class="form-grid">
-        <div class="input-group">
-          <label>注射日期時間</label>
-          <input type="datetime-local" id="doseTime">
-        </div>
+        <div class="input-group"><label>注射日期時間</label><input type="datetime-local" id="doseTime"></div>
         <div class="input-group">
           <label>本次施打劑量 (mg)</label>
           <select id="doseMg">
@@ -215,108 +163,62 @@
           </select>
         </div>
       </div>
+      
+      <div class="input-group" style="margin-bottom:10px;"><label id="lastSiteTip">注射部位輪替</label><select id="doseSite"><option value="左腹部">左腹部</option><option value="右腹部">右腹部</option><option value="左大腿">左大腿</option><option value="右大腿">右大腿</option><option value="手臂">手臂</option></select></div>
 
-      <div class="form-grid">
-        <div class="input-group">
-          <label id="lastSiteTip">注射部位輪替</label>
-          <select id="doseSite">
-            <option value="左腹部">左腹部</option>
-            <option value="右腹部">右腹部</option>
-            <option value="左大腿">左大腿</option>
-            <option value="右大腿">右大腿</option>
-            <option value="手臂">手臂</option>
-          </select>
-        </div>
-        <div class="input-group">
-          <label id="lblPenCap">針筆總容量 (含殘劑 mg)</label>
-          <input type="number" step="0.1" id="penTotalCap">
+      <!-- 針筆記憶狀態區 -->
+      <div id="penActiveState" class="pen-active-card">
+        <div class="pen-active-text">
+          <span>💉 正在使用已記憶的針筆</span>
+          <span id="penActiveRemain">剩餘: -- mg</span>
         </div>
       </div>
 
-      <div class="input-group" style="margin-bottom:12px;">
-        <label id="lblPenPrice">藥劑購入價格 (NTD $)</label>
-        <input type="number" step="1" id="penPrice">
+      <div id="penNewInputGroup">
+        <div class="form-grid">
+          <div class="input-group"><label>新針筆總容量 (含殘劑 mg)</label><input type="number" step="0.1" id="penTotalCap" placeholder="例如 50"></div>
+          <div class="input-group"><label>藥劑購入價格 (NTD $)</label><input type="number" step="1" id="penPrice" placeholder="例如 13000"></div>
+        </div>
+        <div style="font-size:10px; color:#a1a1aa; margin-bottom:12px;">*輸入後將自動記憶，直到剩餘容量歸零為止。</div>
       </div>
 
-      <button class="ios-btn ios-btn-blue" onclick="addDose()">新增打針紀錄並扣除容量</button>
+      <button class="ios-btn ios-btn-blue" onclick="addDose()">儲存打針紀錄</button>
     </div>
 
     <!-- 體組成 Form -->
     <div id="formWeight" style="display:none;">
+      <button class="ios-btn-secondary" onclick="document.getElementById('inbodyUpload').click()">
+        📸 上傳 InBody 圖片辨識
+      </button>
+      <input type="file" id="inbodyUpload" accept="image/*" style="display:none;" onchange="processOCR(event)">
+      <div id="ocrStatus" style="font-size:11px; color:#30d158; text-align:center; margin-bottom:10px; font-weight:bold;"></div>
+
       <div class="form-grid" style="margin-bottom:6px;">
-        <div class="input-group">
-          <label>測量日期</label>
-          <input type="date" id="weightDate">
-        </div>
-        <div class="input-group">
-          <label>體重 (kg)</label>
-          <input type="number" step="0.01" id="weightVal">
-        </div>
+        <div class="input-group"><label>測量日期</label><input type="date" id="weightDate"></div>
+        <div class="input-group"><label>體重 (kg)</label><input type="number" step="0.01" id="weightVal"></div>
       </div>
-
       <div class="sub-label" style="margin: 8px 0 6px 0; color:#60a5fa;">📊 診所報告詳細量化數據</div>
-
       <div class="form-grid-3">
-        <div class="input-group">
-          <label>體脂率 (%)</label>
-          <input type="number" step="0.01" id="pFat">
-        </div>
-        <div class="input-group">
-          <label>肌肉質量 (kg)</label>
-          <input type="number" step="0.01" id="mMuscle">
-        </div>
-        <div class="input-group">
-          <label>四肢肌肉 (kg)</label>
-          <input type="number" step="0.01" id="mLimb">
-        </div>
+        <div class="input-group"><label>體脂率 (%)</label><input type="number" step="0.01" id="pFat"></div>
+        <div class="input-group"><label>肌肉質量 (kg)</label><input type="number" step="0.01" id="mMuscle"></div>
+        <div class="input-group"><label>四肢肌肉 (kg)</label><input type="number" step="0.01" id="mLimb"></div>
       </div>
-
       <div class="form-grid-3">
-        <div class="input-group">
-          <label>腿部肌肉 (kg)</label>
-          <input type="number" step="0.01" id="mLeg">
-        </div>
-        <div class="input-group">
-          <label>脂肪質量 (kg)</label>
-          <input type="number" step="0.01" id="mFat">
-        </div>
-        <div class="input-group">
-          <label>儲存脂肪 (kg)</label>
-          <input type="number" step="0.01" id="mStoreFat">
-        </div>
+        <div class="input-group"><label>腿部肌肉 (kg)</label><input type="number" step="0.01" id="mLeg"></div>
+        <div class="input-group"><label>脂肪質量 (kg)</label><input type="number" step="0.01" id="mFat"></div>
+        <div class="input-group"><label>儲存脂肪 (kg)</label><input type="number" step="0.01" id="mStoreFat"></div>
       </div>
-
       <div class="form-grid-3">
-        <div class="input-group">
-          <label>內臟脂肪(cm²)</label>
-          <input type="number" step="0.01" id="vfatArea">
-        </div>
-        <div class="input-group">
-          <label>骨礦物質 (kg)</label>
-          <input type="number" step="0.01" id="mBone">
-        </div>
-        <div class="input-group">
-          <label>骨密度(g/cm²)</label>
-          <input type="number" step="0.01" id="dBone">
-        </div>
+        <div class="input-group"><label>內臟脂肪(cm²)</label><input type="number" step="0.01" id="vfatArea"></div>
+        <div class="input-group"><label>骨礦物質 (kg)</label><input type="number" step="0.01" id="mBone"></div>
+        <div class="input-group"><label>骨密度</label><input type="number" step="0.01" id="dBone"></div>
       </div>
-
       <div class="form-grid-3" style="margin-bottom:12px;">
-        <div class="input-group">
-          <label>BMR (kcal)</label>
-          <input type="number" step="1" id="valBMR">
-        </div>
-        <div class="input-group">
-          <label>BMI</label>
-          <input type="number" step="0.01" id="valBMI">
-        </div>
-        <div class="input-group">
-          <label>ECW/TBW</label>
-          <input type="number" step="0.01" id="valWTR">
-        </div>
+        <div class="input-group"><label>BMR</label><input type="number" step="1" id="valBMR"></div>
+        <div class="input-group"><label>BMI</label><input type="number" step="0.01" id="valBMI"></div>
+        <div class="input-group"><label>水份比</label><input type="number" step="0.01" id="valWTR"></div>
       </div>
-
-      <button class="ios-btn ios-btn-green" onclick="addWeight()">儲存體組成紀錄</button>
+      <button class="ios-btn ios-btn-green" onclick="addWeight()">儲存體組成</button>
     </div>
 
     <!-- 體感 Form -->
@@ -330,17 +232,24 @@
         <button class="tag-chip" onclick="toggleTag(this, '⚡ 精神充沛')">⚡ 精神充沛</button>
         <button class="tag-chip" onclick="toggleTag(this, '💧 口乾需補水')">💧 口乾需補水</button>
       </div>
-      <button class="ios-btn ios-btn-purple" onclick="saveSide()">儲存體感日誌</button>
+      <button class="ios-btn ios-btn-purple" onclick="saveSide()">儲存體感</button>
     </div>
   </div>
 
-  <!-- 3. 動態圖表區 (Chart.js) -->
+  <!-- 3. 原生 SVG 動態圖表 -->
   <div class="glass-card">
-    <div class="flex-between">
-      <div class="sub-label">📈 動態趨勢對比 (點擊上方圖例可隱藏/顯示線條)</div>
+    <div class="sub-label">📈 動態趨勢對比 (純原生繪圖不依賴套件)</div>
+    <div class="chart-legend-grid">
+      <div class="legend-tag active" style="color:#64d2ff;" onclick="toggleLine('pk', this)"><span class="legend-dot" style="background:#64d2ff;"></span>血藥(mg)</div>
+      <div class="legend-tag active" style="color:#30d158;" onclick="toggleLine('weight', this)"><span class="legend-dot" style="background:#30d158;"></span>體重(kg)</div>
+      <div class="legend-tag active" style="color:#ff9f0a;" onclick="toggleLine('pFat', this)"><span class="legend-dot" style="background:#ff9f0a;"></span>體脂率(%)</div>
+      <div class="legend-tag active" style="color:#bf5af2;" onclick="toggleLine('mMuscle', this)"><span class="legend-dot" style="background:#bf5af2;"></span>肌肉(kg)</div>
+      <div class="legend-tag active" style="color:#ff453a;" onclick="toggleLine('vfatArea', this)"><span class="legend-dot" style="background:#ff453a;"></span>內臟脂肪</div>
     </div>
-    <div class="chart-container">
-      <canvas id="chartCanvas"></canvas>
+    
+    <div class="svg-chart-wrapper" id="svgChartWrapper">
+      <svg class="svg-chart" id="svgRender" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+      <div class="chart-labels" id="svgLabels"></div>
     </div>
   </div>
 
@@ -350,43 +259,30 @@
       <div class="sub-label">📋 歷史日誌</div>
       <a href="javascript:void(0)" onclick="clearAll()" style="color:#ff453a; font-size:10.5px; text-decoration:none; font-weight:700;">清空全部</a>
     </div>
-
     <div class="filter-bar">
       <button class="filter-chip active" onclick="setLogFilter('all', this)">全部</button>
       <button class="filter-chip" onclick="setLogFilter('dose', this)">針劑</button>
       <button class="filter-chip" onclick="setLogFilter('weight', this)">體組成</button>
       <button class="filter-chip" onclick="setLogFilter('side', this)">體感</button>
     </div>
-
     <div class="logs-wrapper" id="logs"></div>
-
-    <div class="backup-tools">
-      <button class="btn-tool" onclick="addCalendarReminder()" style="flex:100%; background:rgba(100, 210, 255, 0.1); color:#64d2ff; border-color:rgba(100,210,255,0.2); margin-bottom:4px;">📅 同步下週打針至 iPhone 日曆</button>
-      <button class="btn-tool" onclick="exportData()">📥 匯出 JSON</button>
-      <button class="btn-tool" onclick="importData()">📤 匯入備份</button>
-    </div>
   </div>
-
 </div>
 
 <script>
-  const APP_VERSION = "5.0";
-  let myChart = null;
-  
-  function forceReload() {
-    window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
-  }
-
-  const nowStr = new Date().toISOString();
-  document.getElementById('doseTime').value = nowStr.slice(0, 16);
-  document.getElementById('weightDate').value = nowStr.slice(0, 10);
-
+  // 核心數據
   let doses = JSON.parse(localStorage.getItem('mf_doses') || '[]');
   let weights = JSON.parse(localStorage.getItem('mf_weights') || '[]');
   let sides = JSON.parse(localStorage.getItem('mf_sides') || '[]');
+  let lineVisible = { pk: true, weight: true, pFat: true, mMuscle: true, vfatArea: true };
   let selectedTags = [];
   let currentLogFilter = 'all';
 
+  // 初始化時間
+  document.getElementById('doseTime').value = new Date().toISOString().slice(0, 16);
+  document.getElementById('weightDate').value = new Date().toISOString().slice(0, 10);
+
+  function forceReload() { window.location.reload(true); }
   function switchTab(t) {
     ['dose', 'weight', 'side'].forEach(x => {
       document.getElementById('form' + x.charAt(0).toUpperCase() + x.slice(1)).style.display = (x === t) ? 'block' : 'none';
@@ -394,25 +290,29 @@
     });
   }
 
-  function getActivePenConfig() {
-    for (let i = doses.length - 1; i >= 0; i--) {
-      if (doses[i].penTotalCap && doses[i].penPrice) {
-        return { cap: doses[i].penTotalCap, price: doses[i].penPrice, startIndex: i };
+  // ==== 針筆記憶邏輯 ====
+  function getActivePen() {
+    let cap = 0, price = 0, used = 0, active = false;
+    for (let i = 0; i < doses.length; i++) {
+      if (doses[i].penTotalCap > 0) {
+        cap = doses[i].penTotalCap; price = doses[i].penPrice; used = 0; active = true;
       }
+      used += doses[i].mg;
     }
-    return null;
+    let remain = Math.max(0, cap - used);
+    if (remain <= 0) active = false;
+    return { active, cap, price, remain };
   }
 
   function addDose() {
     let time = document.getElementById('doseTime').value;
     let mg = parseFloat(document.getElementById('doseMg').value);
     let site = document.getElementById('doseSite').value;
-    
-    let activePen = getActivePenConfig();
-    let penTotalCap = parseFloat(document.getElementById('penTotalCap').value) || (activePen ? activePen.cap : null);
-    let penPrice = parseFloat(document.getElementById('penPrice').value) || (activePen ? activePen.price : null);
-
     if (!time) return alert('請選擇打針時間');
+
+    let state = getActivePen();
+    let penTotalCap = state.active ? null : (parseFloat(document.getElementById('penTotalCap').value) || null);
+    let penPrice = state.active ? null : (parseFloat(document.getElementById('penPrice').value) || null);
 
     doses.push({ id: Date.now(), time: new Date(time).getTime(), mg, site, penTotalCap, penPrice });
     doses.sort((a, b) => a.time - b.time);
@@ -420,380 +320,216 @@
     
     document.getElementById('penTotalCap').value = '';
     document.getElementById('penPrice').value = '';
-
     refresh();
   }
 
+  // ==== OCR 圖片辨識邏輯 ====
+  async function processOCR(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const status = document.getElementById('ocrStatus');
+    status.innerText = "⏳ 載入辨識引擎中 (首次較久)...";
+    
+    if (!window.Tesseract) {
+      await new Promise(res => {
+        let s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+        s.onload = res; document.head.appendChild(s);
+      });
+    }
+    status.innerText = "🔍 正在萃取圖片數字，請稍候...";
+    
+    try {
+      const worker = await Tesseract.createWorker('chi_tra+eng');
+      const ret = await worker.recognize(file);
+      await worker.terminate();
+      
+      const txt = ret.data.text.replace(/\s+/g, '');
+      
+      // 透過正則表達式尋找相鄰的數字
+      const match = (pattern) => { let m = txt.match(pattern); return m ? parseFloat(m[1]) : ''; };
+      
+      document.getElementById('weightVal').value = match(/(?:體重|Weight)[^\d]*(\d+\.\d+)/i);
+      document.getElementById('mMuscle').value = match(/(?:骨骼肌|SMM|肌肉)[^\d]*(\d+\.\d+)/i);
+      document.getElementById('pFat').value = match(/(?:體脂肪率|PBF)[^\d]*(\d+\.\d+)/i);
+      document.getElementById('mFat').value = match(/(?:體脂肪重|FatMass)[^\d]*(\d+\.\d+)/i);
+      document.getElementById('valBMI').value = match(/(?:BMI)[^\d]*(\d+\.\d+)/i);
+      
+      status.innerText = "✅ 萃取完成，請檢查欄位數據！";
+      setTimeout(() => status.innerText = "", 5000);
+    } catch(e) {
+      status.innerText = "❌ 辨識失敗，請改用手動輸入或將圖片傳給 AI。";
+    }
+  }
+
+  // ==== 其餘表單儲存 ====
   function addWeight() {
     let date = document.getElementById('weightDate').value;
     let val = parseFloat(document.getElementById('weightVal').value);
-    if (!date || isNaN(val)) return alert('請至少輸入體重數字');
-
+    if (!date || isNaN(val)) return alert('至少需輸入體重數字');
+    
     let extra = {
-      pFat: parseFloat(document.getElementById('pFat').value) || null,
-      mMuscle: parseFloat(document.getElementById('mMuscle').value) || null,
-      mLimb: parseFloat(document.getElementById('mLimb').value) || null,
-      mLeg: parseFloat(document.getElementById('mLeg').value) || null,
-      mFat: parseFloat(document.getElementById('mFat').value) || null,
-      mStoreFat: parseFloat(document.getElementById('mStoreFat').value) || null,
-      vfatArea: parseFloat(document.getElementById('vfatArea').value) || null,
-      mBone: parseFloat(document.getElementById('mBone').value) || null,
-      dBone: parseFloat(document.getElementById('dBone').value) || null,
-      valBMR: parseFloat(document.getElementById('valBMR').value) || null,
-      valBMI: parseFloat(document.getElementById('valBMI').value) || null,
-      valWTR: parseFloat(document.getElementById('valWTR').value) || null
+      pFat: parseFloat(document.getElementById('pFat').value)||null, mMuscle: parseFloat(document.getElementById('mMuscle').value)||null,
+      mLimb: parseFloat(document.getElementById('mLimb').value)||null, mLeg: parseFloat(document.getElementById('mLeg').value)||null,
+      mFat: parseFloat(document.getElementById('mFat').value)||null, mStoreFat: parseFloat(document.getElementById('mStoreFat').value)||null,
+      vfatArea: parseFloat(document.getElementById('vfatArea').value)||null, mBone: parseFloat(document.getElementById('mBone').value)||null,
+      dBone: parseFloat(document.getElementById('dBone').value)||null, valBMR: parseFloat(document.getElementById('valBMR').value)||null,
+      valBMI: parseFloat(document.getElementById('valBMI').value)||null, valWTR: parseFloat(document.getElementById('valWTR').value)||null
     };
-
     weights = weights.filter(w => w.date !== date);
     weights.push({ id: Date.now(), date, val, extra, time: new Date(date).getTime() });
-    weights.sort((a, b) => new Date(a.date) - new Date(b.date));
+    weights.sort((a,b)=>a.time-b.time);
     localStorage.setItem('mf_weights', JSON.stringify(weights));
-    
-    ['pFat','mMuscle','mLimb','mLeg','mFat','mStoreFat','vfatArea','mBone','dBone','valBMR','valBMI','valWTR','weightVal'].forEach(id => {
-      document.getElementById(id).value = '';
-    });
-
     refresh();
   }
 
   function toggleTag(btn, tag) {
-    if (selectedTags.includes(tag)) {
-      selectedTags = selectedTags.filter(x => x !== tag);
-      btn.classList.remove('active');
-    } else {
-      selectedTags.push(tag);
-      btn.classList.add('active');
-    }
+    if (selectedTags.includes(tag)) { selectedTags = selectedTags.filter(x=>x!==tag); btn.classList.remove('active'); }
+    else { selectedTags.push(tag); btn.classList.add('active'); }
   }
-
   function saveSide() {
-    if (selectedTags.length === 0) return alert('請選擇標籤');
+    if (selectedTags.length===0) return alert('請選擇標籤');
     let date = new Date().toISOString().slice(0, 10);
     sides = sides.filter(s => s.date !== date);
     sides.push({ id: Date.now(), date, tags: [...selectedTags], time: Date.now() });
-    localStorage.setItem('mf_sides', JSON.stringify(sides));
-    alert('已儲存體感紀錄！');
-    refresh();
+    localStorage.setItem('mf_sides', JSON.stringify(sides)); refresh();
   }
-
   function deleteLog(type, id) {
-    if(!confirm('確定刪除此筆紀錄？')) return;
+    if(!confirm('確定刪除？')) return;
     if(type==='dose') doses = doses.filter(d=>d.id!==id);
     if(type==='weight') weights = weights.filter(w=>w.id!==id);
     if(type==='side') sides = sides.filter(s=>s.id!==id);
-    localStorage.setItem('mf_doses', JSON.stringify(doses));
-    localStorage.setItem('mf_weights', JSON.stringify(weights));
-    localStorage.setItem('mf_sides', JSON.stringify(sides));
+    localStorage.setItem('mf_doses', JSON.stringify(doses)); localStorage.setItem('mf_weights', JSON.stringify(weights)); localStorage.setItem('mf_sides', JSON.stringify(sides));
     refresh();
   }
+  function clearAll() { if(confirm('確定清空？')){ localStorage.clear(); doses=[]; weights=[]; sides=[]; refresh(); } }
+  function setLogFilter(f, el) { currentLogFilter = f; document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); renderLogs(); }
+  function toggleLine(key, el) { lineVisible[key] = !lineVisible[key]; el.classList.toggle('active'); refresh(); }
 
-  function clearAll() {
-    if (confirm('確定要清空所有數據嗎？')) {
-      localStorage.clear(); doses = []; weights = []; sides = []; refresh();
+  // ==== 純 SVG 繪製邏輯 ====
+  function drawSVGChart() {
+    const svg = document.getElementById('svgRender');
+    const lbl = document.getElementById('svgLabels');
+    svg.innerHTML = ''; lbl.innerHTML = '';
+
+    if(doses.length === 0 && weights.length === 0) {
+      lbl.innerHTML = `<span style="width:100%;text-align:center;margin-top:90px;font-size:12px;">尚無紀錄</span>`;
+      return;
     }
-  }
 
-  function setLogFilter(filter, el) {
-    currentLogFilter = filter;
-    document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
-    el.classList.add('active');
-    renderLogs();
-  }
+    const ka = 0.04, ke = 0.00578, now = Date.now();
+    let startT = doses.length ? doses[0].time : weights[0].time;
+    let endT = doses.length ? (doses[doses.length-1].time + 10*24*3600*1000) : (weights[weights.length-1].time + 24*3600*1000);
+    if (endT < now + 3*24*3600*1000) endT = now + 3*24*3600*1000;
 
-  function calculatePKData() {
-    if (doses.length === 0) return { labels: [], pkValues: [], current: '0.00', trough: '0.00', daysNext: '--', penRemainStr: '-- mg' };
-
-    const ka = 0.04;
-    const ke = 0.00578;
-    const now = Date.now();
-    const start = doses[0].time;
-    const lastDose = doses[doses.length - 1];
-    const nextDoseTime = lastDose.time + 7 * 24 * 3600 * 1000;
-    const diffHours = (nextDoseTime - now) / (3600 * 1000);
-    let daysNext = diffHours > 0 ? (diffHours / 24).toFixed(1) + '天' : '今日應施打';
-
-    let activePen = getActivePenConfig();
-    let penRemainStr = '-- mg';
-    if (activePen) {
-      let usedSum = 0;
-      for (let i = activePen.startIndex; i < doses.length; i++) {
-        usedSum += doses[i].mg;
+    let pkPts = []; let maxPk = 0; let curPk = 0;
+    if (lineVisible.pk && doses.length > 0) {
+      for(let t=startT; t<=endT; t+=6*3600*1000) {
+        let v = 0;
+        doses.forEach(d => { if(t>=d.time){ let hrs=(t-d.time)/3600000; v += Math.max(0, d.mg*(ka/(ka-ke))*(Math.exp(-ke*hrs)-Math.exp(-ka*hrs))); }});
+        pkPts.push({t, v}); if(v>maxPk) maxPk = v;
+        if(Math.abs(t-now)<3*3600*1000) curPk = v;
       }
-      let rem = Math.max(0, activePen.cap - usedSum);
-      penRemainStr = rem.toFixed(1) + ' mg';
     }
+    document.getElementById('currentLevel').innerText = curPk.toFixed(2) + 'mg';
 
-    const end = Math.max(now, nextDoseTime) + 3 * 24 * 3600 * 1000;
-
-    let labels = [];
-    let pkValues = [];
-    let current = 0;
-    let trough = 999;
-
-    for (let t = start; t <= end; t += 12 * 3600 * 1000) { // 每 12 小時一個點
-      let level = 0;
-      doses.forEach(d => {
-        if (t >= d.time) {
-          let hrs = (t - d.time) / (3600 * 1000);
-          let conc = d.mg * (ka / (ka - ke)) * (Math.exp(-ke * hrs) - Math.exp(-ka * hrs));
-          level += Math.max(0, conc);
-        }
+    const renderLine = (pts, color, dash, fill) => {
+      if(!pts.length) return;
+      let minV = Math.min(...pts.map(p=>p.v))*0.95; let maxV = Math.max(...pts.map(p=>p.v))*1.05;
+      if(minV===maxV){ minV-=1; maxV+=1; }
+      
+      let coords = pts.map(p => {
+        let x = ((p.t - startT)/(endT - startT)) * 100;
+        let y = 100 - ((p.v - minV)/(maxV - minV)) * 90 - 5; // 留上下邊距
+        return `${x},${y}`;
       });
 
-      let d = new Date(t);
-      labels.push(`${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:00`);
-      pkValues.push(level.toFixed(2));
+      if(fill && coords.length > 0) {
+        let poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        poly.setAttribute("points", `0,100 ${coords.join(' ')} 100,100`);
+        poly.setAttribute("fill", color.replace('1)', '0.15)'));
+        svg.appendChild(poly);
+      }
 
-      if (Math.abs(t - now) < 6 * 3600 * 1000) current = level;
-      if (t > now && level < trough) trough = level;
+      let line = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      line.setAttribute("points", coords.join(' '));
+      line.setAttribute("fill", "none"); line.setAttribute("stroke", color); line.setAttribute("stroke-width", "2");
+      if(dash) line.setAttribute("stroke-dasharray", "2, 2");
+      svg.appendChild(line);
+
+      // 畫圓點
+      if(pts.length < 50) {
+        pts.forEach(p => {
+          let x = ((p.t - startT)/(endT - startT)) * 100;
+          let y = 100 - ((p.v - minV)/(maxV - minV)) * 90 - 5;
+          let c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+          c.setAttribute("cx", x); c.setAttribute("cy", y); c.setAttribute("r", "1.5");
+          c.setAttribute("fill", color); svg.appendChild(c);
+        });
+      }
+    };
+
+    if(lineVisible.pk && pkPts.length) {
+      let scaledPk = pkPts.map(p => ({ t: p.t, v: p.v })); // PK 基準從 0 開始
+      let pkMax = Math.max(...scaledPk.map(p=>p.v))*1.1 || 5;
+      let coords = scaledPk.map(p => { let x = ((p.t - startT)/(endT - startT))*100; let y = 100 - (p.v/pkMax)*90 - 5; return `${x},${y}`; });
+      let poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      poly.setAttribute("points", `0,100 ${coords.join(' ')} 100,100`); poly.setAttribute("fill", "rgba(100,210,255,0.2)"); svg.appendChild(poly);
+      let line = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      line.setAttribute("points", coords.join(' ')); line.setAttribute("fill", "none"); line.setAttribute("stroke", "#64d2ff"); line.setAttribute("stroke-width", "2"); svg.appendChild(line);
     }
 
-    return { labels, pkValues, current: current.toFixed(2), trough: trough === 999 ? '0.00' : trough.toFixed(2), daysNext, penRemainStr };
-  }
+    const extractWts = (key) => weights.filter(w=>(key==='weight'?w.val:w.extra[key])).map(w=>({t:w.time, v:(key==='weight'?w.val:w.extra[key])}));
+    if(lineVisible.weight) renderLine(extractWts('weight'), '#30d158', true, false);
+    if(lineVisible.pFat) renderLine(extractWts('pFat'), '#ff9f0a', false, false);
+    if(lineVisible.mMuscle) renderLine(extractWts('mMuscle'), '#bf5af2', false, false);
+    if(lineVisible.vfatArea) renderLine(extractWts('vfatArea'), '#ff453a', true, false);
 
-  // 使用 Chart.js 渲染圖表，確保 100% 能顯示
-  function updateChart(pkData) {
-    const ctx = document.getElementById('chartCanvas').getContext('2d');
-
-    // 配對體組成數據點到 X 軸時間
-    let weightSeries = new Array(pkData.labels.length).fill(null);
-    let fatSeries = new Array(pkData.labels.length).fill(null);
-    let muscleSeries = new Array(pkData.labels.length).fill(null);
-    let vfatSeries = new Array(pkData.labels.length).fill(null);
-
-    weights.forEach(w => {
-      let wDateStr = new Date(w.time || w.date).toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' });
-      let index = pkData.labels.findIndex(lbl => lbl.startsWith(wDateStr));
-      if (index !== -1) {
-        weightSeries[index] = w.val;
-        if (w.extra) {
-          if (w.extra.pFat) fatSeries[index] = w.extra.pFat;
-          if (w.extra.mMuscle) muscleSeries[index] = w.extra.mMuscle;
-          if (w.extra.vfatArea) vfatSeries[index] = w.extra.vfatArea;
-        }
-      }
-    });
-
-    if (myChart) {
-      myChart.destroy();
-    }
-
-    myChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: pkData.labels,
-        datasets: [
-          {
-            label: '血藥濃度 (mg)',
-            data: pkData.pkValues,
-            borderColor: '#64d2ff',
-            backgroundColor: 'rgba(100, 210, 255, 0.15)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4,
-            yAxisID: 'y'
-          },
-          {
-            label: '體重 (kg)',
-            data: weightSeries,
-            borderColor: '#30d158',
-            backgroundColor: '#30d158',
-            borderWidth: 2,
-            borderDash: [5, 5],
-            spanGaps: true,
-            yAxisID: 'y1'
-          },
-          {
-            label: '體脂率 (%)',
-            data: fatSeries,
-            borderColor: '#ff9f0a',
-            backgroundColor: '#ff9f0a',
-            borderWidth: 2,
-            spanGaps: true,
-            yAxisID: 'y1'
-          },
-          {
-            label: '肌肉量 (kg)',
-            data: muscleSeries,
-            borderColor: '#bf5af2',
-            backgroundColor: '#bf5af2',
-            borderWidth: 2,
-            spanGaps: true,
-            yAxisID: 'y1'
-          },
-          {
-            label: '內臟脂肪 (cm²)',
-            data: vfatSeries,
-            borderColor: '#ff453a',
-            backgroundColor: '#ff453a',
-            borderWidth: 2,
-            spanGaps: true,
-            yAxisID: 'y1'
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: {
-            display: true,
-            labels: { color: '#8e8e93', font: { size: 10 } }
-          }
-        },
-        scales: {
-          x: {
-            ticks: { color: '#71717a', font: { size: 9 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 5 },
-            grid: { color: 'rgba(255, 255, 255, 0.05)' }
-          },
-          y: {
-            type: 'linear', display: true, position: 'left',
-            title: { display: true, text: '血藥 (mg)', color: '#64d2ff', font: { size: 9 } },
-            ticks: { color: '#64d2ff', font: { size: 9 } },
-            grid: { color: 'rgba(255, 255, 255, 0.05)' }
-          },
-          y1: {
-            type: 'linear', display: true, position: 'right',
-            title: { display: true, text: '體組成數值', color: '#30d158', font: { size: 9 } },
-            ticks: { color: '#30d158', font: { size: 9 } },
-            grid: { drawOnChartArea: false }
-          }
-        }
-      }
-    });
+    // 畫時間標籤
+    let d1 = new Date(startT); let d2 = new Date(endT);
+    lbl.innerHTML = `<span>${d1.getMonth()+1}/${d1.getDate()}</span><span>${d2.getMonth()+1}/${d2.getDate()}</span>`;
   }
 
   function renderLogs() {
     let list = [];
-
-    if(currentLogFilter === 'all' || currentLogFilter === 'dose') {
-      doses.forEach(d => {
-        let costInfo = '';
-        if (d.penPrice && d.penTotalCap) {
-          let costPerMg = d.penPrice / d.penTotalCap;
-          let shotCost = (costPerMg * d.mg).toFixed(0);
-          costInfo = ` | 花費約 $${shotCost}`;
-        }
-        list.push({ type: 'dose', id: d.id, time: d.time, title: '注射針劑', val: `${d.mg}mg (${d.site||'未標記'}${costInfo})`, tagClass: 'tag-dose' });
-      });
-    }
-    if(currentLogFilter === 'all' || currentLogFilter === 'weight') {
-      weights.forEach(w => list.push({ type: 'weight', id: w.id, time: w.time || new Date(w.date).getTime(), title: '體組成測量', val: `${w.val} kg`, extra: w.extra, tagClass: 'tag-weight' }));
-    }
-    if(currentLogFilter === 'all' || currentLogFilter === 'side') {
-      sides.forEach(s => list.push({ type: 'side', id: s.id, time: s.time || new Date(s.date).getTime(), title: '體感記錄', val: s.tags.join(', '), tagClass: 'tag-side' }));
-    }
-
-    list.sort((a,b) => b.time - a.time);
-
-    let h = '';
-    list.forEach(item => {
-      let dateStr = new Date(item.time).toLocaleString('zh-TW', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
-      
-      let extraHtml = '';
-      if (item.type === 'weight' && item.extra) {
-        let ex = item.extra;
-        let items = [];
-        if(ex.pFat) items.push(`<div class="comp-item">體脂率: <span>${ex.pFat}%</span></div>`);
-        if(ex.mMuscle) items.push(`<div class="comp-item">肌肉量: <span>${ex.mMuscle}kg</span></div>`);
-        if(ex.mLimb) items.push(`<div class="comp-item">四肢肌: <span>${ex.mLimb}kg</span></div>`);
-        if(ex.mLeg) items.push(`<div class="comp-item">腿部肌: <span>${ex.mLeg}kg</span></div>`);
-        if(ex.mFat) items.push(`<div class="comp-item">脂肪量: <span>${ex.mFat}kg</span></div>`);
-        if(ex.mStoreFat) items.push(`<div class="comp-item">儲存脂: <span>${ex.mStoreFat}kg</span></div>`);
-        if(ex.vfatArea) items.push(`<div class="comp-item">內臟脂: <span>${ex.vfatArea}cm²</span></div>`);
-        if(ex.mBone) items.push(`<div class="comp-item">骨礦物: <span>${ex.mBone}kg</span></div>`);
-        if(ex.dBone) items.push(`<div class="comp-item">骨密度: <span>${ex.dBone}</span></div>`);
-        if(ex.valBMR) items.push(`<div class="comp-item">BMR: <span>${ex.valBMR}k</span></div>`);
-        if(ex.valBMI) items.push(`<div class="comp-item">BMI: <span>${ex.valBMI}</span></div>`);
-        if(ex.valWTR) items.push(`<div class="comp-item">水份比: <span>${ex.valWTR}</span></div>`);
-        
-        if (items.length > 0) {
-          extraHtml = `<div class="comp-details-grid">${items.join('')}</div>`;
-        }
-      }
-
-      h += `
-        <div class="log-card">
-          <div class="log-header">
-            <div class="log-left">
-              <span class="log-tag ${item.tagClass}">${item.title}</span>
-              <span class="log-date">${dateStr}</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="log-val">${item.val}</span>
-              <button class="btn-action" onclick="deleteLog('${item.type}', ${item.id})">🗑️</button>
-            </div>
-          </div>
-          ${extraHtml}
+    if(currentLogFilter==='all'||currentLogFilter==='dose') doses.forEach(d=>list.push({type:'dose',id:d.id,time:d.time,title:'注射',val:`${d.mg}mg (${d.site||''})`,tagClass:'tag-dose'}));
+    if(currentLogFilter==='all'||currentLogFilter==='weight') weights.forEach(w=>list.push({type:'weight',id:w.id,time:w.time,title:'體組成',val:`${w.val}kg`,tagClass:'tag-weight'}));
+    if(currentLogFilter==='all'||currentLogFilter==='side') sides.forEach(s=>list.push({type:'side',id:s.id,time:s.time,title:'體感',val:s.tags.join(','),tagClass:'tag-side'}));
+    list.sort((a,b)=>b.time-a.time);
+    
+    document.getElementById('logs').innerHTML = list.map(item => `
+      <div class="log-card">
+        <div class="log-header">
+          <div class="log-left"><span class="log-tag ${item.tagClass}">${item.title}</span><span class="log-date">${new Date(item.time).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span></div>
+          <div style="display:flex;gap:8px;"><span class="log-val">${item.val}</span><button class="btn-action" onclick="deleteLog('${item.type}',${item.id})">🗑️</button></div>
         </div>
-      `;
-    });
-
-    document.getElementById('logs').innerHTML = h || '<div style="color:#8e8e93; text-align:center; padding:12px; font-size:11px;">尚無相關紀錄</div>';
+      </div>
+    `).join('') || '<div style="color:#8e8e93;text-align:center;padding:12px;font-size:11px;">尚無紀錄</div>';
   }
 
   function refresh() {
-    let pk = calculatePKData();
-    document.getElementById('currentLevel').innerText = pk.current + 'mg';
-    document.getElementById('troughLevel').innerText = pk.trough + 'mg';
-    document.getElementById('nextDoseCountdown').innerText = pk.daysNext;
-    document.getElementById('penRemain').innerText = pk.penRemainStr;
-
-    let activePen = getActivePenConfig();
-    if (activePen) {
-      document.getElementById('lblPenCap').innerText = `針筆總容量 (已記憶 ${activePen.cap}mg)`;
-      document.getElementById('lblPenPrice').innerText = `藥劑價格 (已記憶 $${activePen.price})`;
+    let pState = getActivePen();
+    if(pState.active) {
+      document.getElementById('penActiveState').style.display = 'block';
+      document.getElementById('penActiveRemain').innerText = `剩餘: ${pState.remain.toFixed(1)} mg`;
+      document.getElementById('penNewInputGroup').style.display = 'none';
+      document.getElementById('penRemain').innerText = pState.remain.toFixed(1) + ' mg';
     } else {
-      document.getElementById('lblPenCap').innerText = '針筆總容量 (含殘劑 mg)';
-      document.getElementById('lblPenPrice').innerText = '藥劑購入價格 (NTD $)';
+      document.getElementById('penActiveState').style.display = 'none';
+      document.getElementById('penNewInputGroup').style.display = 'block';
+      document.getElementById('penRemain').innerText = '-- mg';
     }
 
-    if(doses.length > 0) {
-      let last = doses[doses.length - 1];
-      document.getElementById('lastSiteTip').innerText = `注射部位 (上次: ${last.site || '無'})`;
+    if(doses.length) {
+      let nextDoseTime = doses[doses.length-1].time + 7*24*3600*1000;
+      let diffDays = (nextDoseTime - Date.now()) / (24*3600*1000);
+      document.getElementById('nextDoseCountdown').innerText = diffDays > 0 ? diffDays.toFixed(1) + '天' : '今日應打';
     }
 
-    updateChart(pk);
-    renderLogs();
+    drawSVGChart(); renderLogs();
   }
 
-  function exportData() {
-    let data = { doses, weights, sides, version: APP_VERSION };
-    let blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-    let a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `mounflow_backup_v${APP_VERSION}_${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-  }
-
-  function importData() {
-    let input = document.createElement('input');
-    input.type = 'file';
-    input.onchange = e => {
-      let file = e.target.files[0];
-      let reader = new FileReader();
-      reader.onload = event => {
-        try {
-          let data = JSON.parse(event.target.result);
-          if(data.doses) doses = data.doses;
-          if(data.weights) weights = data.weights;
-          if(data.sides) sides = data.sides;
-          localStorage.setItem('mf_doses', JSON.stringify(doses));
-          localStorage.setItem('mf_weights', JSON.stringify(weights));
-          localStorage.setItem('mf_sides', JSON.stringify(sides));
-          refresh();
-          alert('數據匯入成功！');
-        } catch(err) { alert('檔案格式錯誤'); }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
-  }
-
-  window.addEventListener('resize', refresh);
   refresh();
 </script>
-
 </body>
 </html>
