@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MounFlow</title>
+  <title>MounFlow 2.0</title>
 
-  <!-- iOS PWA Fullscreen & Web App Native Options -->
+  <!-- iOS PWA Fullscreen -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="MounFlow">
@@ -13,287 +13,137 @@
   <link rel="apple-touch-icon" href="https://img.icons8.com/isometric/512/syringe.png">
 
   <style>
-    /* Reset & Base System Styles */
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
     html, body {
-      background-color: #000000;
+      background-color: #000;
       color: #f1f5f9;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-      width: 100%;
-      height: 100%;
-      overflow-x: hidden;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+      width: 100%; height: 100%;
+      overflow-x: hidden; overflow-y: auto;
     }
-
     body {
-      /* Native iPhone Safe Areas (Notch, Dynamic Island, Home Bar) */
       padding-top: max(12px, env(safe-area-inset-top));
       padding-bottom: max(20px, env(safe-area-inset-bottom));
       padding-left: max(12px, env(safe-area-inset-left));
       padding-right: max(12px, env(safe-area-inset-right));
     }
-
-    .app-shell {
-      max-width: 430px; /* iPhone 15/16 Pro Max Width limit */
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    /* iOS Native Card Styling */
+    .app-shell { max-width: 430px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+    
     .card {
       background: rgba(22, 22, 24, 0.95);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 20px;
       padding: 14px 16px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
     }
+    
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .app-title { font-size: 19px; font-weight: 700; color: #60a5fa; letter-spacing: -0.3px; }
+    .sub-label { font-size: 10px; color: #71717a; font-weight: 600; text-transform: uppercase; }
+    
+    /* 數據面板 */
+    .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .data-box { background: #1c1c1e; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+    .data-val { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
+    .color-blue { color: #64d2ff; }
+    .color-green { color: #30d158; }
 
-    .flex-between {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .app-title {
-      font-size: 19px;
-      font-weight: 700;
-      color: #60a5fa;
-      letter-spacing: -0.3px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .sub-label {
-      font-size: 10px;
-      color: #71717a;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 2px;
-      font-weight: 600;
-    }
-
-    .mg-display {
-      font-size: 26px;
-      font-weight: 900;
-      color: #34d399;
-      letter-spacing: -0.8px;
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* iOS Segmented Control Tabs */
+    /* Segmented Control */
     .segmented-control {
-      display: flex;
-      background: #1c1c1e;
-      border-radius: 12px;
-      padding: 2px;
-      margin-bottom: 12px;
+      display: flex; background: #1c1c1e; border-radius: 12px; padding: 2px; margin-bottom: 12px;
       border: 1px solid rgba(255, 255, 255, 0.05);
     }
-
     .segment-btn {
-      flex: 1;
-      padding: 7px 0;
-      font-size: 11px;
-      font-weight: 600;
-      color: #8e8e93;
-      background: transparent;
-      border: none;
-      border-radius: 10px;
-      transition: all 0.2s ease;
-      cursor: pointer;
+      flex: 1; padding: 7px 0; font-size: 11px; font-weight: 600; color: #8e8e93;
+      background: transparent; border: none; border-radius: 10px; cursor: pointer;
     }
+    .segment-btn.active { background: #2c2c2e; color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
 
-    .segment-btn.active {
-      background: #2c2c2e;
-      color: #ffffff;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    }
-
-    /* iOS Form Elements */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    label {
-      font-size: 10px;
-      color: #8e8e93;
-      font-weight: 500;
-      padding-left: 2px;
-    }
-
+    /* 表單與輸入 */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+    .input-group { display: flex; flex-direction: column; gap: 4px; }
+    label { font-size: 10px; color: #8e8e93; font-weight: 500; }
     input, select {
-      width: 100%;
-      background: #2c2c2e;
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 500;
-      outline: none;
+      width: 100%; background: #2c2c2e; color: #fff; border: 1px solid rgba(255,255,255,0.1);
+      padding: 10px 12px; border-radius: 12px; font-size: 13px; font-weight: 500; outline: none;
       -webkit-appearance: none;
-      font-family: inherit;
     }
 
-    input:focus, select:focus {
-      border-color: #0a84ff;
-    }
-
-    /* Primary Action Buttons */
     .ios-btn {
-      width: 100%;
-      padding: 12px;
-      border-radius: 14px;
-      border: none;
-      font-size: 13px;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: -0.2px;
-      cursor: pointer;
-      transition: opacity 0.15s ease, transform 0.1s ease;
+      width: 100%; padding: 12px; border-radius: 14px; border: none; font-size: 13px; font-weight: 700; color: #fff;
+      cursor: pointer; transition: opacity 0.15s ease;
     }
-
     .ios-btn-blue { background: #007aff; }
     .ios-btn-green { background: #34c759; }
     .ios-btn-purple { background: #af52de; }
+    .ios-btn:active { opacity: 0.75; }
 
-    .ios-btn:active {
-      opacity: 0.75;
-      transform: scale(0.985);
-    }
-
-    /* Tags Grid for Side Effects */
-    .tags-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-
+    /* 標籤網格 */
+    .tags-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
     .tag-chip {
-      background: #2c2c2e;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #d1d1d6;
-      padding: 9px 2px;
-      border-radius: 10px;
-      font-size: 10.5px;
-      font-weight: 500;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
+      background: #2c2c2e; border: 1px solid rgba(255,255,255,0.08); color: #d1d1d6;
+      padding: 9px 2px; border-radius: 10px; font-size: 10.5px; text-align: center; cursor: pointer;
     }
+    .tag-chip.active { background: #5856d6; border-color: #5e5ce6; color: #fff; }
 
-    .tag-chip.active {
-      background: #5856d6;
-      border-color: #5e5ce6;
-      color: #ffffff;
-      font-weight: 600;
-    }
+    /* 圖表容器 */
+    .chart-container { width: 100%; height: 160px; position: relative; margin-top: 6px; }
+    canvas { width: 100% !important; height: 100% !important; display: block; }
 
-    /* Chart Container */
-    .chart-container {
-      width: 100%;
-      height: 150px;
-      position: relative;
-      margin-top: 4px;
-    }
-
-    canvas {
-      width: 100% !important;
-      height: 100% !important;
-      display: block;
-    }
-
-    /* History Log List */
-    .logs-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      max-height: 130px;
-      overflow-y: auto;
-      padding-right: 2px;
-    }
-
+    /* 紀錄清單與刪除按鈕 */
+    .logs-wrapper { display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto; }
     .log-card {
-      background: #1c1c1e;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 11px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background: #1c1c1e; border: 1px solid rgba(255,255,255,0.05); padding: 8px 12px;
+      border-radius: 10px; font-size: 11px; display: flex; justify-content: space-between; align-items: center;
     }
+    .btn-delete { color: #ff453a; background: none; border: none; font-size: 12px; padding: 2px 6px; cursor: pointer; }
 
-    .log-date { color: #8e8e93; font-weight: 500; }
-    .log-val-blue { color: #64d2ff; font-weight: 700; }
-    .log-val-green { color: #30d158; font-weight: 700; }
-    .log-val-purple { color: #bf5af2; font-weight: 600; }
-
-    /* Custom Scrollbar for iOS */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-thumb { background: #3a3a3c; border-radius: 4px; }
+    /* 數據備份與還原工具 */
+    .backup-tools { display: flex; gap: 8px; margin-top: 6px; }
+    .btn-tool { flex: 1; background: #2c2c2e; color: #8e8e93; border: 1px solid rgba(255,255,255,0.08); padding: 6px; border-radius: 8px; font-size: 10px; cursor: pointer; }
   </style>
 </head>
 <body>
 
 <div class="app-shell">
 
-  <!-- 1. Header Card (Current Estimated Level) -->
+  <!-- 1. 精準 PK 數據面板 -->
   <div class="card">
     <div class="flex-between">
       <div>
-        <div class="app-title">💉 MounFlow</div>
-        <div class="sub-label">Tirzepatide 半衰期 PK 模型</div>
+        <div class="app-title">💉 MounFlow 2.0</div>
+        <div class="sub-label">雙相動力學 PK 模型</div>
       </div>
-      <div style="text-align: right;">
-        <div class="sub-label">體內預估殘留量</div>
-        <div class="mg-display" id="currentLevel">0.0 mg</div>
+    </div>
+    <div class="data-grid">
+      <div class="data-box">
+        <div class="sub-label">當前估計血藥量</div>
+        <div class="data-val color-blue" id="currentLevel">0.00 <span style="font-size:12px;">mg</span></div>
+      </div>
+      <div class="data-box">
+        <div class="sub-label">估計谷值 (最低殘留)</div>
+        <div class="data-val color-green" id="troughLevel">0.00 <span style="font-size:12px;">mg</span></div>
       </div>
     </div>
   </div>
 
-  <!-- 2. Interactive Input Controls -->
+  <!-- 2. 輸入面板 -->
   <div class="card">
-    <!-- iOS Segmented Control -->
     <div class="segmented-control">
-      <button class="segment-btn active" onclick="switchTab('dose')" id="tabDose">💉 打針紀錄</button>
-      <button class="segment-btn" onclick="switchTab('weight')" id="tabWeight">⚖️ 體重紀錄</button>
-      <button class="segment-btn" onclick="switchTab('side')" id="tabSide">🩹 體感標籤</button>
+      <button class="segment-btn active" onclick="switchTab('dose')" id="tabDose">💉 打針</button>
+      <button class="segment-btn" onclick="switchTab('weight')" id="tabWeight">⚖️ 體重</button>
+      <button class="segment-btn" onclick="switchTab('side')" id="tabSide">🩹 體感</button>
     </div>
 
-    <!-- Dose Form -->
+    <!-- 打針 Form -->
     <div id="formDose">
       <div class="form-grid">
         <div class="input-group">
-          <label>打針日期時間</label>
+          <label>注射日期時間</label>
           <input type="datetime-local" id="doseTime">
         </div>
         <div class="input-group">
-          <label>注射劑量</label>
+          <label>劑量 (mg)</label>
           <select id="doseMg">
             <option value="2.5">2.5 mg</option>
             <option value="5.0" selected>5.0 mg</option>
@@ -304,10 +154,10 @@
           </select>
         </div>
       </div>
-      <button class="ios-btn ios-btn-blue" onclick="addDose()">儲存打針紀錄</button>
+      <button class="ios-btn ios-btn-blue" onclick="addDose()">新增打針紀錄</button>
     </div>
 
-    <!-- Weight Form -->
+    <!-- 體重 Form -->
     <div id="formWeight" style="display:none;">
       <div class="form-grid">
         <div class="input-group">
@@ -315,18 +165,18 @@
           <input type="date" id="weightDate">
         </div>
         <div class="input-group">
-          <label>當天體重 (kg)</label>
+          <label>體重 (kg)</label>
           <input type="number" step="0.01" id="weightVal" placeholder="例如 78.5">
         </div>
       </div>
       <button class="ios-btn ios-btn-green" onclick="addWeight()">儲存體重紀錄</button>
     </div>
 
-    <!-- Side Effect Form -->
+    <!-- 體感 Form -->
     <div id="formSide" style="display:none;">
-      <label style="display:block; margin-bottom:6px;">選擇今日體感點擊紀錄：</label>
+      <label style="display:block; margin-bottom:6px;">選擇今日體感：</label>
       <div class="tags-grid">
-        <button class="tag-chip" onclick="toggleTag(this, '🤢 胃脹排空慢')">🤢 胃脹排空慢</button>
+        <button class="tag-chip" onclick="toggleTag(this, '🤢 胃脹/排空慢')">🤢 胃脹排空慢</button>
         <button class="tag-chip" onclick="toggleTag(this, '🤕 餐後頭痛')">🤕 餐後頭痛</button>
         <button class="tag-chip" onclick="toggleTag(this, '🤐 食慾極低')">🤐 食慾極低</button>
         <button class="tag-chip" onclick="toggleTag(this, '😋 輕微飢餓')">😋 輕微飢餓</button>
@@ -337,27 +187,31 @@
     </div>
   </div>
 
-  <!-- 3. Dynamic PK Concentration Chart -->
+  <!-- 3. 高畫質動力學趨勢圖 -->
   <div class="card">
-    <div class="sub-label" style="color:#a1a1aa; margin-bottom:6px;">📈 血藥濃度動態趨勢 (mg)</div>
+    <div class="sub-label" style="color:#a1a1aa;">📈 血藥濃度衰減模型 (預測未來7天)</div>
     <div class="chart-container">
       <canvas id="cvs"></canvas>
     </div>
   </div>
 
-  <!-- 4. History Logs Card -->
+  <!-- 4. 歷史紀錄與單筆刪除 -->
   <div class="card">
     <div class="flex-between" style="margin-bottom:8px;">
-      <div class="sub-label" style="color:#a1a1aa;">📋 歷史紀錄</div>
-      <a href="javascript:void(0)" onclick="clearAll()" style="color:#ff453a; font-size:10px; text-decoration:none; font-weight:600;">清除全部</a>
+      <div class="sub-label" style="color:#a1a1aa;">📋 歷史日誌 (支援單筆刪除)</div>
+      <a href="javascript:void(0)" onclick="clearAll()" style="color:#ff453a; font-size:10px; text-decoration:none; font-weight:600;">清空</a>
     </div>
     <div class="logs-wrapper" id="logs"></div>
+
+    <div class="backup-tools">
+      <button class="btn-tool" onclick="exportData()">📥 匯出備份</button>
+      <button class="btn-tool" onclick="importData()">📤 匯入備份</button>
+    </div>
   </div>
 
 </div>
 
 <script>
-  // Setup Default Timestamps
   const nowStr = new Date().toISOString();
   document.getElementById('doseTime').value = nowStr.slice(0, 16);
   document.getElementById('weightDate').value = nowStr.slice(0, 10);
@@ -377,8 +231,8 @@
   function addDose() {
     let time = document.getElementById('doseTime').value;
     let mg = parseFloat(document.getElementById('doseMg').value);
-    if (!time) return alert('請先選擇打針時間');
-    doses.push({ time: new Date(time).getTime(), mg });
+    if (!time) return alert('請選擇打針時間');
+    doses.push({ id: Date.now(), time: new Date(time).getTime(), mg });
     doses.sort((a, b) => a.time - b.time);
     localStorage.setItem('mf_doses', JSON.stringify(doses));
     refresh();
@@ -387,10 +241,10 @@
   function addWeight() {
     let date = document.getElementById('weightDate').value;
     let val = parseFloat(document.getElementById('weightVal').value);
-    if (!date || isNaN(val)) return alert('請輸入正確的體重數字');
+    if (!date || isNaN(val)) return alert('請輸入正確數字');
     weights = weights.filter(w => w.date !== date);
-    weights.push({ date, val });
-    weights.sort((a,b) => new Date(a.date) - new Date(b.date));
+    weights.push({ id: Date.now(), date, val });
+    weights.sort((a, b) => new Date(a.date) - new Date(b.date));
     localStorage.setItem('mf_weights', JSON.stringify(weights));
     document.getElementById('weightVal').value = '';
     refresh();
@@ -407,46 +261,86 @@
   }
 
   function saveSide() {
-    if (selectedTags.length === 0) return alert('請先選擇至少一個體感標籤');
+    if (selectedTags.length === 0) return alert('請選擇標籤');
     let date = new Date().toISOString().slice(0, 10);
     sides = sides.filter(s => s.date !== date);
-    sides.push({ date, tags: [...selectedTags] });
+    sides.push({ id: Date.now(), date, tags: [...selectedTags] });
     localStorage.setItem('mf_sides', JSON.stringify(sides));
-    alert('體感紀錄已成功儲存！');
+    alert('已儲存！');
+    refresh();
+  }
+
+  // 單筆刪除功能
+  function deleteLog(type, id) {
+    if(!confirm('確定刪除此筆紀錄？')) return;
+    if(type==='dose') doses = doses.filter(d=>d.id!==id);
+    if(type==='weight') weights = weights.filter(w=>w.id!==id);
+    if(type==='side') sides = sides.filter(s=>s.id!==id);
+    localStorage.setItem('mf_doses', JSON.stringify(doses));
+    localStorage.setItem('mf_weights', JSON.stringify(weights));
+    localStorage.setItem('mf_sides', JSON.stringify(sides));
     refresh();
   }
 
   function clearAll() {
-    if (confirm('確定要清除所有資料嗎？此動作無法復原。')) {
+    if (confirm('確定要清空所有數據嗎？')) {
       localStorage.clear(); doses = []; weights = []; sides = []; refresh();
     }
   }
 
-  // Native Canvas High-DPI Chart Engine
+  // 二房室/雙相 PK 計算模型 (Two-Compartment Pharmacokinetics)
+  function calculatePKData() {
+    if (doses.length === 0) return { chartData: [], current: 0, trough: 0 };
+
+    const ka = 0.04; // 吸收速率常數 (1/hr)
+    const ke = 0.00578; // 消除速率常數 (半衰期 120 hr)
+    const now = Date.now();
+    const start = doses[0].time;
+    const end = now + 7 * 24 * 3600 * 1000;
+
+    let chartData = [];
+    let current = 0;
+    let trough = 999;
+
+    for (let t = start; t <= end; t += 6 * 3600 * 1000) { // 每 6 小時採樣一次
+      let level = 0;
+      doses.forEach(d => {
+        if (t >= d.time) {
+          let hrs = (t - d.time) / (3600 * 1000);
+          // 雙向指數 PK 吸收與消除公式
+          let conc = d.mg * (ka / (ka - ke)) * (Math.exp(-ke * hrs) - Math.exp(-ka * hrs));
+          level += Math.max(0, conc);
+        }
+      });
+
+      chartData.push({ t, v: level });
+
+      if (Math.abs(t - now) < 3 * 3600 * 1000) current = level;
+      if (t > now && level < trough) trough = level;
+    }
+
+    return { chartData, current: current.toFixed(2), trough: trough === 999 ? 0 : trough.toFixed(2) };
+  }
+
   function drawCanvasChart(data) {
     let cvs = document.getElementById('cvs');
     let ctx = cvs.getContext('2d');
-    
     let dpr = window.devicePixelRatio || 2;
-    let w = cvs.offsetWidth;
-    let h = cvs.offsetHeight;
+    let w = cvs.offsetWidth, h = cvs.offsetHeight;
     
-    cvs.width = w * dpr;
-    cvs.height = h * dpr;
+    cvs.width = w * dpr; cvs.height = h * dpr;
     ctx.scale(dpr, dpr);
-
     ctx.clearRect(0, 0, w, h);
 
     if (data.length < 2) {
-      ctx.fillStyle = '#636366'; 
-      ctx.font = '12px -apple-system, sans-serif';
-      ctx.fillText('輸入第一筆打針紀錄後，此處將自動產生動態曲線', 10, h / 2);
+      ctx.fillStyle = '#636366'; ctx.font = '12px sans-serif';
+      ctx.fillText('輸入打針紀錄後將自動算血藥濃度趨勢', 10, h / 2);
       return;
     }
 
-    let maxVal = Math.max(...data.map(d => d.v), 10);
+    let maxVal = Math.max(...data.map(d => d.v), 5);
 
-    // Gradient Fill Under Curve
+    // 填充漸層
     let grad = ctx.createLinearGradient(0, 0, 0, h);
     grad.addColorStop(0, 'rgba(100, 210, 255, 0.35)');
     grad.addColorStop(1, 'rgba(100, 210, 255, 0.0)');
@@ -457,16 +351,12 @@
       let y = h - 12 - (d.v / maxVal) * (h - 24);
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     });
-    ctx.lineTo(w - 10, h - 12);
-    ctx.lineTo(10, h - 12);
-    ctx.closePath();
-    ctx.fillStyle = grad;
-    ctx.fill();
+    ctx.lineTo(w - 10, h - 12); ctx.lineTo(10, h - 12); ctx.closePath();
+    ctx.fillStyle = grad; ctx.fill();
 
-    // Sharp Smooth Blue Line
+    // 曲線
     ctx.beginPath();
-    ctx.strokeStyle = '#64d2ff'; 
-    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = '#64d2ff'; ctx.lineWidth = 2.5;
     data.forEach((d, i) => {
       let x = (i / (data.length - 1)) * (w - 20) + 10;
       let y = h - 12 - (d.v / maxVal) * (h - 24);
@@ -476,37 +366,51 @@
   }
 
   function refresh() {
-    let current = 0;
-    let chartData = [];
+    let pk = calculatePKData();
+    document.getElementById('currentLevel').innerText = pk.current + ' mg';
+    document.getElementById('troughLevel').innerText = pk.trough + ' mg';
+    drawCanvasChart(pk.chartData);
 
-    if (doses.length > 0) {
-      let now = Date.now();
-      let k = Math.log(2) / 120; // Half-life = 5 days (120 hrs)
-      let start = doses[0].time;
-      let end = now + 7 * 24 * 3600 * 1000; // Forecast 7 days ahead
-
-      for (let t = start; t <= end; t += 12 * 3600 * 1000) {
-        let level = 0;
-        doses.forEach(d => {
-          if (t >= d.time) {
-            let hrs = (t - d.time) / (3600 * 1000);
-            level += d.mg * ((hrs < 24) ? (hrs / 24) * Math.exp(-k * hrs) : Math.exp(-k * hrs));
-          }
-        });
-        chartData.push({ t, v: level });
-        if (Math.abs(t - now) < 6 * 3600 * 1000) current = level.toFixed(2);
-      }
-    }
-
-    document.getElementById('currentLevel').innerText = current + ' mg';
-    drawCanvasChart(chartData);
-
-    // Render Log Cards
+    // 渲染歷史日誌與刪除按鈕
     let h = '';
-    doses.forEach(d => h += `<div class="log-card"><span class="log-date">💉 打針: ${new Date(d.time).toLocaleDateString('zh-TW', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'})}</span><span class="log-val-blue">${d.mg} mg</span></div>`);
-    weights.forEach(w => h += `<div class="log-card"><span class="log-date">⚖️ 體重: ${w.date}</span><span class="log-val-green">${w.val} kg</span></div>`);
-    sides.forEach(s => h += `<div class="log-card"><span class="log-date">🩹 體感: ${s.date}</span><span class="log-val-purple">${s.tags.join(', ')}</span></div>`);
+    doses.forEach(d => h += `<div class="log-card"><span>💉 打針: ${new Date(d.time).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})} (${d.mg}mg)</span><button class="btn-delete" onclick="deleteLog('dose', ${d.id})">🗑️</button></div>`);
+    weights.forEach(w => h += `<div class="log-card"><span>⚖️ 體重: ${w.date} (${w.val}kg)</span><button class="btn-delete" onclick="deleteLog('weight', ${w.id})">🗑️</button></div>`);
+    sides.forEach(s => h += `<div class="log-card"><span>🩹 體感: ${s.date} (${s.tags.join(', ')})</span><button class="btn-delete" onclick="deleteLog('side', ${s.id})">🗑️</button></div>`);
     document.getElementById('logs').innerHTML = h || '<div style="color:#636366; text-align:center; padding:8px; font-size:11px;">尚無紀錄</div>';
+  }
+
+  // 匯出與匯入備份
+  function exportData() {
+    let data = { doses, weights, sides };
+    let blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    let a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `mounflow_backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+  }
+
+  function importData() {
+    let input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = e => {
+      let file = e.target.files[0];
+      let reader = new FileReader();
+      reader.onload = event => {
+        try {
+          let data = JSON.parse(event.target.result);
+          if(data.doses) doses = data.doses;
+          if(data.weights) weights = data.weights;
+          if(data.sides) sides = data.sides;
+          localStorage.setItem('mf_doses', JSON.stringify(doses));
+          localStorage.setItem('mf_weights', JSON.stringify(weights));
+          localStorage.setItem('mf_sides', JSON.stringify(sides));
+          refresh();
+          alert('數據匯入成功！');
+        } catch(err) { alert('備份檔案格式錯誤'); }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
   }
 
   window.addEventListener('resize', refresh);
