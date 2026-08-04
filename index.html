@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MounFlow v4.0.0 Ultra</title>
+  <title>MOUNFLOW v4.0</title>
 
   <!-- iOS PWA Options -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="MounFlow">
+  <meta name="apple-mobile-web-app-title" content="MOUNFLOW">
   <meta name="theme-color" content="#000000">
-  <link rel="apple-touch-icon" href="https://img.icons8.com/isometric/512/syringe.png">
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -29,46 +28,57 @@
     
     .app-shell { max-width: 430px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
     
-    /* iOS 26 空間懸浮玻璃卡片 */
+    /* 懸浮玻璃卡片 */
     .glass-card {
-      background: rgba(28, 28, 32, 0.75);
+      background: rgba(24, 24, 28, 0.78);
       backdrop-filter: blur(25px) saturate(180%);
       -webkit-backdrop-filter: blur(25px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 24px;
-      padding: 16px 18px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      padding: 18px 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.12);
       position: relative;
       overflow: hidden;
     }
     
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
-    .app-title { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.4px; display: flex; align-items: center; gap: 8px; }
     
-    /* 未來感霓虹徽章 */
+    /* 品牌名稱設計 (極簡寬體字風格) */
+    .brand-title {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      background: linear-gradient(135deg, #ffffff 30%, #a1a1aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
+    
+    /* 霓虹版本徽章 */
     .version-badge {
       font-size: 9px; font-weight: 800;
-      background: linear-gradient(135deg, rgba(96, 165, 250, 0.3), rgba(168, 85, 247, 0.3));
-      color: #60a5fa; padding: 3px 8px; border-radius: 20px;
-      border: 1px solid rgba(96, 165, 250, 0.4);
-      box-shadow: 0 0 12px rgba(96, 165, 250, 0.2);
+      background: linear-gradient(135deg, rgba(96, 165, 250, 0.25), rgba(168, 85, 247, 0.25));
+      color: #60a5fa; padding: 3px 9px; border-radius: 20px;
+      border: 1px solid rgba(96, 165, 250, 0.35);
+      box-shadow: 0 0 12px rgba(96, 165, 250, 0.15);
       cursor: pointer; transition: transform 0.15s ease, opacity 0.15s ease;
+      letter-spacing: 0.5px;
     }
     .version-badge:active { transform: scale(0.92); opacity: 0.7; }
     
-    .sub-label { font-size: 10px; color: #8e8e93; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .sub-label { font-size: 10px; color: #71717a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
 
     /* 儀表數據格 */
-    .data-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .data-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
     .data-box {
       background: rgba(10, 10, 12, 0.6);
       padding: 10px 6px; border-radius: 16px;
       border: 1px solid rgba(255, 255, 255, 0.05); text-align: center;
     }
-    .data-val { font-size: 17px; font-weight: 900; letter-spacing: -0.5px; margin-top: 3px; }
-    .color-blue { color: #64d2ff; text-shadow: 0 0 10px rgba(100, 210, 255, 0.3); }
-    .color-green { color: #30d158; text-shadow: 0 0 10px rgba(48, 209, 88, 0.3); }
-    .color-purple { color: #bf5af2; text-shadow: 0 0 10px rgba(191, 90, 242, 0.3); }
+    .data-val { font-size: 17px; font-weight: 900; letter-spacing: -0.5px; margin-top: 4px; }
+    .color-blue { color: #64d2ff; text-shadow: 0 0 10px rgba(100, 210, 255, 0.25); }
+    .color-green { color: #30d158; text-shadow: 0 0 10px rgba(48, 209, 88, 0.25); }
+    .color-purple { color: #bf5af2; text-shadow: 0 0 10px rgba(191, 90, 242, 0.25); }
 
     /* Segmented Control 分頁切換 */
     .segmented-control {
@@ -148,16 +158,11 @@
 
 <div class="app-shell">
 
-  <!-- 1. 空間儀表板 -->
+  <!-- 1. 儀表板卡片 -->
   <div class="glass-card">
     <div class="flex-between">
-      <div>
-        <div class="app-title">
-          💉 MounFlow 
-          <span class="version-badge" onclick="forceReload()" title="點擊刷新">v4.0.0</span>
-        </div>
-        <div class="sub-label">Tirzepatide 動力學與體重對比</div>
-      </div>
+      <div class="brand-title">MOUNFLOW</div>
+      <span class="version-badge" onclick="forceReload()" title="點擊刷新">v4.0</span>
     </div>
     <div class="data-grid">
       <div class="data-box">
@@ -178,9 +183,9 @@
   <!-- 2. 輸入面板 -->
   <div class="glass-card">
     <div class="segmented-control">
-      <button class="segment-btn active" onclick="switchTab('dose')" id="tabDose">💉 打針</button>
-      <button class="segment-btn" onclick="switchTab('weight')" id="tabWeight">⚖️ 體重</button>
-      <button class="segment-btn" onclick="switchTab('side')" id="tabSide">🩹 體感</button>
+      <button class="segment-btn active" onclick="switchTab('dose')" id="tabDose">打針</button>
+      <button class="segment-btn" onclick="switchTab('weight')" id="tabWeight">體重</button>
+      <button class="segment-btn" onclick="switchTab('side')" id="tabSide">體感</button>
     </div>
 
     <!-- 打針 Form -->
@@ -245,17 +250,14 @@
     </div>
   </div>
 
-  <!-- 3. 極光雙軸對比圖表 -->
+  <!-- 3. 圖表卡片 -->
   <div class="glass-card">
-    <div class="flex-between">
-      <div class="sub-label">📈 濃度趨勢(藍) 與 體重走勢(綠)</div>
-    </div>
     <div class="chart-container">
       <canvas id="cvs"></canvas>
     </div>
   </div>
 
-  <!-- 4. 歷史紀錄與同步工具 -->
+  <!-- 4. 歷史紀錄 -->
   <div class="glass-card">
     <div class="flex-between" style="margin-bottom:10px;">
       <div class="sub-label">📋 歷史日誌</div>
@@ -264,9 +266,9 @@
 
     <div class="filter-bar">
       <button class="filter-chip active" onclick="setLogFilter('all', this)">全部</button>
-      <button class="filter-chip" onclick="setLogFilter('dose', this)">💉 針劑</button>
-      <button class="filter-chip" onclick="setLogFilter('weight', this)">⚖️ 體重</button>
-      <button class="filter-chip" onclick="setLogFilter('side', this)">🩹 體感</button>
+      <button class="filter-chip" onclick="setLogFilter('dose', this)">針劑</button>
+      <button class="filter-chip" onclick="setLogFilter('weight', this)">體重</button>
+      <button class="filter-chip" onclick="setLogFilter('side', this)">體感</button>
     </div>
 
     <div class="logs-wrapper" id="logs"></div>
@@ -281,7 +283,7 @@
 </div>
 
 <script>
-  const APP_VERSION = "4.0.0";
+  const APP_VERSION = "4.0";
   
   function forceReload() {
     window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
@@ -384,9 +386,9 @@
     let icsContent = 
 `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//MounFlow App//v${APP_VERSION}//EN
+PRODID:-//MOUNFLOW//v${APP_VERSION}//EN
 BEGIN:VEVENT
-SUMMARY:💉 MounFlow 打針提醒 (${lastDose.mg}mg)
+SUMMARY:MOUNFLOW 打針提醒 (${lastDose.mg}mg)
 DESCRIPTION:每週 Tirzepatide 劑量施打提醒。請開啟 App 記錄：https://serious0116-cmd.github.io/mounflow/
 DTSTART:${startTime}
 DTEND:${endTime}
