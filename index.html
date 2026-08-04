@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MOUNFLOW v4.0</title>
+  <title>MOUNFLOW v4.1</title>
 
   <!-- iOS PWA Options -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -28,7 +28,6 @@
     
     .app-shell { max-width: 430px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
     
-    /* 懸浮玻璃卡片 */
     .glass-card {
       background: rgba(24, 24, 28, 0.78);
       backdrop-filter: blur(25px) saturate(180%);
@@ -43,7 +42,6 @@
     
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
     
-    /* 品牌名稱設計 (極簡寬體字風格) */
     .brand-title {
       font-size: 20px;
       font-weight: 900;
@@ -54,7 +52,6 @@
       text-transform: uppercase;
     }
     
-    /* 霓虹版本徽章 */
     .version-badge {
       font-size: 9px; font-weight: 800;
       background: linear-gradient(135deg, rgba(96, 165, 250, 0.25), rgba(168, 85, 247, 0.25));
@@ -68,7 +65,7 @@
     
     .sub-label { font-size: 10px; color: #71717a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
 
-    /* 儀表數據格 */
+    /* 數據格 */
     .data-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
     .data-box {
       background: rgba(10, 10, 12, 0.6);
@@ -80,7 +77,7 @@
     .color-green { color: #30d158; text-shadow: 0 0 10px rgba(48, 209, 88, 0.25); }
     .color-purple { color: #bf5af2; text-shadow: 0 0 10px rgba(191, 90, 242, 0.25); }
 
-    /* Segmented Control 分頁切換 */
+    /* Segmented Control */
     .segmented-control {
       display: flex; background: rgba(10, 10, 12, 0.7); border-radius: 14px; padding: 3px; margin-bottom: 12px;
       border: 1px solid rgba(255, 255, 255, 0.06);
@@ -91,7 +88,7 @@
     }
     .segment-btn.active { background: rgba(255, 255, 255, 0.12); color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
 
-    /* 表單與輸入 */
+    /* 表單 */
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
     .input-group { display: flex; flex-direction: column; gap: 4px; }
     label { font-size: 10px; color: #8e8e93; font-weight: 600; }
@@ -110,7 +107,6 @@
     .ios-btn-purple { background: linear-gradient(135deg, #af52de, #8e44ad); box-shadow: 0 4px 15px rgba(175, 82, 222, 0.3); }
     .ios-btn:active { transform: scale(0.98); opacity: 0.85; }
 
-    /* 體感標籤 */
     .tags-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
     .tag-chip {
       background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.08); color: #d1d1d6;
@@ -119,7 +115,9 @@
     .tag-chip.active { background: rgba(88, 86, 214, 0.4); border-color: #5e5ce6; color: #fff; box-shadow: 0 0 10px rgba(94, 92, 230, 0.3); }
 
     /* 圖表容器 */
-    .chart-container { width: 100%; height: 160px; position: relative; margin-top: 8px; }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .chart-legend { display: flex; gap: 10px; font-size: 10px; font-weight: 600; }
+    .chart-container { width: 100%; height: 180px; position: relative; margin-top: 4px; }
     canvas { width: 100% !important; height: 100% !important; display: block; }
 
     /* 歷史紀錄與篩選 */
@@ -162,7 +160,7 @@
   <div class="glass-card">
     <div class="flex-between">
       <div class="brand-title">MOUNFLOW</div>
-      <span class="version-badge" onclick="forceReload()" title="點擊刷新">v4.0</span>
+      <span class="version-badge" onclick="forceReload()" title="點擊刷新">v4.1</span>
     </div>
     <div class="data-grid">
       <div class="data-box">
@@ -250,8 +248,15 @@
     </div>
   </div>
 
-  <!-- 3. 圖表卡片 -->
+  <!-- 3. 座標清晰的圖表卡片 -->
   <div class="glass-card">
+    <div class="chart-header">
+      <div class="sub-label">趨勢分析</div>
+      <div class="chart-legend">
+        <span style="color:#64d2ff;">— 血藥(mg)</span>
+        <span style="color:#30d158;">--- 體重(kg)</span>
+      </div>
+    </div>
     <div class="chart-container">
       <canvas id="cvs"></canvas>
     </div>
@@ -283,7 +288,7 @@
 </div>
 
 <script>
-  const APP_VERSION = "4.0";
+  const APP_VERSION = "4.1";
   
   function forceReload() {
     window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
@@ -446,6 +451,7 @@ END:VCALENDAR`;
     return { chartData, current: current.toFixed(2), trough: trough === 999 ? 0 : trough.toFixed(2), daysNext };
   }
 
+  // 強化版 Canvas 繪圖：含 X/Y 座標與刻度文字標示
   function drawCanvasChart(data) {
     let cvs = document.getElementById('cvs');
     let ctx = cvs.getContext('2d');
@@ -458,39 +464,91 @@ END:VCALENDAR`;
 
     if (data.length < 2) {
       ctx.fillStyle = '#8e8e93'; ctx.font = '12px sans-serif';
-      ctx.fillText('新增打針紀錄後將自動算血藥與體重曲線', 10, h / 2);
+      ctx.fillText('新增打針紀錄後將自動繪製動態曲線', 15, h / 2);
       return;
     }
+
+    // 留出圖表邊距以繪製座標軸標籤
+    const paddingLeft = 32;
+    const paddingRight = 32;
+    const paddingTop = 15;
+    const paddingBottom = 22;
+    const chartW = w - paddingLeft - paddingRight;
+    const chartH = h - paddingTop - paddingBottom;
 
     let minT = data[0].t;
     let maxT = data[data.length - 1].t;
     let maxVal = Math.max(...data.map(d => d.v), 5);
 
-    let grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, 'rgba(100, 210, 255, 0.4)');
+    // 1. 繪製背景參考橫線與左側 Y 軸刻度 (血藥濃度)
+    ctx.font = '9px -apple-system, sans-serif';
+    ctx.fillStyle = '#64d2ff';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i <= 3; i++) {
+      let ratio = i / 3;
+      let y = paddingTop + chartH * (1 - ratio);
+      let val = (maxVal * ratio).toFixed(1);
+
+      // 虛線網格
+      ctx.beginPath();
+      ctx.setLineDash([2, 4]);
+      ctx.moveTo(paddingLeft, y);
+      ctx.lineTo(w - paddingRight, y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 左側 Y 軸刻度文字 (mg)
+      ctx.fillText(val + 'm', 4, y + 3);
+    }
+
+    // 2. 繪製底部 X 軸時間刻度 (日期 M/D)
+    ctx.fillStyle = '#71717a';
+    ctx.textAlign = 'center';
+    let labelStep = Math.max(1, Math.floor(data.length / 4));
+    for (let i = 0; i < data.length; i += labelStep) {
+      let x = paddingLeft + (i / (data.length - 1)) * chartW;
+      let d = new Date(data[i].t);
+      let dateLabel = `${d.getMonth() + 1}/${d.getDate()}`;
+      ctx.fillText(dateLabel, x, h - 5);
+    }
+
+    // 3. 繪製藍色濃度漸層與曲線
+    let grad = ctx.createLinearGradient(0, paddingTop, 0, h - paddingBottom);
+    grad.addColorStop(0, 'rgba(100, 210, 255, 0.35)');
     grad.addColorStop(1, 'rgba(100, 210, 255, 0.0)');
 
     ctx.beginPath();
     data.forEach((d, i) => {
-      let x = (i / (data.length - 1)) * (w - 20) + 10;
-      let y = h - 12 - (d.v / maxVal) * (h - 24);
+      let x = paddingLeft + (i / (data.length - 1)) * chartW;
+      let y = paddingTop + chartH * (1 - (d.v / maxVal));
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     });
-    ctx.lineTo(w - 10, h - 12); ctx.lineTo(10, h - 12); ctx.closePath();
+    ctx.lineTo(paddingLeft + chartW, paddingTop + chartH);
+    ctx.lineTo(paddingLeft, paddingTop + chartH);
+    ctx.closePath();
     ctx.fillStyle = grad; ctx.fill();
 
     ctx.beginPath();
-    ctx.strokeStyle = '#64d2ff'; ctx.lineWidth = 2.5;
+    ctx.strokeStyle = '#64d2ff'; ctx.lineWidth = 2.2;
     data.forEach((d, i) => {
-      let x = (i / (data.length - 1)) * (w - 20) + 10;
-      let y = h - 12 - (d.v / maxVal) * (h - 24);
+      let x = paddingLeft + (i / (data.length - 1)) * chartW;
+      let y = paddingTop + chartH * (1 - (d.v / maxVal));
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     });
     ctx.stroke();
 
+    // 4. 繪製綠色體重虛線與右側 Y 軸刻度 (kg)
     if (weights.length > 0) {
-      let minW = Math.min(...weights.map(w => w.val)) - 1;
-      let maxW = Math.max(...weights.map(w => w.val)) + 1;
+      let minW = Math.min(...weights.map(w => w.val)) - 0.5;
+      let maxW = Math.max(...weights.map(w => w.val)) + 0.5;
+
+      // 右側 Y 軸刻度文字 (kg)
+      ctx.fillStyle = '#30d158';
+      ctx.textAlign = 'right';
+      ctx.fillText(maxW.toFixed(1) + 'k', w - 2, paddingTop + 3);
+      ctx.fillText(minW.toFixed(1) + 'k', w - 2, paddingTop + chartH + 3);
 
       ctx.beginPath();
       ctx.strokeStyle = '#30d158'; ctx.lineWidth = 1.8;
@@ -500,19 +558,20 @@ END:VCALENDAR`;
       weights.forEach(wItem => {
         let wtTime = wItem.time || new Date(wItem.date).getTime();
         if (wtTime >= minT && wtTime <= maxT) {
-          let x = ((wtTime - minT) / (maxT - minT)) * (w - 20) + 10;
-          let y = h - 12 - ((wItem.val - minW) / (maxW - minW)) * (h - 24);
+          let x = paddingLeft + ((wtTime - minT) / (maxT - minT)) * chartW;
+          let y = paddingTop + chartH * (1 - ((wItem.val - minW) / (maxW - minW)));
           if (first) { ctx.moveTo(x, y); first = false; } else { ctx.lineTo(x, y); }
         }
       });
       ctx.stroke();
       ctx.setLineDash([]);
 
+      // 體重圓點標註
       weights.forEach(wItem => {
         let wtTime = wItem.time || new Date(wItem.date).getTime();
         if (wtTime >= minT && wtTime <= maxT) {
-          let x = ((wtTime - minT) / (maxT - minT)) * (w - 20) + 10;
-          let y = h - 12 - ((wItem.val - minW) / (maxW - minW)) * (h - 24);
+          let x = paddingLeft + ((wtTime - minT) / (maxT - minT)) * chartW;
+          let y = paddingTop + chartH * (1 - ((wItem.val - minW) / (maxW - minW)));
           ctx.beginPath();
           ctx.arc(x, y, 3.5, 0, Math.PI * 2);
           ctx.fillStyle = '#30d158';
