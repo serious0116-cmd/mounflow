@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MounFlow v3.1.2</title>
+  <title>MounFlow v4.0.0 Ultra</title>
 
   <!-- iOS PWA Options -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,138 +14,150 @@
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
-    html, body {
-      background-color: #000;
+    
+    body {
+      background-color: #050507;
       color: #f1f5f9;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
       width: 100%; height: 100%;
       overflow-x: hidden; overflow-y: auto;
+      padding-top: max(14px, env(safe-area-inset-top));
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+      padding-left: max(14px, env(safe-area-inset-left));
+      padding-right: max(14px, env(safe-area-inset-right));
     }
-    body {
-      padding-top: max(12px, env(safe-area-inset-top));
-      padding-bottom: max(20px, env(safe-area-inset-bottom));
-      padding-left: max(12px, env(safe-area-inset-left));
-      padding-right: max(12px, env(safe-area-inset-right));
-    }
-    .app-shell { max-width: 430px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
     
-    .card {
-      background: rgba(22, 22, 24, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
-      padding: 14px 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+    .app-shell { max-width: 430px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    
+    /* iOS 26 空間懸浮玻璃卡片 */
+    .glass-card {
+      background: rgba(28, 28, 32, 0.75);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 16px 18px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      position: relative;
+      overflow: hidden;
     }
     
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
-    .app-title { font-size: 19px; font-weight: 700; color: #60a5fa; letter-spacing: -0.3px; display: flex; align-items: center; gap: 6px; }
-    .version-badge { font-size: 9px; font-weight: 700; background: rgba(96, 165, 250, 0.2); color: #60a5fa; padding: 2px 6px; border-radius: 6px; border: 1px solid rgba(96, 165, 250, 0.3); }
-    .sub-label { font-size: 10px; color: #71717a; font-weight: 600; text-transform: uppercase; }
+    .app-title { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.4px; display: flex; align-items: center; gap: 8px; }
     
-    .btn-reload {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #8e8e93; font-size: 10px; padding: 4px 8px; border-radius: 8px; cursor: pointer;
+    /* 未來感霓虹徽章 */
+    .version-badge {
+      font-size: 9px; font-weight: 800;
+      background: linear-gradient(135deg, rgba(96, 165, 250, 0.3), rgba(168, 85, 247, 0.3));
+      color: #60a5fa; padding: 3px 8px; border-radius: 20px;
+      border: 1px solid rgba(96, 165, 250, 0.4);
+      box-shadow: 0 0 12px rgba(96, 165, 250, 0.2);
+      cursor: pointer; transition: transform 0.15s ease, opacity 0.15s ease;
     }
-    .btn-reload:active { opacity: 0.6; }
+    .version-badge:active { transform: scale(0.92); opacity: 0.7; }
+    
+    .sub-label { font-size: 10px; color: #8e8e93; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* 數據面板 */
-    .data-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 8px; }
-    .data-box { background: #1c1c1e; padding: 8px 6px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
-    .data-val { font-size: 16px; font-weight: 900; letter-spacing: -0.5px; margin-top: 2px; }
-    .color-blue { color: #64d2ff; }
-    .color-green { color: #30d158; }
-    .color-purple { color: #bf5af2; }
+    /* 儀表數據格 */
+    .data-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .data-box {
+      background: rgba(10, 10, 12, 0.6);
+      padding: 10px 6px; border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.05); text-align: center;
+    }
+    .data-val { font-size: 17px; font-weight: 900; letter-spacing: -0.5px; margin-top: 3px; }
+    .color-blue { color: #64d2ff; text-shadow: 0 0 10px rgba(100, 210, 255, 0.3); }
+    .color-green { color: #30d158; text-shadow: 0 0 10px rgba(48, 209, 88, 0.3); }
+    .color-purple { color: #bf5af2; text-shadow: 0 0 10px rgba(191, 90, 242, 0.3); }
 
-    /* Segmented Control */
+    /* Segmented Control 分頁切換 */
     .segmented-control {
-      display: flex; background: #1c1c1e; border-radius: 12px; padding: 2px; margin-bottom: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex; background: rgba(10, 10, 12, 0.7); border-radius: 14px; padding: 3px; margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
     .segment-btn {
-      flex: 1; padding: 7px 0; font-size: 11px; font-weight: 600; color: #8e8e93;
-      background: transparent; border: none; border-radius: 10px; cursor: pointer;
+      flex: 1; padding: 8px 0; font-size: 11.5px; font-weight: 700; color: #8e8e93;
+      background: transparent; border: none; border-radius: 11px; cursor: pointer; transition: all 0.2s ease;
     }
-    .segment-btn.active { background: #2c2c2e; color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+    .segment-btn.active { background: rgba(255, 255, 255, 0.12); color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
 
     /* 表單與輸入 */
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
     .input-group { display: flex; flex-direction: column; gap: 4px; }
-    label { font-size: 10px; color: #8e8e93; font-weight: 500; }
+    label { font-size: 10px; color: #8e8e93; font-weight: 600; }
     input, select {
-      width: 100%; background: #2c2c2e; color: #fff; border: 1px solid rgba(255,255,255,0.1);
-      padding: 10px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; outline: none;
+      width: 100%; background: rgba(255, 255, 255, 0.06); color: #fff; border: 1px solid rgba(255,255,255,0.12);
+      padding: 11px 12px; border-radius: 14px; font-size: 13px; font-weight: 600; outline: none;
       -webkit-appearance: none;
     }
 
     .ios-btn {
-      width: 100%; padding: 12px; border-radius: 14px; border: none; font-size: 13px; font-weight: 700; color: #fff;
-      cursor: pointer; transition: opacity 0.15s ease;
+      width: 100%; padding: 13px; border-radius: 16px; border: none; font-size: 13.5px; font-weight: 800; color: #fff;
+      cursor: pointer; transition: transform 0.1s ease, opacity 0.15s ease;
     }
-    .ios-btn-blue { background: #007aff; }
-    .ios-btn-green { background: #34c759; }
-    .ios-btn-purple { background: #af52de; }
-    .ios-btn:active { opacity: 0.75; }
+    .ios-btn-blue { background: linear-gradient(135deg, #007aff, #0056b3); box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3); }
+    .ios-btn-green { background: linear-gradient(135deg, #34c759, #28a745); box-shadow: 0 4px 15px rgba(52, 199, 89, 0.3); }
+    .ios-btn-purple { background: linear-gradient(135deg, #af52de, #8e44ad); box-shadow: 0 4px 15px rgba(175, 82, 222, 0.3); }
+    .ios-btn:active { transform: scale(0.98); opacity: 0.85; }
 
-    /* 標籤網格 */
+    /* 體感標籤 */
     .tags-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
     .tag-chip {
-      background: #2c2c2e; border: 1px solid rgba(255,255,255,0.08); color: #d1d1d6;
-      padding: 9px 2px; border-radius: 10px; font-size: 10.5px; text-align: center; cursor: pointer;
+      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.08); color: #d1d1d6;
+      padding: 10px 2px; border-radius: 12px; font-size: 11px; font-weight: 600; text-align: center; cursor: pointer;
     }
-    .tag-chip.active { background: #5856d6; border-color: #5e5ce6; color: #fff; }
+    .tag-chip.active { background: rgba(88, 86, 214, 0.4); border-color: #5e5ce6; color: #fff; box-shadow: 0 0 10px rgba(94, 92, 230, 0.3); }
 
     /* 圖表容器 */
-    .chart-container { width: 100%; height: 160px; position: relative; margin-top: 6px; }
+    .chart-container { width: 100%; height: 160px; position: relative; margin-top: 8px; }
     canvas { width: 100% !important; height: 100% !important; display: block; }
 
     /* 歷史紀錄與篩選 */
-    .filter-bar { display: flex; gap: 4px; margin-bottom: 10px; }
+    .filter-bar { display: flex; gap: 6px; margin-bottom: 12px; }
     .filter-chip {
-      background: #1c1c1e; color: #8e8e93; border: 1px solid rgba(255,255,255,0.05);
-      padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 600; cursor: pointer;
+      background: rgba(255, 255, 255, 0.05); color: #8e8e93; border: 1px solid rgba(255,255,255,0.06);
+      padding: 5px 12px; border-radius: 10px; font-size: 10.5px; font-weight: 700; cursor: pointer;
     }
-    .filter-chip.active { background: #3a3a3c; color: #fff; }
+    .filter-chip.active { background: rgba(255, 255, 255, 0.15); color: #fff; }
 
     .logs-wrapper { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 2px; }
     
     .log-card {
-      background: #1c1c1e; border: 1px solid rgba(255,255,255,0.06); padding: 10px 12px;
-      border-radius: 12px; display: flex; justify-content: space-between; align-items: center;
+      background: rgba(10, 10, 12, 0.5); border: 1px solid rgba(255,255,255,0.08); padding: 11px 14px;
+      border-radius: 14px; display: flex; justify-content: space-between; align-items: center;
     }
-    .log-left { display: flex; flex-direction: column; gap: 2px; }
+    .log-left { display: flex; flex-direction: column; gap: 3px; }
     .log-tag {
-      display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 6px; width: fit-content;
+      display: inline-block; font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 6px; width: fit-content;
     }
-    .tag-dose { background: rgba(0, 122, 255, 0.2); color: #64d2ff; }
-    .tag-weight { background: rgba(52, 199, 89, 0.2); color: #30d158; }
-    .tag-side { background: rgba(175, 82, 222, 0.2); color: #bf5af2; }
+    .tag-dose { background: rgba(0, 122, 255, 0.25); color: #64d2ff; }
+    .tag-weight { background: rgba(52, 199, 89, 0.25); color: #30d158; }
+    .tag-side { background: rgba(175, 82, 222, 0.25); color: #bf5af2; }
 
     .log-date { font-size: 11px; color: #8e8e93; font-weight: 500; }
-    .log-val { font-size: 12px; font-weight: 700; color: #f1f5f9; text-align: right; }
+    .log-val { font-size: 13px; font-weight: 800; color: #f1f5f9; text-align: right; }
     
-    .btn-action { background: none; border: none; font-size: 13px; padding: 4px; cursor: pointer; opacity: 0.8; }
+    .btn-action { background: none; border: none; font-size: 13px; padding: 4px; cursor: pointer; opacity: 0.7; }
     .btn-action:active { opacity: 1; }
 
-    .backup-tools { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-    .btn-tool { flex: 1; background: #2c2c2e; color: #8e8e93; border: 1px solid rgba(255,255,255,0.08); padding: 8px; border-radius: 10px; font-size: 10px; font-weight: 600; cursor: pointer; text-align: center; }
+    .backup-tools { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+    .btn-tool { flex: 1; background: rgba(255, 255, 255, 0.06); color: #8e8e93; border: 1px solid rgba(255,255,255,0.08); padding: 9px; border-radius: 12px; font-size: 10.5px; font-weight: 700; cursor: pointer; text-align: center; }
   </style>
 </head>
 <body>
 
 <div class="app-shell">
 
-  <!-- 1. 數據面板 -->
-  <div class="card">
+  <!-- 1. 空間儀表板 -->
+  <div class="glass-card">
     <div class="flex-between">
       <div>
         <div class="app-title">
           💉 MounFlow 
-          <span class="version-badge">v3.1.2</span>
+          <span class="version-badge" onclick="forceReload()" title="點擊刷新">v4.0.0</span>
         </div>
-        <div class="sub-label">血藥濃度與體重追蹤</div>
+        <div class="sub-label">Tirzepatide 動力學與體重對比</div>
       </div>
-      <button class="btn-reload" onclick="forceReload()">🔄 刷新App</button>
     </div>
     <div class="data-grid">
       <div class="data-box">
@@ -157,14 +169,14 @@
         <div class="data-val color-green" id="troughLevel">0.00mg</div>
       </div>
       <div class="data-box">
-        <div class="sub-label">下次打針倒數</div>
+        <div class="sub-label">下劑倒數</div>
         <div class="data-val color-purple" id="nextDoseCountdown">--天</div>
       </div>
     </div>
   </div>
 
   <!-- 2. 輸入面板 -->
-  <div class="card">
+  <div class="glass-card">
     <div class="segmented-control">
       <button class="segment-btn active" onclick="switchTab('dose')" id="tabDose">💉 打針</button>
       <button class="segment-btn" onclick="switchTab('weight')" id="tabWeight">⚖️ 體重</button>
@@ -190,7 +202,7 @@
           </select>
         </div>
       </div>
-      <div class="input-group" style="margin-bottom:10px;">
+      <div class="input-group" style="margin-bottom:12px;">
         <label id="lastSiteTip">注射部位輪替</label>
         <select id="doseSite">
           <option value="左腹部">左腹部</option>
@@ -220,7 +232,7 @@
 
     <!-- 體感 Form -->
     <div id="formSide" style="display:none;">
-      <label style="display:block; margin-bottom:6px;">選擇今日體感：</label>
+      <label style="display:block; margin-bottom:8px;" class="sub-label">選擇今日體感：</label>
       <div class="tags-grid">
         <button class="tag-chip" onclick="toggleTag(this, '🤢 胃脹排空慢')">🤢 胃脹排空慢</button>
         <button class="tag-chip" onclick="toggleTag(this, '🤕 餐後頭痛')">🤕 餐後頭痛</button>
@@ -233,21 +245,21 @@
     </div>
   </div>
 
-  <!-- 3. 動力學趨勢與體重對比圖 -->
-  <div class="card">
+  <!-- 3. 極光雙軸對比圖表 -->
+  <div class="glass-card">
     <div class="flex-between">
-      <div class="sub-label" style="color:#a1a1aa;">📈 濃度趨勢(藍) 與 體重走勢(綠)</div>
+      <div class="sub-label">📈 濃度趨勢(藍) 與 體重走勢(綠)</div>
     </div>
     <div class="chart-container">
       <canvas id="cvs"></canvas>
     </div>
   </div>
 
-  <!-- 4. 歷史紀錄管理 -->
-  <div class="card">
-    <div class="flex-between" style="margin-bottom:8px;">
-      <div class="sub-label" style="color:#a1a1aa;">📋 歷史日誌</div>
-      <a href="javascript:void(0)" onclick="clearAll()" style="color:#ff453a; font-size:10px; text-decoration:none; font-weight:600;">清空全部</a>
+  <!-- 4. 歷史紀錄與同步工具 -->
+  <div class="glass-card">
+    <div class="flex-between" style="margin-bottom:10px;">
+      <div class="sub-label">📋 歷史日誌</div>
+      <a href="javascript:void(0)" onclick="clearAll()" style="color:#ff453a; font-size:10.5px; text-decoration:none; font-weight:700;">清空全部</a>
     </div>
 
     <div class="filter-bar">
@@ -260,7 +272,7 @@
     <div class="logs-wrapper" id="logs"></div>
 
     <div class="backup-tools">
-      <button class="btn-tool" onclick="addCalendarReminder()" style="flex:100%; background:#2c2c2e; color:#64d2ff; margin-bottom:4px;">📅 同步下週打針至 iPhone 日曆</button>
+      <button class="btn-tool" onclick="addCalendarReminder()" style="flex:100%; background:rgba(100, 210, 255, 0.1); color:#64d2ff; border-color:rgba(100,210,255,0.2); margin-bottom:4px;">📅 同步下週打針至 iPhone 日曆</button>
       <button class="btn-tool" onclick="exportData()">📥 匯出 JSON</button>
       <button class="btn-tool" onclick="importData()">📤 匯入備份</button>
     </div>
@@ -269,7 +281,7 @@
 </div>
 
 <script>
-  const APP_VERSION = "3.1.2";
+  const APP_VERSION = "4.0.0";
   
   function forceReload() {
     window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
@@ -443,7 +455,7 @@ END:VCALENDAR`;
     ctx.clearRect(0, 0, w, h);
 
     if (data.length < 2) {
-      ctx.fillStyle = '#636366'; ctx.font = '12px sans-serif';
+      ctx.fillStyle = '#8e8e93'; ctx.font = '12px sans-serif';
       ctx.fillText('新增打針紀錄後將自動算血藥與體重曲線', 10, h / 2);
       return;
     }
@@ -453,7 +465,7 @@ END:VCALENDAR`;
     let maxVal = Math.max(...data.map(d => d.v), 5);
 
     let grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, 'rgba(100, 210, 255, 0.3)');
+    grad.addColorStop(0, 'rgba(100, 210, 255, 0.4)');
     grad.addColorStop(1, 'rgba(100, 210, 255, 0.0)');
 
     ctx.beginPath();
@@ -466,7 +478,7 @@ END:VCALENDAR`;
     ctx.fillStyle = grad; ctx.fill();
 
     ctx.beginPath();
-    ctx.strokeStyle = '#64d2ff'; ctx.lineWidth = 2;
+    ctx.strokeStyle = '#64d2ff'; ctx.lineWidth = 2.5;
     data.forEach((d, i) => {
       let x = (i / (data.length - 1)) * (w - 20) + 10;
       let y = h - 12 - (d.v / maxVal) * (h - 24);
@@ -479,8 +491,8 @@ END:VCALENDAR`;
       let maxW = Math.max(...weights.map(w => w.val)) + 1;
 
       ctx.beginPath();
-      ctx.strokeStyle = '#30d158'; ctx.lineWidth = 1.5;
-      ctx.setLineDash([3, 3]);
+      ctx.strokeStyle = '#30d158'; ctx.lineWidth = 1.8;
+      ctx.setLineDash([4, 4]);
 
       let first = true;
       weights.forEach(wItem => {
@@ -500,7 +512,7 @@ END:VCALENDAR`;
           let x = ((wtTime - minT) / (maxT - minT)) * (w - 20) + 10;
           let y = h - 12 - ((wItem.val - minW) / (maxW - minW)) * (h - 24);
           ctx.beginPath();
-          ctx.arc(x, y, 3, 0, Math.PI * 2);
+          ctx.arc(x, y, 3.5, 0, Math.PI * 2);
           ctx.fillStyle = '#30d158';
           ctx.fill();
         }
@@ -540,7 +552,7 @@ END:VCALENDAR`;
       `;
     });
 
-    document.getElementById('logs').innerHTML = h || '<div style="color:#636366; text-align:center; padding:12px; font-size:11px;">尚無相關紀錄</div>';
+    document.getElementById('logs').innerHTML = h || '<div style="color:#8e8e93; text-align:center; padding:12px; font-size:11px;">尚無相關紀錄</div>';
   }
 
   function refresh() {
