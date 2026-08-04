@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MOUNFLOW v4.6</title>
+  <title>MOUNFLOW v4.7</title>
 
   <!-- iOS PWA Options -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -178,7 +178,7 @@
   <div class="glass-card">
     <div class="flex-between">
       <div class="brand-title">MOUNFLOW</div>
-      <span class="version-badge" onclick="forceReload()" title="點擊刷頁">v4.6</span>
+      <span class="version-badge" onclick="forceReload()" title="點擊刷頁">v4.7</span>
     </div>
     <div class="data-grid">
       <div class="data-box">
@@ -237,13 +237,13 @@
         </div>
         <div class="input-group">
           <label id="lblPenCap">針筆總容量 (含殘劑 mg)</label>
-          <input type="number" step="0.1" id="penTotalCap" placeholder="例如 50 (40+10殘劑)">
+          <input type="number" step="0.1" id="penTotalCap">
         </div>
       </div>
 
       <div class="input-group" style="margin-bottom:12px;">
         <label id="lblPenPrice">藥劑購入價格 (NTD $)</label>
-        <input type="number" step="1" id="penPrice" placeholder="例如 13000">
+        <input type="number" step="1" id="penPrice">
       </div>
 
       <button class="ios-btn ios-btn-blue" onclick="addDose()">新增打針紀錄並扣除容量</button>
@@ -258,7 +258,7 @@
         </div>
         <div class="input-group">
           <label>體重 (kg)</label>
-          <input type="number" step="0.01" id="weightVal" placeholder="例如 99.0">
+          <input type="number" step="0.01" id="weightVal">
         </div>
       </div>
 
@@ -267,60 +267,60 @@
       <div class="form-grid-3">
         <div class="input-group">
           <label>體脂率 (%)</label>
-          <input type="number" step="0.01" id="pFat" placeholder="36.35">
+          <input type="number" step="0.01" id="pFat">
         </div>
         <div class="input-group">
           <label>肌肉質量 (kg)</label>
-          <input type="number" step="0.01" id="mMuscle" placeholder="59.61">
+          <input type="number" step="0.01" id="mMuscle">
         </div>
         <div class="input-group">
           <label>四肢肌肉 (kg)</label>
-          <input type="number" step="0.01" id="mLimb" placeholder="27.44">
+          <input type="number" step="0.01" id="mLimb">
         </div>
       </div>
 
       <div class="form-grid-3">
         <div class="input-group">
           <label>腿部肌肉 (kg)</label>
-          <input type="number" step="0.01" id="mLeg" placeholder="19.84">
+          <input type="number" step="0.01" id="mLeg">
         </div>
         <div class="input-group">
           <label>脂肪質量 (kg)</label>
-          <input type="number" step="0.01" id="mFat" placeholder="36.0">
+          <input type="number" step="0.01" id="mFat">
         </div>
         <div class="input-group">
           <label>儲存脂肪 (kg)</label>
-          <input type="number" step="0.01" id="mStoreFat" placeholder="33.03">
+          <input type="number" step="0.01" id="mStoreFat">
         </div>
       </div>
 
       <div class="form-grid-3">
         <div class="input-group">
           <label>內臟脂肪(cm²)</label>
-          <input type="number" step="0.01" id="vfatArea" placeholder="164.13">
+          <input type="number" step="0.01" id="vfatArea">
         </div>
         <div class="input-group">
           <label>骨礦物質 (kg)</label>
-          <input type="number" step="0.01" id="mBone" placeholder="3.43">
+          <input type="number" step="0.01" id="mBone">
         </div>
         <div class="input-group">
           <label>骨密度(g/cm²)</label>
-          <input type="number" step="0.01" id="dBone" placeholder="1.33">
+          <input type="number" step="0.01" id="dBone">
         </div>
       </div>
 
       <div class="form-grid-3" style="margin-bottom:12px;">
         <div class="input-group">
           <label>BMR (kcal)</label>
-          <input type="number" step="1" id="valBMR" placeholder="1819">
+          <input type="number" step="1" id="valBMR">
         </div>
         <div class="input-group">
           <label>BMI</label>
-          <input type="number" step="0.01" id="valBMI" placeholder="32.34">
+          <input type="number" step="0.01" id="valBMI">
         </div>
         <div class="input-group">
           <label>ECW/TBW</label>
-          <input type="number" step="0.01" id="valWTR" placeholder="0.38">
+          <input type="number" step="0.01" id="valWTR">
         </div>
       </div>
 
@@ -395,7 +395,7 @@
 </div>
 
 <script>
-  const APP_VERSION = "4.6";
+  const APP_VERSION = "4.7";
   
   function forceReload() {
     window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
@@ -427,7 +427,6 @@
     });
   }
 
-  // 取得目前正在使用的針筆設定 (容量與價格)
   function getActivePenConfig() {
     for (let i = doses.length - 1; i >= 0; i--) {
       if (doses[i].penTotalCap && doses[i].penPrice) {
@@ -580,7 +579,6 @@ END:VCALENDAR`;
     const diffHours = (nextDoseTime - now) / (3600 * 1000);
     let daysNext = diffHours > 0 ? (diffHours / 24).toFixed(1) + '天' : '今日應施打';
 
-    // 計算針筆剩餘容量
     let activePen = getActivePenConfig();
     let penRemainStr = '-- mg';
     if (activePen) {
@@ -592,7 +590,6 @@ END:VCALENDAR`;
       penRemainStr = rem.toFixed(1) + ' mg';
     }
 
-    // 確保即使只有 1 筆紀錄也能延伸繪製 7 天曲線
     const end = Math.max(now, nextDoseTime) + 3 * 24 * 3600 * 1000;
 
     let chartData = [];
@@ -657,7 +654,6 @@ END:VCALENDAR`;
       ctx.fillText(dateLabel, x, h - 5);
     }
 
-    // 繪製血藥曲線 (即便只有 1 筆也能繪製)
     if (lineVisible.pk && data.length > 0) {
       let maxVal = Math.max(...data.map(d => d.v), 5);
 
