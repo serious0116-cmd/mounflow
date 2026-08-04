@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MounFlow 2.0</title>
+  <title>MounFlow 2.0 Pro</title>
 
-  <!-- iOS PWA Fullscreen -->
+  <!-- iOS PWA Options -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="MounFlow">
@@ -90,17 +90,37 @@
     .chart-container { width: 100%; height: 160px; position: relative; margin-top: 6px; }
     canvas { width: 100% !important; height: 100% !important; display: block; }
 
-    /* 紀錄清單與刪除按鈕 */
-    .logs-wrapper { display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto; }
-    .log-card {
-      background: #1c1c1e; border: 1px solid rgba(255,255,255,0.05); padding: 8px 12px;
-      border-radius: 10px; font-size: 11px; display: flex; justify-content: space-between; align-items: center;
+    /* 優化後的歷史紀錄分類與清單 */
+    .filter-bar { display: flex; gap: 4px; margin-bottom: 10px; }
+    .filter-chip {
+      background: #1c1c1e; color: #8e8e93; border: 1px solid rgba(255,255,255,0.05);
+      padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 600; cursor: pointer;
     }
-    .btn-delete { color: #ff453a; background: none; border: none; font-size: 12px; padding: 2px 6px; cursor: pointer; }
+    .filter-chip.active { background: #3a3a3c; color: #fff; }
+
+    .logs-wrapper { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 2px; }
+    
+    .log-card {
+      background: #1c1c1e; border: 1px solid rgba(255,255,255,0.06); padding: 10px 12px;
+      border-radius: 12px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .log-left { display: flex; flex-direction: column; gap: 2px; }
+    .log-tag {
+      display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 6px; width: fit-content;
+    }
+    .tag-dose { background: rgba(0, 122, 255, 0.2); color: #64d2ff; }
+    .tag-weight { background: rgba(52, 199, 89, 0.2); color: #30d158; }
+    .tag-side { background: rgba(175, 82, 222, 0.2); color: #bf5af2; }
+
+    .log-date { font-size: 11px; color: #8e8e93; font-weight: 500; }
+    .log-val { font-size: 13px; font-weight: 700; color: #f1f5f9; }
+    
+    .btn-delete { color: #ff453a; background: none; border: none; font-size: 14px; padding: 4px; cursor: pointer; opacity: 0.7; }
+    .btn-delete:active { opacity: 1; }
 
     /* 數據備份與還原工具 */
-    .backup-tools { display: flex; gap: 8px; margin-top: 6px; }
-    .btn-tool { flex: 1; background: #2c2c2e; color: #8e8e93; border: 1px solid rgba(255,255,255,0.08); padding: 6px; border-radius: 8px; font-size: 10px; cursor: pointer; }
+    .backup-tools { display: flex; gap: 8px; margin-top: 10px; }
+    .btn-tool { flex: 1; background: #2c2c2e; color: #8e8e93; border: 1px solid rgba(255,255,255,0.08); padding: 8px; border-radius: 10px; font-size: 10px; font-weight: 600; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -176,7 +196,7 @@
     <div id="formSide" style="display:none;">
       <label style="display:block; margin-bottom:6px;">選擇今日體感：</label>
       <div class="tags-grid">
-        <button class="tag-chip" onclick="toggleTag(this, '🤢 胃脹/排空慢')">🤢 胃脹排空慢</button>
+        <button class="tag-chip" onclick="toggleTag(this, '🤢 胃脹排空慢')">🤢 胃脹排空慢</button>
         <button class="tag-chip" onclick="toggleTag(this, '🤕 餐後頭痛')">🤕 餐後頭痛</button>
         <button class="tag-chip" onclick="toggleTag(this, '🤐 食慾極低')">🤐 食慾極低</button>
         <button class="tag-chip" onclick="toggleTag(this, '😋 輕微飢餓')">😋 輕微飢餓</button>
@@ -195,17 +215,27 @@
     </div>
   </div>
 
-  <!-- 4. 歷史紀錄與單筆刪除 -->
+  <!-- 4. 歷史紀錄管理 (優化版) -->
   <div class="card">
     <div class="flex-between" style="margin-bottom:8px;">
-      <div class="sub-label" style="color:#a1a1aa;">📋 歷史日誌 (支援單筆刪除)</div>
-      <a href="javascript:void(0)" onclick="clearAll()" style="color:#ff453a; font-size:10px; text-decoration:none; font-weight:600;">清空</a>
+      <div class="sub-label" style="color:#a1a1aa;">📋 歷史日誌</div>
+      <a href="javascript:void(0)" onclick="clearAll()" style="color:#ff453a; font-size:10px; text-decoration:none; font-weight:600;">清空全部</a>
     </div>
+
+    <!-- 紀錄分類篩選 -->
+    <div class="filter-bar">
+      <button class="filter-chip active" onclick="setLogFilter('all', this)">全部</button>
+      <button class="filter-chip" onclick="setLogFilter('dose', this)">💉 針劑</button>
+      <button class="filter-chip" onclick="setLogFilter('weight', this)">⚖️ 體重</button>
+      <button class="filter-chip" onclick="setLogFilter('side', this)">🩹 體感</button>
+    </div>
+
+    <!-- 日誌內容列表 -->
     <div class="logs-wrapper" id="logs"></div>
 
     <div class="backup-tools">
-      <button class="btn-tool" onclick="exportData()">📥 匯出備份</button>
-      <button class="btn-tool" onclick="importData()">📤 匯入備份</button>
+      <button class="btn-tool" onclick="exportData()">📥 匯出 JSON 備份</button>
+      <button class="btn-tool" onclick="importData()">📤 匯入備份檔案</button>
     </div>
   </div>
 
@@ -220,6 +250,7 @@
   let weights = JSON.parse(localStorage.getItem('mf_weights') || '[]');
   let sides = JSON.parse(localStorage.getItem('mf_sides') || '[]');
   let selectedTags = [];
+  let currentLogFilter = 'all';
 
   function switchTab(t) {
     ['dose', 'weight', 'side'].forEach(x => {
@@ -243,7 +274,7 @@
     let val = parseFloat(document.getElementById('weightVal').value);
     if (!date || isNaN(val)) return alert('請輸入正確數字');
     weights = weights.filter(w => w.date !== date);
-    weights.push({ id: Date.now(), date, val });
+    weights.push({ id: Date.now(), date, val, time: new Date(date).getTime() });
     weights.sort((a, b) => new Date(a.date) - new Date(b.date));
     localStorage.setItem('mf_weights', JSON.stringify(weights));
     document.getElementById('weightVal').value = '';
@@ -264,13 +295,12 @@
     if (selectedTags.length === 0) return alert('請選擇標籤');
     let date = new Date().toISOString().slice(0, 10);
     sides = sides.filter(s => s.date !== date);
-    sides.push({ id: Date.now(), date, tags: [...selectedTags] });
+    sides.push({ id: Date.now(), date, tags: [...selectedTags], time: Date.now() });
     localStorage.setItem('mf_sides', JSON.stringify(sides));
-    alert('已儲存！');
+    alert('已儲存體感紀錄！');
     refresh();
   }
 
-  // 單筆刪除功能
   function deleteLog(type, id) {
     if(!confirm('確定刪除此筆紀錄？')) return;
     if(type==='dose') doses = doses.filter(d=>d.id!==id);
@@ -283,17 +313,24 @@
   }
 
   function clearAll() {
-    if (confirm('確定要清空所有數據嗎？')) {
+    if (confirm('確定要清空所有數據嗎？此動作無法復原。')) {
       localStorage.clear(); doses = []; weights = []; sides = []; refresh();
     }
   }
 
-  // 二房室/雙相 PK 計算模型 (Two-Compartment Pharmacokinetics)
+  function setLogFilter(filter, el) {
+    currentLogFilter = filter;
+    document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    renderLogs();
+  }
+
+  // 二房室/雙相 PK 計算模型
   function calculatePKData() {
     if (doses.length === 0) return { chartData: [], current: 0, trough: 0 };
 
-    const ka = 0.04; // 吸收速率常數 (1/hr)
-    const ke = 0.00578; // 消除速率常數 (半衰期 120 hr)
+    const ka = 0.04;
+    const ke = 0.00578;
     const now = Date.now();
     const start = doses[0].time;
     const end = now + 7 * 24 * 3600 * 1000;
@@ -302,12 +339,11 @@
     let current = 0;
     let trough = 999;
 
-    for (let t = start; t <= end; t += 6 * 3600 * 1000) { // 每 6 小時採樣一次
+    for (let t = start; t <= end; t += 6 * 3600 * 1000) {
       let level = 0;
       doses.forEach(d => {
         if (t >= d.time) {
           let hrs = (t - d.time) / (3600 * 1000);
-          // 雙向指數 PK 吸收與消除公式
           let conc = d.mg * (ka / (ka - ke)) * (Math.exp(-ke * hrs) - Math.exp(-ka * hrs));
           level += Math.max(0, conc);
         }
@@ -334,13 +370,12 @@
 
     if (data.length < 2) {
       ctx.fillStyle = '#636366'; ctx.font = '12px sans-serif';
-      ctx.fillText('輸入打針紀錄後將自動算血藥濃度趨勢', 10, h / 2);
+      ctx.fillText('新增第一筆打針紀錄後自動計算趨勢圖', 10, h / 2);
       return;
     }
 
     let maxVal = Math.max(...data.map(d => d.v), 5);
 
-    // 填充漸層
     let grad = ctx.createLinearGradient(0, 0, 0, h);
     grad.addColorStop(0, 'rgba(100, 210, 255, 0.35)');
     grad.addColorStop(1, 'rgba(100, 210, 255, 0.0)');
@@ -354,7 +389,6 @@
     ctx.lineTo(w - 10, h - 12); ctx.lineTo(10, h - 12); ctx.closePath();
     ctx.fillStyle = grad; ctx.fill();
 
-    // 曲線
     ctx.beginPath();
     ctx.strokeStyle = '#64d2ff'; ctx.lineWidth = 2.5;
     data.forEach((d, i) => {
@@ -365,21 +399,50 @@
     ctx.stroke();
   }
 
+  function renderLogs() {
+    let list = [];
+
+    if(currentLogFilter === 'all' || currentLogFilter === 'dose') {
+      doses.forEach(d => list.push({ type: 'dose', id: d.id, time: d.time, title: '注射針劑', val: `${d.mg} mg`, tagClass: 'tag-dose' }));
+    }
+    if(currentLogFilter === 'all' || currentLogFilter === 'weight') {
+      weights.forEach(w => list.push({ type: 'weight', id: w.id, time: w.time || new Date(w.date).getTime(), title: '測量體重', val: `${w.val} kg`, tagClass: 'tag-weight' }));
+    }
+    if(currentLogFilter === 'all' || currentLogFilter === 'side') {
+      sides.forEach(s => list.push({ type: 'side', id: s.id, time: s.time || new Date(s.date).getTime(), title: '體感記錄', val: s.tags.join(', '), tagClass: 'tag-side' }));
+    }
+
+    // 時間倒序排列（最新在最前）
+    list.sort((a,b) => b.time - a.time);
+
+    let h = '';
+    list.forEach(item => {
+      let dateStr = new Date(item.time).toLocaleString('zh-TW', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
+      h += `
+        <div class="log-card">
+          <div class="log-left">
+            <span class="log-tag ${item.tagClass}">${item.title}</span>
+            <span class="log-date">${dateStr}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="log-val">${item.val}</span>
+            <button class="btn-delete" onclick="deleteLog('${item.type}', ${item.id})">🗑️</button>
+          </div>
+        </div>
+      `;
+    });
+
+    document.getElementById('logs').innerHTML = h || '<div style="color:#636366; text-align:center; padding:12px; font-size:11px;">尚無相關紀錄</div>';
+  }
+
   function refresh() {
     let pk = calculatePKData();
     document.getElementById('currentLevel').innerText = pk.current + ' mg';
     document.getElementById('troughLevel').innerText = pk.trough + ' mg';
     drawCanvasChart(pk.chartData);
-
-    // 渲染歷史日誌與刪除按鈕
-    let h = '';
-    doses.forEach(d => h += `<div class="log-card"><span>💉 打針: ${new Date(d.time).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})} (${d.mg}mg)</span><button class="btn-delete" onclick="deleteLog('dose', ${d.id})">🗑️</button></div>`);
-    weights.forEach(w => h += `<div class="log-card"><span>⚖️ 體重: ${w.date} (${w.val}kg)</span><button class="btn-delete" onclick="deleteLog('weight', ${w.id})">🗑️</button></div>`);
-    sides.forEach(s => h += `<div class="log-card"><span>🩹 體感: ${s.date} (${s.tags.join(', ')})</span><button class="btn-delete" onclick="deleteLog('side', ${s.id})">🗑️</button></div>`);
-    document.getElementById('logs').innerHTML = h || '<div style="color:#636366; text-align:center; padding:8px; font-size:11px;">尚無紀錄</div>';
+    renderLogs();
   }
 
-  // 匯出與匯入備份
   function exportData() {
     let data = { doses, weights, sides };
     let blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
@@ -406,7 +469,7 @@
           localStorage.setItem('mf_sides', JSON.stringify(sides));
           refresh();
           alert('數據匯入成功！');
-        } catch(err) { alert('備份檔案格式錯誤'); }
+        } catch(err) { alert('檔案格式錯誤'); }
       };
       reader.readAsText(file);
     };
