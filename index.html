@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MOUNFLOW v4.5</title>
+  <title>MOUNFLOW v4.6</title>
 
   <!-- iOS PWA Options -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -107,11 +107,7 @@
     .ios-btn-blue { background: linear-gradient(135deg, #007aff, #0056b3); box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3); }
     .ios-btn-green { background: linear-gradient(135deg, #34c759, #28a745); box-shadow: 0 4px 15px rgba(52, 199, 89, 0.3); }
     .ios-btn-purple { background: linear-gradient(135deg, #af52de, #8e44ad); box-shadow: 0 4px 15px rgba(175, 82, 222, 0.3); }
-    .ios-btn-secondary {
-      background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #60a5fa;
-      padding: 8px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 10px; width: 100%;
-    }
-    .ios-btn:active, .ios-btn-secondary:active { transform: scale(0.98); opacity: 0.85; }
+    .ios-btn:active { transform: scale(0.98); opacity: 0.85; }
 
     .tags-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
     .tag-chip {
@@ -182,7 +178,7 @@
   <div class="glass-card">
     <div class="flex-between">
       <div class="brand-title">MOUNFLOW</div>
-      <span class="version-badge" onclick="forceReload()" title="點擊刷新">v4.5</span>
+      <span class="version-badge" onclick="forceReload()" title="點擊刷頁">v4.6</span>
     </div>
     <div class="data-grid">
       <div class="data-box">
@@ -240,23 +236,21 @@
           </select>
         </div>
         <div class="input-group">
-          <label>針筆總容量 (含殘劑 mg)</label>
+          <label id="lblPenCap">針筆總容量 (含殘劑 mg)</label>
           <input type="number" step="0.1" id="penTotalCap" placeholder="例如 50 (40+10殘劑)">
         </div>
       </div>
 
       <div class="input-group" style="margin-bottom:12px;">
-        <label>藥劑購入價格 (NTD $)</label>
-        <input type="number" step="1" id="penPrice" placeholder="例如 8000">
+        <label id="lblPenPrice">藥劑購入價格 (NTD $)</label>
+        <input type="number" step="1" id="penPrice" placeholder="例如 13000">
       </div>
 
       <button class="ios-btn ios-btn-blue" onclick="addDose()">新增打針紀錄並扣除容量</button>
     </div>
 
-    <!-- 體組成完整量化數據 Form -->
+    <!-- 體組成 Form -->
     <div id="formWeight" style="display:none;">
-      <button class="ios-btn-secondary" onclick="fillSampleInBody()">⚡ 一鍵載入我的 7/30 Starbia 診所報告</button>
-
       <div class="form-grid" style="margin-bottom:6px;">
         <div class="input-group">
           <label>測量日期</label>
@@ -401,7 +395,7 @@
 </div>
 
 <script>
-  const APP_VERSION = "4.5";
+  const APP_VERSION = "4.6";
   
   function forceReload() {
     window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
@@ -417,13 +411,7 @@
   let selectedTags = [];
   let currentLogFilter = 'all';
 
-  let lineVisible = {
-    pk: true,
-    weight: true,
-    pFat: true,
-    mMuscle: true,
-    vfatArea: true
-  };
+  let lineVisible = { pk: true, weight: true, pFat: true, mMuscle: true, vfatArea: true };
 
   function toggleLine(key, el) {
     lineVisible[key] = !lineVisible[key];
@@ -439,36 +427,34 @@
     });
   }
 
-  // 快捷帶入按鈕
-  function fillSampleInBody() {
-    document.getElementById('weightDate').value = "2026-07-30";
-    document.getElementById('weightVal').value = "99.0";
-    document.getElementById('pFat').value = "36.35";
-    document.getElementById('mMuscle').value = "59.61";
-    document.getElementById('mLimb').value = "27.44";
-    document.getElementById('mLeg').value = "19.84";
-    document.getElementById('mFat').value = "36.0";
-    document.getElementById('mStoreFat').value = "33.03";
-    document.getElementById('vfatArea').value = "164.13";
-    document.getElementById('mBone').value = "3.43";
-    document.getElementById('dBone').value = "1.33";
-    document.getElementById('valBMR').value = "1819";
-    document.getElementById('valBMI').value = "32.34";
-    document.getElementById('valWTR').value = "0.38";
+  // 取得目前正在使用的針筆設定 (容量與價格)
+  function getActivePenConfig() {
+    for (let i = doses.length - 1; i >= 0; i--) {
+      if (doses[i].penTotalCap && doses[i].penPrice) {
+        return { cap: doses[i].penTotalCap, price: doses[i].penPrice, startIndex: i };
+      }
+    }
+    return null;
   }
 
   function addDose() {
     let time = document.getElementById('doseTime').value;
     let mg = parseFloat(document.getElementById('doseMg').value);
     let site = document.getElementById('doseSite').value;
-    let penTotalCap = parseFloat(document.getElementById('penTotalCap').value) || null;
-    let penPrice = parseFloat(document.getElementById('penPrice').value) || null;
+    
+    let activePen = getActivePenConfig();
+    let penTotalCap = parseFloat(document.getElementById('penTotalCap').value) || (activePen ? activePen.cap : null);
+    let penPrice = parseFloat(document.getElementById('penPrice').value) || (activePen ? activePen.price : null);
 
     if (!time) return alert('請選擇打針時間');
 
     doses.push({ id: Date.now(), time: new Date(time).getTime(), mg, site, penTotalCap, penPrice });
     doses.sort((a, b) => a.time - b.time);
     localStorage.setItem('mf_doses', JSON.stringify(doses));
+    
+    document.getElementById('penTotalCap').value = '';
+    document.getElementById('penPrice').value = '';
+
     refresh();
   }
 
@@ -550,10 +536,8 @@
 
   function addCalendarReminder() {
     if (doses.length === 0) return alert('請先新增至少一筆打針紀錄');
-    
     let lastDose = doses[doses.length - 1];
     let nextTime = new Date(lastDose.time + 7 * 24 * 3600 * 1000);
-    
     let formatTime = (date) => date.toISOString().replace(/-|:|\.\d+/g, '');
     let startTime = formatTime(nextTime);
     let endTime = formatTime(new Date(nextTime.getTime() + 30 * 60 * 1000));
@@ -564,7 +548,7 @@ VERSION:2.0
 PRODID:-//MOUNFLOW//v${APP_VERSION}//EN
 BEGIN:VEVENT
 SUMMARY:MOUNFLOW 打針提醒 (${lastDose.mg}mg)
-DESCRIPTION:每週 Tirzepatide 劑量施打提醒。請開啟 App 記錄：https://serious0116-cmd.github.io/mounflow/
+DESCRIPTION:每週 Tirzepatide 劑量施打提醒。
 DTSTART:${startTime}
 DTEND:${endTime}
 BEGIN:VALARM
@@ -585,7 +569,7 @@ END:VCALENDAR`;
   }
 
   function calculatePKData() {
-    if (doses.length === 0) return { chartData: [], current: 0, trough: 0, daysNext: '--', penRemainStr: '-- mg' };
+    if (doses.length === 0) return { chartData: [], current: '0.00', trough: '0.00', daysNext: '--', penRemainStr: '-- mg' };
 
     const ka = 0.04;
     const ke = 0.00578;
@@ -596,17 +580,19 @@ END:VCALENDAR`;
     const diffHours = (nextDoseTime - now) / (3600 * 1000);
     let daysNext = diffHours > 0 ? (diffHours / 24).toFixed(1) + '天' : '今日應施打';
 
+    // 計算針筆剩餘容量
+    let activePen = getActivePenConfig();
     let penRemainStr = '-- mg';
-    if (lastDose.penTotalCap) {
-      let totalUsedInPen = 0;
-      for (let i = doses.length - 1; i >= 0; i--) {
-        totalUsedInPen += doses[i].mg;
-        if (doses[i].penTotalCap && i !== doses.length - 1) break;
+    if (activePen) {
+      let usedSum = 0;
+      for (let i = activePen.startIndex; i < doses.length; i++) {
+        usedSum += doses[i].mg;
       }
-      let rem = Math.max(0, lastDose.penTotalCap - totalUsedInPen);
+      let rem = Math.max(0, activePen.cap - usedSum);
       penRemainStr = rem.toFixed(1) + ' mg';
     }
 
+    // 確保即使只有 1 筆紀錄也能延伸繪製 7 天曲線
     const end = Math.max(now, nextDoseTime) + 3 * 24 * 3600 * 1000;
 
     let chartData = [];
@@ -629,10 +615,10 @@ END:VCALENDAR`;
       if (t > now && level < trough) trough = level;
     }
 
-    return { chartData, current: current.toFixed(2), trough: trough === 999 ? 0 : trough.toFixed(2), daysNext, penRemainStr };
+    return { chartData, current: current.toFixed(2), trough: trough === 999 ? '0.00' : trough.toFixed(2), daysNext, penRemainStr };
   }
 
-  function drawCanvasChart(data) {
+  function drawCanvasChart(pkResult) {
     let cvs = document.getElementById('cvs');
     let ctx = cvs.getContext('2d');
     let dpr = window.devicePixelRatio || 2;
@@ -642,9 +628,11 @@ END:VCALENDAR`;
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, w, h);
 
-    if (data.length < 2 && weights.length < 2) {
-      ctx.fillStyle = '#8e8e93'; ctx.font = '12px sans-serif';
-      ctx.fillText('新增紀錄後將自動繪製趨勢圖', 15, h / 2);
+    let data = pkResult.chartData;
+
+    if (doses.length === 0 && weights.length === 0) {
+      ctx.fillStyle = '#8e8e93'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('輸入打針或體組成紀錄後將自動繪製曲線', w / 2, h / 2);
       return;
     }
 
@@ -663,17 +651,18 @@ END:VCALENDAR`;
     ctx.textAlign = 'center';
     let labelStep = Math.max(1, Math.floor(data.length / 4));
     for (let i = 0; i < data.length; i += labelStep) {
-      let x = paddingLeft + (i / (data.length - 1)) * chartW;
+      let x = paddingLeft + (i / Math.max(1, data.length - 1)) * chartW;
       let d = new Date(data[i].t);
       let dateLabel = `${d.getMonth() + 1}/${d.getDate()}`;
       ctx.fillText(dateLabel, x, h - 5);
     }
 
+    // 繪製血藥曲線 (即便只有 1 筆也能繪製)
     if (lineVisible.pk && data.length > 0) {
       let maxVal = Math.max(...data.map(d => d.v), 5);
 
       let grad = ctx.createLinearGradient(0, paddingTop, 0, h - paddingBottom);
-      grad.addColorStop(0, 'rgba(100, 210, 255, 0.3)');
+      grad.addColorStop(0, 'rgba(100, 210, 255, 0.35)');
       grad.addColorStop(1, 'rgba(100, 210, 255, 0.0)');
 
       ctx.beginPath();
@@ -719,7 +708,7 @@ END:VCALENDAR`;
       validItems.forEach(wItem => {
         let wtTime = wItem.time || new Date(wItem.date).getTime();
         let val = (key === 'weight') ? wItem.val : wItem.extra[key];
-        let x = paddingLeft + ((wtTime - minT) / (maxT - minT)) * chartW;
+        let x = paddingLeft + ((wtTime - minT) / Math.max(1, maxT - minT)) * chartW;
         let y = paddingTop + chartH * (1 - ((val - minV) / (maxV - minV)));
         if (first) { ctx.moveTo(x, y); first = false; } else { ctx.lineTo(x, y); }
       });
@@ -729,7 +718,7 @@ END:VCALENDAR`;
       validItems.forEach(wItem => {
         let wtTime = wItem.time || new Date(wItem.date).getTime();
         let val = (key === 'weight') ? wItem.val : wItem.extra[key];
-        let x = paddingLeft + ((wtTime - minT) / (maxT - minT)) * chartW;
+        let x = paddingLeft + ((wtTime - minT) / Math.max(1, maxT - minT)) * chartW;
         let y = paddingTop + chartH * (1 - ((val - minV) / (maxV - minV)));
         ctx.beginPath();
         ctx.arc(x, y, 3, 0, Math.PI * 2);
@@ -820,12 +809,21 @@ END:VCALENDAR`;
     document.getElementById('nextDoseCountdown').innerText = pk.daysNext;
     document.getElementById('penRemain').innerText = pk.penRemainStr;
 
+    let activePen = getActivePenConfig();
+    if (activePen) {
+      document.getElementById('lblPenCap').innerText = `針筆總容量 (已記憶 ${activePen.cap}mg)`;
+      document.getElementById('lblPenPrice').innerText = `藥劑價格 (已記憶 $${activePen.price})`;
+    } else {
+      document.getElementById('lblPenCap').innerText = '針筆總容量 (含殘劑 mg)';
+      document.getElementById('lblPenPrice').innerText = '藥劑購入價格 (NTD $)';
+    }
+
     if(doses.length > 0) {
       let last = doses[doses.length - 1];
       document.getElementById('lastSiteTip').innerText = `注射部位 (上次: ${last.site || '無'})`;
     }
 
-    drawCanvasChart(pk.chartData);
+    drawCanvasChart(pk);
     renderLogs();
   }
 
