@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MounFlow v3.1.1</title>
+  <title>MounFlow v3.1.2</title>
 
   <!-- iOS PWA Options -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -42,7 +42,6 @@
     .version-badge { font-size: 9px; font-weight: 700; background: rgba(96, 165, 250, 0.2); color: #60a5fa; padding: 2px 6px; border-radius: 6px; border: 1px solid rgba(96, 165, 250, 0.3); }
     .sub-label { font-size: 10px; color: #71717a; font-weight: 600; text-transform: uppercase; }
     
-    /* 強制重新整理按鈕 */
     .btn-reload {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -50,7 +49,7 @@
     }
     .btn-reload:active { opacity: 0.6; }
 
-    /* 數據面板 3格 */
+    /* 數據面板 */
     .data-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 8px; }
     .data-box { background: #1c1c1e; padding: 8px 6px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
     .data-val { font-size: 16px; font-weight: 900; letter-spacing: -0.5px; margin-top: 2px; }
@@ -136,15 +135,15 @@
 
 <div class="app-shell">
 
-  <!-- 1. 精準 PK 數據面板 (含一鍵全螢幕刷版按鈕) -->
+  <!-- 1. 數據面板 -->
   <div class="card">
     <div class="flex-between">
       <div>
         <div class="app-title">
           💉 MounFlow 
-          <span class="version-badge">v3.1.1</span>
+          <span class="version-badge">v3.1.2</span>
         </div>
-        <div class="sub-label">雙相 PK 動力學 & 雙軸對比</div>
+        <div class="sub-label">血藥濃度與體重追蹤</div>
       </div>
       <button class="btn-reload" onclick="forceReload()">🔄 刷新App</button>
     </div>
@@ -270,9 +269,8 @@
 </div>
 
 <script>
-  const APP_VERSION = "3.1.1";
+  const APP_VERSION = "3.1.2";
   
-  // PWA 強制清除快取刷版功能
   function forceReload() {
     window.location.href = window.location.pathname + '?reload=' + new Date().getTime();
   }
