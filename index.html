@@ -1,5 +1,4 @@
-# Generate the single-file HTML for iPhone-native app "MounFlow"
-html_content = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
@@ -44,7 +43,7 @@ html_content = """<!DOCTYPE html>
     }
 
     .app-shell {
-      max-width: 430px; /* iPhone 15/16 Pro Max Ultra Width limit */
+      max-width: 430px; /* iPhone 15/16 Pro Max Width limit */
       margin: 0 auto;
       display: flex;
       flex-direction: column;
@@ -163,7 +162,7 @@ html_content = """<!DOCTYPE html>
       border-color: #0a84ff;
     }
 
-    /* Primary Action Buttons with Native Haptic feel */
+    /* Primary Action Buttons */
     .ios-btn {
       width: 100%;
       padding: 12px;
@@ -214,7 +213,7 @@ html_content = """<!DOCTYPE html>
       font-weight: 600;
     }
 
-    /* Chart Container (Fixed Height Aspect for Mobile) */
+    /* Chart Container */
     .chart-container {
       width: 100%;
       height: 150px;
@@ -327,7 +326,7 @@ html_content = """<!DOCTYPE html>
     <div id="formSide" style="display:none;">
       <label style="display:block; margin-bottom:6px;">選擇今日體感點擊紀錄：</label>
       <div class="tags-grid">
-        <button class="tag-chip" onclick="toggleTag(this, '🤢 胃脹/排空慢')">🤢 胃脹排空慢</button>
+        <button class="tag-chip" onclick="toggleTag(this, '🤢 胃脹排空慢')">🤢 胃脹排空慢</button>
         <button class="tag-chip" onclick="toggleTag(this, '🤕 餐後頭痛')">🤕 餐後頭痛</button>
         <button class="tag-chip" onclick="toggleTag(this, '🤐 食慾極低')">🤐 食慾極低</button>
         <button class="tag-chip" onclick="toggleTag(this, '😋 輕微飢餓')">😋 輕微飢餓</button>
@@ -391,7 +390,7 @@ html_content = """<!DOCTYPE html>
     if (!date || isNaN(val)) return alert('請輸入正確的體重數字');
     weights = weights.filter(w => w.date !== date);
     weights.push({ date, val });
-    weights.sort((a, b) => new Date(a.date) - new Date(b.date));
+    weights.sort((a,b) => new Date(a.date) - new Date(b.date));
     localStorage.setItem('mf_weights', JSON.stringify(weights));
     document.getElementById('weightVal').value = '';
     refresh();
@@ -515,10 +514,4 @@ html_content = """<!DOCTYPE html>
 </script>
 
 </body>
-</html>"""
-
-# Save file directly
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(html_content)
-
-print("iPhone Native index.html updated successfully.")
+</html>
