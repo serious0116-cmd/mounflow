@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+[source: 1]<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
@@ -174,7 +174,7 @@
         .trend-item .delta.neutral { color: var(--text-muted); }
 
         /* ── Toast ── */
-        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(16,16,24,0.92); backdrop-filter: blur(16px); color: #fff; padding: 10px 22px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 8px 32px rgba(0,0,0,0.6); opacity: 0; transition: opacity 0.25s ease; pointer-events: none; z-index: 999; max-width: 90%; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(16,16,24,0.92); backdrop-filter: blur(16px); color: #fff; padding: 10px 22px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 8px 32px rgba(0,0,0,0.6); opacity: 0; transition: opacity 0.25s ease; pointer-events: none; z-index: 3000; max-width: 90%; }
         .toast.show { opacity: 1; }
 
         /* ── 歡迎畫面 ── */
@@ -228,6 +228,8 @@
 </head>
 <body>
 
+    <div class="toast" id="toast"></div>
+
     <!-- 歡迎畫面 -->
     <div class="welcome-overlay" id="welcomeOverlay">
         <div class="logo">MOUNFLOW</div>
@@ -274,8 +276,6 @@
     </div>
 
     <div class="app" id="mainApp">
-        <div class="toast" id="toast"></div>
-
         <!-- ─── 儀表板 ─── -->
         <div class="card">
             <div class="header">
@@ -334,3 +334,911 @@
                             <option value="7.5">7.5 mg</option>
                             <option value="10.0">10.0 mg</option>
                             <option value="12.5">12.5 mg</option>
+                            <option value="15.0">15.0 mg</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field mb-1"><label>部位</label>
+                    <select id="doseSite">
+                        <option value="左腹部">左腹部</option>
+                        <option value="右腹部">右腹部</option>
+                        <option value="左大腿">左大腿</option>
+                        <option value="右大腿">右大腿</option>
+                        <option value="手臂">手臂</option>
+                    </select>
+                </div>
+                <div class="pen-state" id="penState">
+                    <span class="label">使用中針筆</span>
+                    <span class="remain" id="penRemainLabel">剩餘 -- mg</span>
+                </div>
+                <div id="penNewGroup">
+                    <div class="grid-2">
+                        <div class="field"><label>新筆容量</label><input type="number" step="0.1" min="0" inputmode="decimal" id="penTotalCap" placeholder="50"></div>
+                        <div class="field"><label>價格 (NTD)</label><input type="number" step="1" min="0" inputmode="numeric" id="penPrice" placeholder="13000"></div>
+                    </div>
+                    <div class="hint">輸入後自動記憶，直至容量歸零</div>
+                </div>
+                <button class="btn btn-primary mt-1" onclick="addDose()">儲存注射</button>
+            </div>
+
+            <!-- 體組成 -->
+            <div id="panelWeight" class="panel">
+                <div class="grid-2">
+                    <div class="field"><label>日期</label><input type="date" id="weightDate"></div>
+                    <div class="field"><label>體重 (kg)</label><input type="number" step="0.01" min="0" inputmode="decimal" id="weightVal" placeholder="體重"></div>
+                </div>
+                <div class="field mb-1"><label>體脂率 (%)</label><input type="number" step="0.01" min="0" max="100" inputmode="decimal" id="pFat" placeholder="體脂率"></div>
+                <button class="btn btn-success mt-1" onclick="addWeight()">儲存體組成</button>
+            </div>
+
+            <!-- 體感 -->
+            <div id="panelSide" class="panel">
+                <div class="text-muted text-small" style="margin-bottom:4px;">選擇今日體感（可複選）</div>
+                <div class="tags" id="sideTags">
+                    <button class="tag" data-tag="胃脹排空慢">胃脹排空慢</button>
+                    <button class="tag" data-tag="餐後頭痛">餐後頭痛</button>
+                    <button class="tag" data-tag="食慾極低">食慾極低</button>
+                    <button class="tag" data-tag="輕微飢餓">輕微飢餓</button>
+                    <button class="tag" data-tag="精神充沛">精神充沛</button>
+                    <button class="tag" data-tag="口乾需補水">口乾需補水</button>
+                </div>
+                <div class="field mb-1"><label>自訂體感</label><input type="text" id="customSide" placeholder="輸入您想記錄的體感"></div>
+                <button class="btn btn-purple" onclick="saveSide()">儲存體感</button>
+            </div>
+        </div>
+
+        <!-- ─── 趨勢摘要 + 目標體重 ─── -->
+        <div class="card">
+            <div class="flex" style="margin-bottom:6px;">
+                <span class="text-muted text-small" style="font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">趨勢摘要</span>
+                <span class="text-muted text-small" id="trendUpdateTime">--</span>
+            </div>
+            <div class="trend-grid">
+                <div class="trend-item">
+                    <div class="label">體重</div>
+                    <div class="number" id="trendWeight">--</div>
+                    <div class="delta" id="trendWeightDelta">--</div>
+                </div>
+                <div class="trend-item">
+                    <div class="label">體脂率</div>
+                    <div class="number" id="trendFat">--</div>
+                    <div class="delta" id="trendFatDelta">--</div>
+                </div>
+                <div class="trend-item">
+                    <div class="label">血藥狀態</div>
+                    <div class="number" style="color:var(--blue);" id="trendPk">--</div>
+                    <div class="delta neutral" id="trendPkDelta">--</div>
+                </div>
+            </div>
+
+            <div class="goal-block" id="goalBlock">
+                <div class="goal-header">
+                    <span>目標體重 <span id="goalLabel" style="color:var(--text-primary);font-weight:700;">-- kg</span></span>
+                    <span id="goalPct" style="color:var(--text-muted);">0%</span>
+                </div>
+                <div class="goal-bar"><div class="fill" id="goalFill" style="width:0%;"></div></div>
+                <div class="goal-sub" id="goalSub">請先記錄體重，再設定目標</div>
+                <div class="goal-speed" id="goalSpeed">尚無數據</div>
+                <div class="goal-set">
+                    <button class="btn-goal" style="flex:1;padding:6px 14px;" onclick="openGoalModal()">修改目標體重</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── 日誌 ─── -->
+        <div class="card">
+            <div class="flex mb-1">
+                <span class="text-muted text-small" style="font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">日誌 <span id="logScopeLabel" style="font-weight:400;">(本週)</span></span>
+                <div class="inline-flex">
+                    <button class="tool-btn" style="flex:0;padding:3px 12px;font-size:9px;" onclick="exportJSON()">JSON</button>
+                    <button class="tool-btn" style="flex:0;padding:3px 12px;font-size:9px;" onclick="exportCSV()">CSV</button>
+                    <button class="tool-btn" style="flex:0;padding:3px 12px;font-size:9px;" onclick="document.getElementById('importFile').click()">匯入</button>
+                    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+                    <button class="tool-btn danger" style="flex:0;padding:3px 12px;font-size:9px;" onclick="clearAll()">清空</button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <div class="filter-row" id="timeFilterRow">
+                    <button class="filter-chip time-active active" onclick="setTimeFilter('week',this)">本週</button>
+                    <button class="filter-chip time-active" onclick="setTimeFilter('month',this)">本月</button>
+                    <button class="filter-chip time-active" onclick="setTimeFilter('year',this)">今年</button>
+                </div>
+                <div class="filter-row" id="typeFilterRow">
+                    <button class="filter-chip active" onclick="setTypeFilter('all',this)">全部</button>
+                    <button class="filter-chip" onclick="setTypeFilter('dose',this)">注射</button>
+                    <button class="filter-chip" onclick="setTypeFilter('weight',this)">體組成</button>
+                    <button class="filter-chip" onclick="setTypeFilter('side',this)">體感</button>
+                </div>
+            </div>
+
+            <div class="log-list" id="logList"></div>
+        </div>
+    </div>
+
+    <script>
+    'use strict';
+
+    // ============================================================
+    //  安全儲存層（iOS Safari 隱私瀏覽 / 部分環境會封鎖 localStorage）
+    // ============================================================
+    const LS = (function() {
+        let memoryStore = {};
+        let storageOK = true;
+        try {
+            const testKey = '__mf_test__';
+            localStorage.setItem(testKey, '1');
+            localStorage.removeItem(testKey);
+        } catch (err) {
+            storageOK = false;
+        }
+        return {
+            get(key) {
+                if (storageOK) {
+                    try { return localStorage.getItem(key); } catch (err) { storageOK = false; }
+                }
+                return Object.prototype.hasOwnProperty.call(memoryStore, key) ? memoryStore[key] : null;
+            },
+            set(key, value) {
+                if (storageOK) {
+                    try { localStorage.setItem(key, value); return; } catch (err) { storageOK = false; }
+                }
+                memoryStore[key] = value;
+            },
+            remove(key) {
+                if (storageOK) {
+                    try { localStorage.removeItem(key); return; } catch (err) { storageOK = false; }
+                }
+                delete memoryStore[key];
+            },
+            isPersistent() { return storageOK; }
+        };
+    })();
+
+    // 任何未預期的錯誤都跳出提示，而不是讓畫面卡住沒反應
+    window.addEventListener('error', function(e) {
+        showToastSafe('發生錯誤：' + (e.message || '未知錯誤'));
+    });
+    function showToastSafe(msg) {
+        try { showToast(msg); } catch (err) { /* toast 尚未就緒時忽略 */ }
+    }
+
+    // ============================================================
+    //  核心數據
+    // ============================================================
+    const STORAGE_KEY = 'mf_users_v9';
+    let users = JSON.parse(LS.get(STORAGE_KEY) || '[]');
+    let currentUser = LS.get('mf_current_user') || null;
+
+    if (users.length === 0) {
+        document.getElementById('welcomeOverlay').style.display = 'flex';
+        document.getElementById('mainApp').style.display = 'none';
+    } else {
+        document.getElementById('welcomeOverlay').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        if (!currentUser || !users.includes(currentUser)) {
+            currentUser = users[0];
+            LS.set('mf_current_user', currentUser);
+        }
+    }
+
+    function getUserKey(type) { return `mf_${currentUser}_${type}`; }
+
+    let doses = [], weights = [], sides = [];
+
+    function loadUserData() {
+        doses = JSON.parse(LS.get(getUserKey('doses')) || '[]');
+        weights = JSON.parse(LS.get(getUserKey('weights')) || '[]');
+        sides = JSON.parse(LS.get(getUserKey('sides')) || '[]');
+    }
+    if (users.length > 0 && currentUser) loadUserData();
+
+    let currentTimeFilter = 'week';
+    let currentTypeFilter = 'all';
+    let selectedTags = [];
+
+    // ============================================================
+    //  時間範圍
+    // ============================================================
+    function getTimeRange() {
+        const now = new Date();
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay() + 1);
+        startOfWeek.setHours(0,0,0,0);
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const startOfYear = new Date(now.getFullYear(), 0, 1);
+        switch(currentTimeFilter) {
+            case 'week': return { start: startOfWeek.getTime(), label: '本週' };
+            case 'month': return { start: startOfMonth.getTime(), label: '本月' };
+            case 'year': return { start: startOfYear.getTime(), label: '今年' };
+            default: return { start: 0, label: '全部' };
+        }
+    }
+    function getTimeLabel() {
+        const map = { week: '本週', month: '本月', year: '今年' };
+        return map[currentTimeFilter] || '全部';
+    }
+
+    // ============================================================
+    //  使用者管理
+    // ============================================================
+    function createFirstUser() {
+        const name = document.getElementById('welcomeName').value.trim();
+        if (!name) { showToast('請輸入暱稱'); return; }
+        if (users.includes(name)) { showToast('名稱已存在'); return; }
+        users = [name];
+        LS.set(STORAGE_KEY, JSON.stringify(users));
+        currentUser = name;
+        LS.set('mf_current_user', name);
+        doses = []; weights = []; sides = [];
+        saveAll();
+        document.getElementById('welcomeOverlay').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        document.getElementById('doseTime').value = new Date().toISOString().slice(0,16);
+        document.getElementById('weightDate').value = new Date().toISOString().slice(0,10);
+        document.querySelectorAll('#sideTags .tag').forEach(el => {
+            el.addEventListener('click', function() {
+                const tag = this.dataset.tag;
+                if (selectedTags.includes(tag)) {
+                    selectedTags = selectedTags.filter(t => t !== tag);
+                    this.classList.remove('active');
+                } else {
+                    selectedTags.push(tag);
+                    this.classList.add('active');
+                }
+            });
+        });
+        document.getElementById('setupOverlay').classList.add('show');
+        document.getElementById('setupStartWeight').focus();
+    }
+
+    function confirmSetup() {
+        const start = parseFloat(document.getElementById('setupStartWeight').value);
+        const target = parseFloat(document.getElementById('setupTargetWeight').value);
+        const errorEl = document.getElementById('setupError');
+        if (isNaN(start) || start <= 0 || start > 400) { errorEl.textContent = '請輸入有效體重'; errorEl.classList.add('show'); return; }
+        if (isNaN(target) || target <= 0 || target > 400) { errorEl.textContent = '請輸入有效目標'; errorEl.classList.add('show'); return; }
+        if (target >= start) { errorEl.textContent = '目標須小於目前體重'; errorEl.classList.add('show'); return; }
+        errorEl.classList.remove('show');
+        const today = new Date().toISOString().slice(0,10);
+        weights.push({ id: Date.now(), date: today, val: start, extra: { pFat: null }, time: Date.now() });
+        weights.sort((a,b) => a.time - b.time);
+        LS.set(`mf_${currentUser}_goal`, JSON.stringify({ start, target }));
+        saveAll();
+        document.getElementById('setupOverlay').classList.remove('show');
+        showToast(`歡迎，${currentUser}！`);
+        refresh();
+        switchTab('dose');
+    }
+
+    function saveAll() {
+        if (!currentUser) return;
+        LS.set(getUserKey('doses'), JSON.stringify(doses));
+        LS.set(getUserKey('weights'), JSON.stringify(weights));
+        LS.set(getUserKey('sides'), JSON.stringify(sides));
+    }
+
+    function showToast(msg) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(el._timer);
+        el._timer = setTimeout(() => el.classList.remove('show'), 2200);
+    }
+
+    function renderUserSelect() {
+        const sel = document.getElementById('userSelect');
+        sel.innerHTML = users.map(u => `<option value="${u}" ${u===currentUser?'selected':''}>${u}</option>`).join('');
+    }
+
+    function switchUser(user) {
+        if (user === currentUser) return;
+        currentUser = user;
+        LS.set('mf_current_user', user);
+        loadUserData();
+        selectedTags = [];
+        document.querySelectorAll('#sideTags .tag').forEach(el => el.classList.remove('active'));
+        document.getElementById('customSide').value = '';
+        refresh();
+        showToast(`切換至「${user}」`);
+    }
+
+    function addUser() {
+        const name = prompt('請輸入新使用者名稱：');
+        if (!name) return;
+        if (users.includes(name)) { showToast('名稱已存在'); return; }
+        users.push(name);
+        LS.set(STORAGE_KEY, JSON.stringify(users));
+        renderUserSelect();
+        currentUser = name;
+        LS.set('mf_current_user', name);
+        doses = []; weights = []; sides = [];
+        saveAll();
+        selectedTags = [];
+        document.querySelectorAll('#sideTags .tag').forEach(el => el.classList.remove('active'));
+        document.getElementById('customSide').value = '';
+        document.getElementById('setupOverlay').classList.add('show');
+        document.getElementById('setupStartWeight').focus();
+        document.getElementById('setupStartWeight').value = '';
+        document.getElementById('setupTargetWeight').value = '';
+        document.getElementById('setupError').classList.remove('show');
+        refresh();
+        showToast(`已新增「${name}」`);
+    }
+
+    function deleteUser() {
+        if (users.length <= 1) { showToast('至少保留一位使用者'); return; }
+        if (!confirm(`確定刪除使用者「${currentUser}」及其所有資料？`)) return;
+        LS.remove(getUserKey('doses'));
+        LS.remove(getUserKey('weights'));
+        LS.remove(getUserKey('sides'));
+        users = users.filter(u => u !== currentUser);
+        LS.set(STORAGE_KEY, JSON.stringify(users));
+        const newUser = users[0];
+        LS.set('mf_current_user', newUser);
+        currentUser = newUser;
+        loadUserData();
+        selectedTags = [];
+        document.querySelectorAll('#sideTags .tag').forEach(el => el.classList.remove('active'));
+        document.getElementById('customSide').value = '';
+        renderUserSelect();
+        refresh();
+        showToast(`已切換至「${newUser}」`);
+    }
+
+    function switchTab(tab) {
+        ['dose','weight','side'].forEach(t => {
+            const panel = document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1));
+            const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+            if (t === tab) { panel.classList.add('open'); btn.classList.add('active'); }
+            else { panel.classList.remove('open'); btn.classList.remove('active'); }
+        });
+    }
+
+    // ============================================================
+    //  目標體重
+    // ============================================================
+    function getStartWeight() {
+        if (weights.length === 0) return null;
+        const sorted = [...weights].sort((a,b) => a.time - b.time);
+        return sorted[0].val;
+    }
+
+    function openGoalModal() {
+        const start = getStartWeight();
+        if (start === null) { showToast('請先記錄至少一筆體重'); return; }
+        const goal = getGoal();
+        document.getElementById('goalModalInput').value = goal.target || '';
+        document.getElementById('goalModalError').classList.remove('show');
+        document.getElementById('goalOverlay').classList.add('show');
+        document.getElementById('goalModalInput').focus();
+    }
+
+    function closeGoalModal() {
+        document.getElementById('goalOverlay').classList.remove('show');
+    }
+
+    function confirmGoalModal() {
+        const target = parseFloat(document.getElementById('goalModalInput').value);
+        const start = getStartWeight();
+        const errorEl = document.getElementById('goalModalError');
+        if (start === null) { showToast('請先記錄至少一筆體重'); return; }
+        if (isNaN(target) || target <= 0) { errorEl.textContent = '請輸入有效的目標體重'; errorEl.classList.add('show'); return; }
+        if (target >= start) { errorEl.textContent = '目標須小於起始體重'; errorEl.classList.add('show'); return; }
+        errorEl.classList.remove('show');
+        LS.set(`mf_${currentUser}_goal`, JSON.stringify({ start, target }));
+        closeGoalModal();
+        showToast('目標已更新');
+        refresh();
+    }
+
+    function getGoal() {
+        const raw = LS.get(`mf_${currentUser}_goal`);
+        const start = getStartWeight();
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (start !== null && parsed.start !== start) {
+                const newGoal = { start, target: parsed.target };
+                LS.set(`mf_${currentUser}_goal`, JSON.stringify(newGoal));
+                return newGoal;
+            }
+            return parsed;
+        }
+        if (start !== null) {
+            const target = Math.max(50, start - 10);
+            const newGoal = { start, target };
+            LS.set(`mf_${currentUser}_goal`, JSON.stringify(newGoal));
+            return newGoal;
+        }
+        return { start: 0, target: 0 };
+    }
+
+    function updateGoalProgress(currentWeight) {
+        const { start, target } = getGoal();
+        if (start === 0 || target === 0 || !currentWeight) {
+            document.getElementById('goalLabel').textContent = '-- kg';
+            document.getElementById('goalFill').style.width = '0%';
+            document.getElementById('goalPct').textContent = '0%';
+            document.getElementById('goalSub').textContent = '請先記錄體重，再設定目標';
+            document.getElementById('goalSpeed').textContent = '尚無數據';
+            return;
+        }
+        const total = start - target;
+        const current = start - currentWeight;
+        const pct = total > 0 ? Math.min(100, Math.max(0, (current / total) * 100)) : 0;
+        document.getElementById('goalLabel').textContent = `${target.toFixed(1)} kg (起始 ${start.toFixed(1)})`;
+        document.getElementById('goalFill').style.width = pct + '%';
+        document.getElementById('goalPct').textContent = pct.toFixed(0) + '%';
+        if (currentWeight <= target) {
+            document.getElementById('goalSub').textContent = `🎉 已達成目標！共減 ${current.toFixed(1)} kg`;
+        } else {
+            document.getElementById('goalSub').textContent = `已減 ${current.toFixed(1)} kg / 總目標 ${total.toFixed(1)} kg（尚差 ${(currentWeight - target).toFixed(1)} kg）`;
+        }
+        updateGoalSpeed(currentWeight);
+    }
+
+    function updateGoalSpeed(currentWeight) {
+        const range = getTimeRange();
+        const now = Date.now();
+        const rangeWeights = weights.filter(w => w.time >= range.start && w.time <= now).sort((a,b) => a.time - b.time);
+        const speedEl = document.getElementById('goalSpeed');
+        if (rangeWeights.length < 2) {
+            speedEl.textContent = `${range.label} 尚無足夠體重記錄`;
+            return;
+        }
+        const first = rangeWeights[0], last = rangeWeights[rangeWeights.length - 1];
+        const diff = first.val - last.val;
+        if (Math.abs(diff) < 0.01) {
+            speedEl.textContent = `${range.label} 體重持平 (±${Math.abs(diff).toFixed(1)} kg)`;
+            return;
+        }
+        const direction = diff > 0 ? '減了' : '增加了';
+        const cls = diff > 0 ? 'up' : 'down';
+        speedEl.innerHTML = `${range.label} ${direction} <span class="${cls}">${Math.abs(diff).toFixed(1)} kg</span> (${first.val.toFixed(1)} → ${last.val.toFixed(1)})`;
+    }
+
+    // ============================================================
+    //  部位統計
+    // ============================================================
+    function updateSiteStats() {
+        const count = { '左腹部':0, '右腹部':0, '左大腿':0, '右大腿':0, '手臂':0 };
+        doses.forEach(d => { if (count[d.site] !== undefined) count[d.site]++; });
+        document.getElementById('siteLeft').textContent = count['左腹部'];
+        document.getElementById('siteRight').textContent = count['右腹部'];
+        document.getElementById('siteLeg').textContent = count['左大腿'] + count['右大腿'];
+        document.getElementById('siteArm').textContent = count['手臂'];
+    }
+
+    // ============================================================
+    //  智慧提醒
+    // ============================================================
+    function updateSmartAlert(pkLevel) {
+        const banner = document.getElementById('alertBanner');
+        const text = document.getElementById('alertText');
+        if (doses.length === 0) { banner.classList.remove('show'); return; }
+        const last = doses[doses.length-1];
+        const hrsSince = (Date.now() - last.time) / 3600000;
+        if (pkLevel < 1.5 && hrsSince > 120) {
+            banner.classList.add('show');
+            text.textContent = `血藥濃度偏低 (${pkLevel.toFixed(2)} mg)，已過 ${(hrsSince/24).toFixed(1)} 天，建議補打`;
+        } else if (hrsSince > 168) {
+            banner.classList.add('show');
+            text.textContent = `已超過 ${(hrsSince/24).toFixed(1)} 天未注射，請盡快施打`;
+        } else {
+            banner.classList.remove('show');
+        }
+    }
+
+    // ============================================================
+    //  圖表
+    // ============================================================
+    function renderChart() {
+        const canvas = document.getElementById('weightChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const sorted = [...weights].sort((a,b) => a.time - b.time);
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        const W = rect.width, H = rect.height;
+        const pad = { top: 16, bottom: 20, left: 26, right: 8 };
+        const chartW = W - pad.left - pad.right;
+        const chartH = H - pad.top - pad.bottom;
+
+        ctx.clearRect(0, 0, W, H);
+        if (sorted.length < 2) {
+            ctx.fillStyle = '#55576b';
+            ctx.font = '11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(sorted.length === 0 ? '尚無體重數據' : '至少需 2 筆紀錄', W/2, H/2);
+            return;
+        }
+
+        const vals = sorted.map(d => d.val);
+        const minVal = Math.min(...vals) - 0.5;
+        const maxVal = Math.max(...vals) + 0.5;
+        const range = maxVal - minVal || 1;
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+        ctx.lineWidth = 0.5;
+        for (let i=0; i<=4; i++) {
+            const y = pad.top + (chartH / 4) * i;
+            ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+        }
+
+        ctx.beginPath();
+        ctx.strokeStyle = '#5b7fff';
+        ctx.lineWidth = 2;
+        ctx.shadowColor = 'rgba(91,127,255,0.15)';
+        ctx.shadowBlur = 4;
+        const points = vals.map((v, i) => {
+            const x = pad.left + (i / (vals.length - 1)) * chartW;
+            const y = pad.top + chartH - ((v - minVal) / range) * chartH;
+            return { x, y };
+        });
+        points.forEach((p, i) => { if (i===0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        points.forEach((p, i) => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.strokeStyle = '#5b7fff';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+            if (i === 0 || i === points.length-1) {
+                ctx.fillStyle = '#6d6f85';
+                ctx.font = '7px sans-serif';
+                ctx.textAlign = i===0 ? 'left' : 'right';
+                ctx.fillText(vals[i].toFixed(1), p.x + (i===0?4:-4), p.y - 5);
+            }
+        });
+
+        ctx.fillStyle = '#55576b';
+        ctx.font = '7px sans-serif';
+        ctx.textAlign = 'center';
+        const d1 = new Date(sorted[0].time);
+        const d2 = new Date(sorted[sorted.length-1].time);
+        ctx.fillText(`${d1.getMonth()+1}/${d1.getDate()}`, pad.left, H-3);
+        ctx.fillText(`${d2.getMonth()+1}/${d2.getDate()}`, W-pad.right, H-3);
+    }
+
+    // ============================================================
+    //  針筆管理
+    // ============================================================
+    function getActivePen() {
+        const sorted = [...doses].sort((a,b) => a.time - b.time);
+        let activePen = null, totalUsed = 0, counting = false;
+        for (const d of sorted) {
+            if (d.penTotalCap && d.penTotalCap > 0) { activePen = d; totalUsed = 0; counting = true; }
+            if (counting) totalUsed += d.mg;
+        }
+        if (!activePen) return { active: false, cap: 0, price: 0, remain: 0 };
+        const remain = Math.max(0, activePen.penTotalCap - totalUsed);
+        return { active: remain > 0, cap: activePen.penTotalCap, price: activePen.penPrice || 0, remain };
+    }
+
+    function updatePenUI() {
+        const state = getActivePen();
+        const el = document.getElementById('penState');
+        const remainLabel = document.getElementById('penRemainLabel');
+        const remainStat = document.getElementById('penRemain');
+        const newGroup = document.getElementById('penNewGroup');
+        if (state.active) {
+            el.classList.add('show');
+            remainLabel.textContent = `剩餘 ${state.remain.toFixed(1)} mg`;
+            remainStat.textContent = `${state.remain.toFixed(1)} mg`;
+            newGroup.style.display = 'none';
+        } else {
+            el.classList.remove('show');
+            remainStat.textContent = '-- mg';
+            newGroup.style.display = 'block';
+        }
+    }
+
+    // ============================================================
+    //  注射 / 體重 / 體感 儲存
+    // ============================================================
+    function addDose() {
+        const time = document.getElementById('doseTime').value;
+        const mg = parseFloat(document.getElementById('doseMg').value);
+        const site = document.getElementById('doseSite').value;
+        if (!time) { showToast('請選擇時間'); return; }
+        const state = getActivePen();
+        let penTotalCap = null, penPrice = null;
+        if (!state.active) {
+            penTotalCap = parseFloat(document.getElementById('penTotalCap').value) || null;
+            penPrice = parseFloat(document.getElementById('penPrice').value) || null;
+            if (!penTotalCap || penTotalCap <= 0) { showToast('請輸入有效的新筆容量'); return; }
+        }
+        doses.push({ id: Date.now(), time: new Date(time).getTime(), mg, site, penTotalCap: penTotalCap || null, penPrice: penPrice || null });
+        doses.sort((a,b)=>a.time-b.time);
+        saveAll();
+        document.getElementById('penTotalCap').value = '';
+        document.getElementById('penPrice').value = '';
+        document.getElementById('doseTime').value = new Date().toISOString().slice(0,16);
+        showToast('注射已儲存');
+        refresh();
+    }
+
+    function addWeight() {
+        const date = document.getElementById('weightDate').value;
+        const val = parseFloat(document.getElementById('weightVal').value);
+        if (!date || isNaN(val)) { showToast('請輸入日期與體重'); return; }
+        if (val <= 0 || val > 400) { showToast('請輸入有效的體重數值'); return; }
+        const pFatRaw = document.getElementById('pFat').value;
+        const pFat = pFatRaw === '' ? null : parseFloat(pFatRaw);
+        if (pFat !== null && (isNaN(pFat) || pFat < 0 || pFat > 100)) { showToast('體脂率須介於 0-100'); return; }
+        const isFirstEntryForDate = !weights.some(w => w.date === date);
+        weights = weights.filter(w => w.date !== date);
+        weights.push({ id: Date.now(), date, val, extra: { pFat }, time: new Date(date).getTime() });
+        weights.sort((a,b)=>a.time-b.time);
+        saveAll();
+        document.getElementById('weightVal').value = '';
+        document.getElementById('pFat').value = '';
+        showToast(isFirstEntryForDate ? '體組成已儲存' : '已更新今日體組成');
+        refresh();
+    }
+
+    function saveSide() {
+        const custom = document.getElementById('customSide').value.trim();
+        const allTags = [...selectedTags];
+        if (custom) allTags.push(custom);
+        if (!allTags.length) { showToast('請選擇或輸入體感'); return; }
+        const date = new Date().toISOString().slice(0,10);
+        sides = sides.filter(s => s.date !== date);
+        sides.push({ id: Date.now(), date, tags: allTags, time: Date.now() });
+        saveAll();
+        document.querySelectorAll('#sideTags .tag').forEach(el => el.classList.remove('active'));
+        selectedTags = [];
+        document.getElementById('customSide').value = '';
+        showToast('體感已儲存');
+        refresh();
+    }
+
+    // ============================================================
+    //  刪除 / 清空
+    // ============================================================
+    function deleteLog(type, id) {
+        if (!confirm('確定刪除？')) return;
+        if (type === 'dose') doses = doses.filter(d => d.id !== id);
+        if (type === 'weight') weights = weights.filter(w => w.id !== id);
+        if (type === 'side') sides = sides.filter(s => s.id !== id);
+        saveAll();
+        showToast('已刪除');
+        refresh();
+    }
+
+    function clearAll() {
+        if (!confirm('確定清空所有資料？')) return;
+        doses = []; weights = []; sides = [];
+        saveAll();
+        showToast('已清空');
+        refresh();
+    }
+
+    // ============================================================
+    //  匯出 / 匯入
+    // ============================================================
+    function exportJSON() {
+        const data = { user: currentUser, doses, weights, sides, exported: new Date().toISOString() };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `mounflow_${currentUser}_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        showToast('JSON 匯出成功');
+    }
+
+    function exportCSV() {
+        const rows = [['日期', '類型', '數值', '備註']];
+        doses.forEach(d => rows.push([new Date(d.time).toLocaleString('zh-TW'), '注射', d.mg+' mg', d.site]));
+        weights.forEach(w => rows.push([w.date, '體重', w.val+' kg', '體脂 '+(w.extra.pFat??'--')+'%']));
+        sides.forEach(s => rows.push([s.date, '體感', s.tags.join('; '), '']));
+        const csv = rows.map(r => r.join(',')).join('\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `mounflow_${currentUser}_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        showToast('CSV 匯出成功');
+    }
+
+    function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (Array.isArray(data.doses) && Array.isArray(data.weights) && Array.isArray(data.sides)) {
+                    if (!confirm(`匯入將覆蓋「${currentUser}」目前的所有資料，確定繼續？`)) { event.target.value = ''; return; }
+                    doses = data.doses; 
+                    weights = data.weights; 
+                    sides = data.sides;
+                    saveAll(); // 修正：匯入後立即持久化存入 localStorage
+                    showToast(`匯入成功 (${data.user || '未知'})`);
+                    refresh();
+                } else { showToast('無效的備份檔案'); }
+            } catch(err) { showToast('解析失敗'); }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+    // ============================================================
+    //  篩選
+    // ============================================================
+    function setTimeFilter(filter, el) {
+        currentTimeFilter = filter;
+        document.querySelectorAll('#timeFilterRow .filter-chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('logScopeLabel').textContent = '(' + getTimeLabel() + ')';
+        renderLogs();
+        const latestW = weights.length ? [...weights].sort((a,b)=>b.time-a.time)[0] : null;
+        if (latestW) updateGoalSpeed(latestW.val);
+    }
+
+    function setTypeFilter(filter, el) {
+        currentTypeFilter = filter;
+        document.querySelectorAll('#typeFilterRow .filter-chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        renderLogs();
+    }
+
+    // ============================================================
+    //  日誌渲染
+    // ============================================================
+    function renderLogs() {
+        const list = [];
+        const range = getTimeRange();
+        const showByTime = (item) => item.time >= range.start;
+        const showByType = (type) => currentTypeFilter === 'all' || type === currentTypeFilter;
+
+        if (showByType('dose')) doses.forEach(d => { if (showByTime(d)) list.push({ type: 'dose', id: d.id, time: d.time, label: '注射', value: `${d.mg} mg ${d.site||''}`, tagClass: 'dose' }); });
+        if (showByType('weight')) weights.forEach(w => { if (showByTime(w)) list.push({ type: 'weight', id: w.id, time: w.time, label: '體組成', value: `${w.val} kg｜體脂 ${w.extra.pFat??'--'}%`, tagClass: 'weight' }); });
+        if (showByType('side')) sides.forEach(s => { if (showByTime(s)) list.push({ type: 'side', id: s.id, time: s.time, label: '體感', value: s.tags.join(' · '), tagClass: 'side' }); });
+
+        list.sort((a,b) => b.time - a.time);
+        const container = document.getElementById('logList');
+        if (!list.length) {
+            container.innerHTML = `<div class="log-empty">${getTimeLabel()} 尚無紀錄</div>`;
+            return;
+        }
+        container.innerHTML = list.map(item => `
+            <div class="log-item">
+                <div class="log-left">
+                    <span class="log-tag ${item.tagClass}">${item.label}</span>
+                    <span class="log-time">${new Date(item.time).toLocaleString('zh-TW', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'})}</span>
+                    <span class="log-value">${item.value}</span>
+                </div>
+                <button class="log-del" onclick="deleteLog('${item.type}', ${item.id})">✕</button>
+            </div>
+        `).join('');
+    }
+
+    // ============================================================
+    //  刷新全部
+    // ============================================================
+    function refresh() {
+        if (!currentUser) return;
+        renderUserSelect();
+        updatePenUI();
+
+        let curPk = 0, peakVal = 0;
+        if (doses.length) {
+            const now = Date.now();
+            const ka = 0.04, ke = 0.00578;
+            doses.forEach(d => {
+                if (now >= d.time) {
+                    const hrs = (now - d.time) / 3600000;
+                    curPk += Math.max(0, d.mg * (ka / (ka - ke)) * (Math.exp(-ke * hrs) - Math.exp(-ka * hrs)));
+                    const tPeak = Math.log(ka/ke) / (ka - ke);
+                    peakVal += d.mg * (ka / (ka - ke)) * (Math.exp(-ke * tPeak) - Math.exp(-ka * tPeak));
+                }
+            });
+            document.getElementById('currentLevel').textContent = curPk.toFixed(2) + ' mg';
+            const last = doses[doses.length-1];
+            const diff = (last.time + 7*24*3600*1000 - Date.now()) / (24*3600*1000);
+            document.getElementById('nextDoseCountdown').textContent = diff > 0 ? diff.toFixed(1) + ' 天' : '今日應打';
+        } else {
+            document.getElementById('currentLevel').textContent = '0.00 mg';
+            document.getElementById('nextDoseCountdown').textContent = '-- 天';
+        }
+
+        document.getElementById('totalDoses').textContent = doses.length;
+        const totalCost = doses.reduce((sum, d) => sum + (d.penTotalCap && d.penPrice ? d.penPrice : 0), 0);
+        document.getElementById('totalCost').textContent = totalCost.toLocaleString();
+        const totalMg = doses.reduce((s,d)=>s+d.mg, 0);
+        document.getElementById('avgDose').textContent = doses.length ? (totalMg/doses.length).toFixed(1)+' mg' : '0 mg';
+
+        const sortedW = [...weights].sort((a,b)=>a.time-b.time);
+        const latestW = sortedW.length ? sortedW[sortedW.length-1] : null;
+        const prevW = sortedW.length > 1 ? sortedW[sortedW.length-2] : null;
+        if (latestW) {
+            document.getElementById('trendWeight').textContent = latestW.val.toFixed(1) + ' kg';
+            document.getElementById('trendFat').textContent = (latestW.extra.pFat != null ? latestW.extra.pFat.toFixed(1) : '--') + ' %';
+            if (prevW) {
+                const wd = latestW.val - prevW.val;
+                document.getElementById('trendWeightDelta').textContent = (wd>0?'↑':'↓') + ' ' + Math.abs(wd).toFixed(1) + ' kg';
+                document.getElementById('trendWeightDelta').className = 'delta ' + (wd<0?'up':wd>0?'down':'neutral');
+                const fd = (latestW.extra.pFat != null && prevW.extra.pFat != null) ? latestW.extra.pFat - prevW.extra.pFat : null;
+                if (fd !== null) {
+                    document.getElementById('trendFatDelta').textContent = (fd>0?'↑':'↓') + ' ' + Math.abs(fd).toFixed(1) + '%';
+                    document.getElementById('trendFatDelta').className = 'delta ' + (fd<0?'up':fd>0?'down':'neutral');
+                } else { document.getElementById('trendFatDelta').textContent = '--'; document.getElementById('trendFatDelta').className = 'delta neutral'; }
+            } else {
+                document.getElementById('trendWeightDelta').textContent = '首次';
+                document.getElementById('trendWeightDelta').className = 'delta neutral';
+                document.getElementById('trendFatDelta').textContent = '首次';
+                document.getElementById('trendFatDelta').className = 'delta neutral';
+            }
+            document.getElementById('trendUpdateTime').textContent = new Date(latestW.time).toLocaleString('zh-TW', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'});
+            updateGoalProgress(latestW.val);
+        } else {
+            document.getElementById('trendWeight').textContent = '--';
+            document.getElementById('trendFat').textContent = '--';
+            document.getElementById('trendWeightDelta').textContent = '無數據';
+            document.getElementById('trendWeightDelta').className = 'delta neutral';
+            document.getElementById('trendFatDelta').textContent = '無數據';
+            document.getElementById('trendFatDelta').className = 'delta neutral';
+            document.getElementById('trendUpdateTime').textContent = '--';
+            document.getElementById('goalLabel').textContent = '-- kg';
+            document.getElementById('goalFill').style.width = '0%';
+            document.getElementById('goalPct').textContent = '0%';
+            document.getElementById('goalSub').textContent = '請先記錄體重，再設定目標';
+            document.getElementById('goalSpeed').textContent = '尚無體重數據';
+        }
+
+        document.getElementById('trendPk').textContent = curPk ? curPk.toFixed(2)+' mg' : '--';
+        document.getElementById('trendPkDelta').textContent = peakVal ? '峰值 '+peakVal.toFixed(2)+' mg' : '無注射';
+
+        updateSmartAlert(curPk);
+        updateSiteStats();
+        setTimeout(renderChart, 50);
+        renderLogs();
+    }
+
+    // ============================================================
+    //  啟動
+    // ============================================================
+    if (users.length > 0 && currentUser) {
+        document.querySelectorAll('#sideTags .tag').forEach(el => {
+            el.addEventListener('click', function() {
+                const tag = this.dataset.tag;
+                if (selectedTags.includes(tag)) {
+                    selectedTags = selectedTags.filter(t => t !== tag);
+                    this.classList.remove('active');
+                } else {
+                    selectedTags.push(tag);
+                    this.classList.add('active');
+                }
+            });
+        });
+        document.getElementById('doseTime').value = new Date().toISOString().slice(0,16);
+        document.getElementById('weightDate').value = new Date().toISOString().slice(0,10);
+        document.getElementById('logScopeLabel').textContent = '(本週)';
+        refresh();
+    }
+
+    window.addEventListener('resize', () => { setTimeout(renderChart, 100); });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.getElementById('setupOverlay').classList.contains('show')) {
+            confirmSetup();
+        }
+        if (e.key === 'Enter' && document.getElementById('goalOverlay').classList.contains('show')) {
+            confirmGoalModal();
+        }
+        if (e.key === 'Escape' && document.getElementById('goalOverlay').classList.contains('show')) {
+            closeGoalModal();
+        }
+    });
+    </script>
+</body>
+</html>
