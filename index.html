@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MOUNFLOW · v9.6</title>
+    <title>MOUNFLOW · v9.7</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b0b10">
@@ -39,12 +39,10 @@
         .app { max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
         .card { background: var(--surface); backdrop-filter: blur(28px) saturate(160%); -webkit-backdrop-filter: blur(28px) saturate(160%); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 18px 22px; box-shadow: var(--shadow); }
 
-        /* ── 標頭 ── */
         .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
         .brand { font-size: 22px; font-weight: 800; letter-spacing: 2.5px; color: #fff; opacity: 0.9; text-transform: uppercase; }
         .version { font-size: 8px; font-weight: 700; padding: 3px 12px; border-radius: 30px; background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.04); cursor: pointer; letter-spacing: 0.3px; }
 
-        /* ── 使用者列 ── */
         .user-bar { display: flex; align-items: center; gap: 6px; margin: 10px 0 4px; flex-wrap: wrap; }
         .user-bar select { background: var(--surface-light); color: var(--text-primary); border: 1px solid var(--border); padding: 5px 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; outline: none; appearance: none; cursor: pointer; }
         .user-bar select:focus { border-color: var(--border-focus); }
@@ -52,7 +50,6 @@
         .user-bar .btn-sm:active { background: rgba(255,255,255,0.06); }
         .user-bar .btn-sm.danger { color: var(--red); }
 
-        /* ── 統計卡片 ── */
         .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 14px; }
         .stat { background: rgba(0,0,0,0.25); border-radius: var(--radius-sm); padding: 12px 4px 10px; text-align: center; border: 1px solid rgba(255,255,255,0.02); }
         .stat .label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-label); }
@@ -66,26 +63,21 @@
         .stat-mini .label { font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-label); }
         .stat-mini .value { font-size: 14px; font-weight: 800; margin-top: 1px; }
 
-        /* ── 警示區 ── */
         .alert-banner { background: var(--red-dim); border: 1px solid rgba(232,96,96,0.15); border-radius: var(--radius-sm); padding: 8px 14px; margin-top: 10px; font-size: 11px; font-weight: 600; color: var(--red); display: none; align-items: center; gap: 8px; }
         .alert-banner.show { display: flex; }
 
-        /* ── 圖表 ── */
         .chart-container { margin-top: 14px; background: rgba(0,0,0,0.15); border-radius: var(--radius-sm); padding: 6px; }
-        canvas#weightChart { width: 100%; height: 120px; display: block; border-radius: 6px; }
+        canvas#doseChart { width: 100%; height: 130px; display: block; border-radius: 6px; }
 
-        /* ── 部位統計 ── */
         .site-stats { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.03); }
         .site-stats .label { font-size: 8px; color: var(--text-label); text-transform: uppercase; letter-spacing: 0.4px; }
         .site-pill { background: var(--surface-light); padding: 3px 12px; border-radius: 30px; font-size: 10px; color: var(--text-secondary); border: 1px solid var(--border); }
         .site-pill .num { color: var(--text-primary); font-weight: 700; }
 
-        /* ── 區段標籤切換 ── */
         .seg { display: flex; background: rgba(0,0,0,0.30); border-radius: var(--radius-sm); padding: 3px; border: 1px solid var(--border); margin-bottom: 16px; }
         .seg-btn { flex: 1; padding: 8px 0; font-size: 11px; font-weight: 700; color: var(--text-secondary); background: transparent; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
         .seg-btn.active { background: rgba(255,255,255,0.06); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
 
-        /* ── 表單 ── */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .field { display: flex; flex-direction: column; gap: 3px; }
         .field label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-label); }
@@ -103,14 +95,12 @@
         .tag { background: var(--surface-light); border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 4px; border-radius: var(--radius-sm); font-size: 10px; font-weight: 700; text-align: center; cursor: pointer; transition: all 0.15s; }
         .tag.active { background: var(--blue-dim); border-color: rgba(91,127,255,0.20); color: var(--text-primary); }
 
-        /* ── 按鈕 ── */
         .btn { width: 100%; padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 12px; font-weight: 800; color: #fff; cursor: pointer; transition: all 0.12s ease; display: flex; align-items: center; justify-content: center; gap: 6px; letter-spacing: 0.2px; }
         .btn:active { transform: scale(0.97); opacity: 0.8; }
         .btn-primary { background: var(--blue); }
         .btn-success { background: var(--green); color: #0a0a0f; }
         .btn-purple { background: var(--purple); }
 
-        /* ── 篩選 ── */
         .filter-group { margin-bottom: 12px; }
         .filter-row { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 4px; }
         .filter-row:last-child { margin-bottom: 0; }
@@ -119,7 +109,6 @@
         .filter-chip.time-active { background: var(--blue-dim); color: var(--blue); border-color: rgba(91,127,255,0.12); }
         .filter-chip.time-active.active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
-        /* ── 日誌 ── */
         .log-list { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; padding-right: 2px; }
         .log-item { background: rgba(0,0,0,0.15); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
         .log-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -133,7 +122,6 @@
         .log-del:active { color: var(--red); }
         .log-empty { color: var(--text-muted); text-align: center; padding: 16px 0; font-size: 11px; }
 
-        /* ── 工具列 ── */
         .toolbar { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
         .tool-btn { flex: 1; min-width: 50px; background: var(--surface-light); color: var(--text-secondary); border: 1px solid var(--border); padding: 6px 4px; border-radius: var(--radius-sm); font-size: 9px; font-weight: 700; cursor: pointer; text-align: center; transition: background 0.12s; }
         .tool-btn:active { background: rgba(255,255,255,0.04); }
@@ -148,7 +136,6 @@
         .panel.open { display: block; }
         .inline-flex { display: inline-flex; align-items: center; gap: 4px; }
 
-        /* ── 目標體重區塊 ── */
         .goal-block { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.04); }
         .goal-block .goal-header { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-label); margin-bottom: 3px; }
         .goal-block .goal-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
@@ -158,12 +145,8 @@
         .goal-block .goal-speed .up { color: var(--green); }
         .goal-block .goal-speed .down { color: var(--red); }
         .goal-block .goal-set { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
-        .goal-block .goal-set input { flex: 1; min-width: 60px; background: rgba(0,0,0,0.20); border: 1px solid var(--border); color: var(--text-primary); padding: 4px 8px; border-radius: 6px; font-size: 10px; outline: none; }
-        .goal-block .goal-set input:focus { border-color: var(--border-focus); }
-        .goal-block .goal-set .btn-goal { padding: 4px 14px; border: none; border-radius: 6px; font-size: 10px; font-weight: 700; color: #fff; cursor: pointer; background: var(--blue); }
-        .goal-block .goal-set .hint-text { font-size: 8px; color: var(--text-muted); align-self: center; }
+        .goal-block .goal-set .btn-goal { flex: 1; padding: 6px 14px; border: none; border-radius: 6px; font-size: 10px; font-weight: 700; color: #fff; cursor: pointer; background: var(--blue); text-align: center; }
 
-        /* ── 趨勢摘要三欄 ── */
         .trend-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
         .trend-item { background: rgba(0,0,0,0.15); border-radius: var(--radius-sm); padding: 10px 6px; text-align: center; border: 1px solid rgba(255,255,255,0.02); }
         .trend-item .label { font-size: 8px; color: var(--text-label); text-transform: uppercase; letter-spacing: 0.4px; }
@@ -173,11 +156,9 @@
         .trend-item .delta.down { color: var(--red); }
         .trend-item .delta.neutral { color: var(--text-muted); }
 
-        /* ── Toast ── */
         .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(16,16,24,0.92); backdrop-filter: blur(16px); color: #fff; padding: 10px 22px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 8px 32px rgba(0,0,0,0.6); opacity: 0; transition: opacity 0.25s ease; pointer-events: none; z-index: 3000; max-width: 90%; }
         .toast.show { opacity: 1; }
 
-        /* ── 歡迎畫面 ── */
         .welcome-overlay {
             position: fixed; inset: 0; background: var(--bg); z-index: 1000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -190,7 +171,6 @@
         .welcome-overlay .btn { max-width: 280px; margin-top: 14px; }
         .welcome-overlay .hint { font-size: 11px; color: var(--text-muted); margin-top: 10px; }
 
-        /* ── 初始設定彈窗 ── */
         .setup-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             z-index: 2000; display: none; align-items: center; justify-content: center; padding: 24px;
@@ -212,7 +192,6 @@
         .setup-modal .field .error.show { display: block; }
         .setup-modal .btn { margin-top: 6px; }
 
-        /* ── RWD ── */
         @media (max-width:400px) {
             .grid-2 { grid-template-columns:1fr; }
             .stats { gap:4px; }
@@ -246,13 +225,13 @@
             <div class="modal-sub">請輸入您的起始數據</div>
             <div class="field">
                 <label>目前體重</label>
-                <input type="number" step="0.1" min="0" inputmode="decimal" id="setupStartWeight" placeholder="請輸入體重" autofocus>
+                <input type="number" step="0.1" min="0" inputmode="decimal" id="setupStartWeight" autofocus>
                 <div class="unit">公斤 (kg)</div>
                 <div class="error" id="setupError">目標體重必須小於目前體重</div>
             </div>
             <div class="field">
                 <label>目標體重</label>
-                <input type="number" step="0.1" min="0" inputmode="decimal" id="setupTargetWeight" placeholder="請輸入目標體重">
+                <input type="number" step="0.1" min="0" inputmode="decimal" id="setupTargetWeight">
                 <div class="unit">公斤 (kg)</div>
             </div>
             <button class="btn btn-primary" onclick="confirmSetup()">確認開始</button>
@@ -266,7 +245,7 @@
             <div class="modal-sub">起始體重自動抓取第一筆紀錄</div>
             <div class="field">
                 <label>目標體重</label>
-                <input type="number" step="0.1" min="0" inputmode="decimal" id="goalModalInput" placeholder="請輸入目標體重" autofocus>
+                <input type="number" step="0.1" min="0" inputmode="decimal" id="goalModalInput" autofocus>
                 <div class="unit">公斤 (kg)</div>
                 <div class="error" id="goalModalError">目標須小於起始體重</div>
             </div>
@@ -280,7 +259,7 @@
         <div class="card">
             <div class="header">
                 <span class="brand">MOUNFLOW</span>
-                <span class="version" onclick="location.reload()">v9.6</span>
+                <span class="version" onclick="location.reload()">v9.7</span>
             </div>
             <div class="user-bar">
                 <select id="userSelect" onchange="switchUser(this.value)"></select>
@@ -302,8 +281,9 @@
                 <div class="stat-mini"><div class="label">平均劑量</div><div class="value" style="color:var(--purple);" id="avgDose">0 mg</div></div>
             </div>
 
+            <!-- 劑量變化圖 -->
             <div class="chart-container">
-                <canvas id="weightChart"></canvas>
+                <canvas id="doseChart"></canvas>
             </div>
 
             <div class="site-stats">
@@ -353,8 +333,8 @@
                 </div>
                 <div id="penNewGroup">
                     <div class="grid-2">
-                        <div class="field"><label>新筆容量</label><input type="number" step="0.1" min="0" inputmode="decimal" id="penTotalCap" placeholder="50"></div>
-                        <div class="field"><label>價格 (NTD)</label><input type="number" step="1" min="0" inputmode="numeric" id="penPrice" placeholder="13000"></div>
+                        <div class="field"><label>新筆容量</label><input type="number" step="0.1" min="0" inputmode="decimal" id="penTotalCap"></div>
+                        <div class="field"><label>價格 (NTD)</label><input type="number" step="1" min="0" inputmode="numeric" id="penPrice"></div>
                     </div>
                     <div class="hint">輸入後自動記憶，直至容量歸零</div>
                 </div>
@@ -365,9 +345,9 @@
             <div id="panelWeight" class="panel">
                 <div class="grid-2">
                     <div class="field"><label>日期</label><input type="date" id="weightDate"></div>
-                    <div class="field"><label>體重 (kg)</label><input type="number" step="0.01" min="0" inputmode="decimal" id="weightVal" placeholder="體重"></div>
+                    <div class="field"><label>體重 (kg)</label><input type="number" step="0.01" min="0" inputmode="decimal" id="weightVal"></div>
                 </div>
-                <div class="field mb-1"><label>體脂率 (%)</label><input type="number" step="0.01" min="0" max="100" inputmode="decimal" id="pFat" placeholder="體脂率"></div>
+                <div class="field mb-1"><label>體脂率 (%)</label><input type="number" step="0.01" min="0" max="100" inputmode="decimal" id="pFat"></div>
                 <button class="btn btn-success mt-1" onclick="addWeight()">儲存體組成</button>
             </div>
 
@@ -420,7 +400,7 @@
                 <div class="goal-sub" id="goalSub">請先記錄體重，再設定目標</div>
                 <div class="goal-speed" id="goalSpeed">尚無數據</div>
                 <div class="goal-set">
-                    <button class="btn-goal" style="flex:1;padding:6px 14px;" onclick="openGoalModal()">修改目標體重</button>
+                    <button class="btn-goal" onclick="openGoalModal()">修改目標體重</button>
                 </div>
             </div>
         </div>
@@ -460,7 +440,7 @@
     'use strict';
 
     // ============================================================
-    //  安全儲存層（iOS Safari 隱私瀏覽 / 部分環境會封鎖 localStorage）
+    //  安全儲存層
     // ============================================================
     const LS = (function() {
         let memoryStore = {};
@@ -495,7 +475,6 @@
         };
     })();
 
-    // 任何未預期的錯誤都跳出提示，而不是讓畫面卡住沒反應
     window.addEventListener('error', function(e) {
         showToastSafe('發生錯誤：' + (e.message || '未知錯誤'));
     });
@@ -830,81 +809,103 @@
     }
 
     // ============================================================
-    //  圖表
+    //  劑量變化圖（簡單好看版）
     // ============================================================
-    function renderChart() {
-        const canvas = document.getElementById('weightChart');
+    function renderDoseChart() {
+        const canvas = document.getElementById('doseChart');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        const sorted = [...weights].sort((a,b) => a.time - b.time);
+        const sorted = [...doses].sort((a,b) => a.time - b.time);
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
         ctx.scale(dpr, dpr);
         const W = rect.width, H = rect.height;
-        const pad = { top: 16, bottom: 20, left: 26, right: 8 };
+        const pad = { top: 20, bottom: 22, left: 26, right: 8 };
         const chartW = W - pad.left - pad.right;
         const chartH = H - pad.top - pad.bottom;
 
         ctx.clearRect(0, 0, W, H);
-        if (sorted.length < 2) {
+
+        if (sorted.length === 0) {
             ctx.fillStyle = '#55576b';
             ctx.font = '11px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(sorted.length === 0 ? '尚無體重數據' : '至少需 2 筆紀錄', W/2, H/2);
+            ctx.fillText('尚無注射紀錄', W/2, H/2 + 4);
             return;
         }
 
-        const vals = sorted.map(d => d.val);
-        const minVal = Math.min(...vals) - 0.5;
-        const maxVal = Math.max(...vals) + 0.5;
-        const range = maxVal - minVal || 1;
+        const maxDose = Math.max(15, ...sorted.map(d => d.mg));
+        const yMax = Math.ceil(maxDose / 2.5) * 2.5;
+        const barWidth = Math.min(32, chartW / sorted.length * 0.55);
+        const gap = (chartW - barWidth * sorted.length) / (sorted.length + 1);
 
+        // 網格線 + Y軸標籤
         ctx.strokeStyle = 'rgba(255,255,255,0.04)';
         ctx.lineWidth = 0.5;
-        for (let i=0; i<=4; i++) {
-            const y = pad.top + (chartH / 4) * i;
-            ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+        for (let i = 0; i <= 4; i++) {
+            const y = pad.top + chartH - (chartH / 4) * i;
+            ctx.beginPath();
+            ctx.moveTo(pad.left, y);
+            ctx.lineTo(W - pad.right, y);
+            ctx.stroke();
+            ctx.fillStyle = '#4a4c60';
+            ctx.font = '7px sans-serif';
+            ctx.textAlign = 'right';
+            const val = (yMax / 4 * i);
+            ctx.fillText(val.toFixed(1), pad.left - 4, y + 2);
         }
 
-        ctx.beginPath();
-        ctx.strokeStyle = '#5b7fff';
-        ctx.lineWidth = 2;
-        ctx.shadowColor = 'rgba(91,127,255,0.15)';
-        ctx.shadowBlur = 4;
-        const points = vals.map((v, i) => {
-            const x = pad.left + (i / (vals.length - 1)) * chartW;
-            const y = pad.top + chartH - ((v - minVal) / range) * chartH;
-            return { x, y };
-        });
-        points.forEach((p, i) => { if (i===0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
-        ctx.stroke();
-        ctx.shadowBlur = 0;
+        // 畫長條
+        sorted.forEach((d, i) => {
+            const x = pad.left + gap + i * (barWidth + gap);
+            const h = (d.mg / yMax) * chartH;
+            const y = pad.top + chartH - h;
 
-        points.forEach((p, i) => {
+            // 長條漸層
+            const grad = ctx.createLinearGradient(0, y, 0, pad.top + chartH);
+            grad.addColorStop(0, '#5b7fff');
+            grad.addColorStop(1, 'rgba(91,127,255,0.15)');
+            ctx.fillStyle = grad;
+
+            // 圓角長條 (相容性寫法)
+            const r = 3;
             ctx.beginPath();
-            ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
-            ctx.fillStyle = '#fff';
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + barWidth - r, y);
+            ctx.quadraticCurveTo(x + barWidth, y, x + barWidth, y + r);
+            ctx.lineTo(x + barWidth, pad.top + chartH);
+            ctx.lineTo(x, pad.top + chartH);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
             ctx.fill();
-            ctx.strokeStyle = '#5b7fff';
-            ctx.lineWidth = 1.2;
+
+            // 長條邊框
+            ctx.strokeStyle = 'rgba(91,127,255,0.20)';
+            ctx.lineWidth = 0.5;
             ctx.stroke();
-            if (i === 0 || i === points.length-1) {
-                ctx.fillStyle = '#6d6f85';
-                ctx.font = '7px sans-serif';
-                ctx.textAlign = i===0 ? 'left' : 'right';
-                ctx.fillText(vals[i].toFixed(1), p.x + (i===0?4:-4), p.y - 5);
-            }
+
+            // 數值標示（長條上方）
+            ctx.fillStyle = '#9a9bb0';
+            ctx.font = '7px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(d.mg.toFixed(1), x + barWidth/2, y - 4);
+
+            // X軸日期
+            const date = new Date(d.time);
+            ctx.fillStyle = '#4a4c60';
+            ctx.font = '6px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${date.getMonth()+1}/${date.getDate()}`, x + barWidth/2, H - 3);
         });
 
-        ctx.fillStyle = '#55576b';
-        ctx.font = '7px sans-serif';
-        ctx.textAlign = 'center';
-        const d1 = new Date(sorted[0].time);
-        const d2 = new Date(sorted[sorted.length-1].time);
-        ctx.fillText(`${d1.getMonth()+1}/${d1.getDate()}`, pad.left, H-3);
-        ctx.fillText(`${d2.getMonth()+1}/${d2.getDate()}`, W-pad.right, H-3);
+        // Y軸單位標示
+        ctx.fillStyle = '#4a4c60';
+        ctx.font = '6px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('mg', pad.left + 2, pad.top - 2);
     }
 
     // ============================================================
@@ -973,14 +974,13 @@
         const pFatRaw = document.getElementById('pFat').value;
         const pFat = pFatRaw === '' ? null : parseFloat(pFatRaw);
         if (pFat !== null && (isNaN(pFat) || pFat < 0 || pFat > 100)) { showToast('體脂率須介於 0-100'); return; }
-        const isFirstEntryForDate = !weights.some(w => w.date === date);
         weights = weights.filter(w => w.date !== date);
         weights.push({ id: Date.now(), date, val, extra: { pFat }, time: new Date(date).getTime() });
         weights.sort((a,b)=>a.time-b.time);
         saveAll();
         document.getElementById('weightVal').value = '';
         document.getElementById('pFat').value = '';
-        showToast(isFirstEntryForDate ? '體組成已儲存' : '已更新今日體組成');
+        showToast('體組成已儲存');
         refresh();
     }
 
@@ -1201,7 +1201,7 @@
 
         updateSmartAlert(curPk);
         updateSiteStats();
-        setTimeout(renderChart, 50);
+        setTimeout(renderDoseChart, 50);
         renderLogs();
     }
 
@@ -1227,7 +1227,7 @@
         refresh();
     }
 
-    window.addEventListener('resize', () => { setTimeout(renderChart, 100); });
+    window.addEventListener('resize', () => { setTimeout(renderDoseChart, 100); });
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && document.getElementById('setupOverlay').classList.contains('show')) {
             confirmSetup();
