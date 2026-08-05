@@ -3,157 +3,319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MOUNFLOW · v7.3</title>
+    <title>MOUNFLOW · v9.6</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b0b10">
     <style>
-        /* ── 完整样式 ── */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         :root {
-            --bg: #0a0a0f;
-            --surface: rgba(22,22,30,0.85);
-            --border: rgba(255,255,255,0.06);
-            --border-light: rgba(255,255,255,0.10);
-            --text-primary: #f0f2f8;
+            --bg: #060608;
+            --surface: rgba(18,18,26,0.88);
+            --surface-light: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.05);
+            --border-focus: rgba(255,255,255,0.12);
+            --text-primary: #eceef5;
             --text-secondary: #9a9bb0;
-            --text-muted: #5b5d73;
-            --shadow: 0 20px 56px rgba(0,0,0,0.7);
-            --radius-lg: 24px;
-            --radius-md: 16px;
-            --radius-sm: 12px;
-            --blue: #5b9eff;
+            --text-muted: #55576b;
+            --text-label: #6d6f85;
+            --shadow: 0 12px 40px rgba(0,0,0,0.5);
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+            --blue: #5b7fff;
+            --blue-dim: rgba(91,127,255,0.12);
             --green: #4cd964;
-            --orange: #ff9f0a;
-            --purple: #b77cff;
-            --red: #ff6b6b;
+            --green-dim: rgba(76,217,100,0.10);
+            --orange: #e8a838;
+            --orange-dim: rgba(232,168,56,0.10);
+            --purple: #a87cff;
+            --purple-dim: rgba(168,124,255,0.10);
+            --red: #e86060;
+            --red-dim: rgba(232,96,96,0.10);
         }
-        html, body { height: 100%; background: var(--bg); color: var(--text-primary); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif; font-weight: 450; -webkit-font-smoothing: antialiased; padding: 20px env(safe-area-inset-right) 30px env(safe-area-inset-left); overflow-x: hidden; }
-        ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
-        .app { max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
-        .card { background: var(--surface); backdrop-filter: blur(32px) saturate(180%); -webkit-backdrop-filter: blur(32px) saturate(180%); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px 20px 24px; box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.05); }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 8px; }
-        .brand { font-size: 24px; font-weight: 800; letter-spacing: 3px; background: linear-gradient(135deg, #ffffff 30%, #8e8fa3 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
-        .version { font-size: 9px; font-weight: 700; padding: 4px 14px; border-radius: 40px; background: rgba(91,158,255,0.12); color: var(--blue); border: 1px solid rgba(91,158,255,0.20); cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; }
-        .version:active { transform: scale(0.92); opacity: 0.6; }
-        .user-area { display: flex; align-items: center; gap: 6px; width: 100%; margin-top: 6px; }
-        .user-area input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; padding: 6px 10px; border-radius: var(--radius-sm); font-size: 12px; outline: none; }
-        .user-area input:focus { border-color: var(--blue); }
-        .user-area .btn-sm { background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--text-secondary); padding: 6px 14px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-        .user-area .btn-sm:active { background: rgba(255,255,255,0.12); transform: scale(0.95); }
-        .user-area .user-label { font-size: 10px; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+        html, body { height: 100%; background: var(--bg); color: var(--text-primary); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif; font-weight: 450; -webkit-font-smoothing: antialiased; padding: 16px; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 2px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+        .app { max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+        .card { background: var(--surface); backdrop-filter: blur(28px) saturate(160%); -webkit-backdrop-filter: blur(28px) saturate(160%); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 18px 22px; box-shadow: var(--shadow); }
 
-        .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 16px; }
-        .stat { background: rgba(0,0,0,0.35); border-radius: var(--radius-sm); padding: 14px 6px 12px; text-align: center; border: 1px solid rgba(255,255,255,0.04); }
-        .stat .label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); }
-        .stat .value { font-size: 18px; font-weight: 900; letter-spacing: -0.2px; margin-top: 4px; }
-        .value.blue { color: var(--blue); text-shadow: 0 0 24px rgba(91,158,255,0.20); }
-        .value.orange { color: var(--orange); text-shadow: 0 0 24px rgba(255,159,10,0.20); }
-        .value.purple { color: var(--purple); text-shadow: 0 0 24px rgba(183,124,255,0.20); }
+        /* ── 標頭 ── */
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+        .brand { font-size: 22px; font-weight: 800; letter-spacing: 2.5px; color: #fff; opacity: 0.9; text-transform: uppercase; }
+        .version { font-size: 8px; font-weight: 700; padding: 3px 12px; border-radius: 30px; background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.04); cursor: pointer; letter-spacing: 0.3px; }
 
-        .trend-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 8px; }
-        .trend-item { background: rgba(0,0,0,0.30); border-radius: var(--radius-sm); padding: 14px 10px; border: 1px solid rgba(255,255,255,0.04); text-align: center; }
-        .trend-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
-        .trend-number { font-size: 22px; font-weight: 800; margin: 4px 0 2px; line-height: 1.2; }
-        .trend-delta { font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 4px; }
-        .trend-delta.up { color: var(--green); }
-        .trend-delta.down { color: var(--red); }
-        .trend-delta.neutral { color: var(--text-muted); }
-        .trend-bar { width: 100%; height: 3px; background: rgba(255,255,255,0.08); border-radius: 4px; margin-top: 8px; overflow: hidden; }
-        .trend-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
-        .trend-sub { font-size: 9px; color: var(--text-muted); margin-top: 4px; }
+        /* ── 使用者列 ── */
+        .user-bar { display: flex; align-items: center; gap: 6px; margin: 10px 0 4px; flex-wrap: wrap; }
+        .user-bar select { background: var(--surface-light); color: var(--text-primary); border: 1px solid var(--border); padding: 5px 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; outline: none; appearance: none; cursor: pointer; }
+        .user-bar select:focus { border-color: var(--border-focus); }
+        .user-bar .btn-sm { background: var(--surface-light); border: 1px solid var(--border); color: var(--text-secondary); padding: 4px 12px; border-radius: var(--radius-sm); font-size: 9px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+        .user-bar .btn-sm:active { background: rgba(255,255,255,0.06); }
+        .user-bar .btn-sm.danger { color: var(--red); }
 
-        .seg { display: flex; background: rgba(0,0,0,0.45); border-radius: var(--radius-sm); padding: 3px; border: 1px solid var(--border); margin-bottom: 18px; }
-        .seg-btn { flex: 1; padding: 10px 0; font-size: 12px; font-weight: 700; color: var(--text-secondary); background: transparent; border: none; border-radius: 10px; cursor: pointer; transition: all 0.25s ease; letter-spacing: 0.3px; }
-        .seg-btn.active { background: rgba(255,255,255,0.08); color: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.4); }
-        .seg-btn:active { transform: scale(0.96); }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .field { display: flex; flex-direction: column; gap: 4px; }
-        .field label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
-        .field input, .field select, .field textarea { width: 100%; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.08); padding: 10px 12px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; outline: none; -webkit-appearance: none; transition: border 0.2s; font-family: inherit; }
-        .field input:focus, .field select:focus, .field textarea:focus { border-color: rgba(91,158,255,0.35); }
-        .field textarea { resize: vertical; min-height: 40px; font-weight: 400; font-size: 12px; }
-        .field select option { background: #1c1c24; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 800; color: #fff; cursor: pointer; transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; gap: 6px; letter-spacing: 0.3px; }
-        .btn:active { transform: scale(0.97); opacity: 0.85; }
-        .btn-primary { background: linear-gradient(135deg, #007aff, #0056b3); box-shadow: 0 4px 24px rgba(0,122,255,0.25); }
-        .btn-success { background: linear-gradient(135deg, #34c759, #1e8b3a); box-shadow: 0 4px 24px rgba(52,199,89,0.20); }
-        .btn-purple { background: linear-gradient(135deg, #af52de, #7b2fbe); box-shadow: 0 4px 24px rgba(175,82,222,0.20); }
-        .tags { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin: 10px 0 10px; }
-        .tag { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); color: var(--text-secondary); padding: 10px 4px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 700; text-align: center; cursor: pointer; transition: all 0.2s; }
-        .tag.active { background: rgba(91,158,255,0.15); border-color: var(--blue); color: #fff; box-shadow: 0 0 20px rgba(91,158,255,0.10); }
-        .tag:active { transform: scale(0.95); }
-        .pen-state { background: rgba(255,159,10,0.06); border: 1px solid rgba(255,159,10,0.15); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 14px; display: none; align-items: center; justify-content: space-between; }
+        /* ── 統計卡片 ── */
+        .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 14px; }
+        .stat { background: rgba(0,0,0,0.25); border-radius: var(--radius-sm); padding: 12px 4px 10px; text-align: center; border: 1px solid rgba(255,255,255,0.02); }
+        .stat .label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-label); }
+        .stat .value { font-size: 17px; font-weight: 900; letter-spacing: -0.2px; margin-top: 3px; }
+        .stat .value.blue { color: var(--blue); }
+        .stat .value.orange { color: var(--orange); }
+        .stat .value.purple { color: var(--purple); }
+
+        .stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 10px; }
+        .stat-mini { background: rgba(0,0,0,0.15); border-radius: var(--radius-sm); padding: 8px 4px; text-align: center; border: 1px solid rgba(255,255,255,0.02); }
+        .stat-mini .label { font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-label); }
+        .stat-mini .value { font-size: 14px; font-weight: 800; margin-top: 1px; }
+
+        /* ── 警示區 ── */
+        .alert-banner { background: var(--red-dim); border: 1px solid rgba(232,96,96,0.15); border-radius: var(--radius-sm); padding: 8px 14px; margin-top: 10px; font-size: 11px; font-weight: 600; color: var(--red); display: none; align-items: center; gap: 8px; }
+        .alert-banner.show { display: flex; }
+
+        /* ── 圖表 ── */
+        .chart-container { margin-top: 14px; background: rgba(0,0,0,0.15); border-radius: var(--radius-sm); padding: 6px; }
+        canvas#weightChart { width: 100%; height: 120px; display: block; border-radius: 6px; }
+
+        /* ── 部位統計 ── */
+        .site-stats { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.03); }
+        .site-stats .label { font-size: 8px; color: var(--text-label); text-transform: uppercase; letter-spacing: 0.4px; }
+        .site-pill { background: var(--surface-light); padding: 3px 12px; border-radius: 30px; font-size: 10px; color: var(--text-secondary); border: 1px solid var(--border); }
+        .site-pill .num { color: var(--text-primary); font-weight: 700; }
+
+        /* ── 區段標籤切換 ── */
+        .seg { display: flex; background: rgba(0,0,0,0.30); border-radius: var(--radius-sm); padding: 3px; border: 1px solid var(--border); margin-bottom: 16px; }
+        .seg-btn { flex: 1; padding: 8px 0; font-size: 11px; font-weight: 700; color: var(--text-secondary); background: transparent; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .seg-btn.active { background: rgba(255,255,255,0.06); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+        /* ── 表單 ── */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .field { display: flex; flex-direction: column; gap: 3px; }
+        .field label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-label); }
+        .field input, .field select { width: 100%; background: rgba(0,0,0,0.25); color: var(--text-primary); border: 1px solid var(--border); padding: 9px 12px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; outline: none; transition: border 0.15s; appearance: none; }
+        .field input:focus, .field select:focus { border-color: var(--border-focus); }
+        .field input::placeholder { color: var(--text-muted); font-weight: 400; }
+
+        .pen-state { background: var(--orange-dim); border: 1px solid rgba(232,168,56,0.12); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 12px; display: none; align-items: center; justify-content: space-between; }
         .pen-state.show { display: flex; }
-        .pen-state .label { font-size: 11px; font-weight: 700; color: var(--orange); }
-        .pen-state .remain { font-size: 13px; font-weight: 800; color: var(--orange); }
-        .hint { font-size: 10px; color: var(--text-muted); margin: 6px 0 12px; }
+        .pen-state .label { font-size: 10px; font-weight: 700; color: var(--orange); }
+        .pen-state .remain { font-size: 12px; font-weight: 800; color: var(--orange); }
 
-        .filter-bar { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
-        .filter-chip { background: rgba(255,255,255,0.03); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.04); padding: 5px 16px; border-radius: 30px; font-size: 10.5px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-        .filter-chip.active { background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.10); }
-        .filter-chip:active { transform: scale(0.95); }
-        .log-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; padding-right: 2px; }
-        .log-item { background: rgba(0,0,0,0.30); border: 1px solid rgba(255,255,255,0.04); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; }
-        .log-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .log-tag { font-size: 9px; font-weight: 800; padding: 2px 12px; border-radius: 30px; text-transform: uppercase; letter-spacing: 0.3px; }
-        .log-tag.dose { background: rgba(91,158,255,0.15); color: var(--blue); }
-        .log-tag.weight { background: rgba(76,217,100,0.15); color: var(--green); }
-        .log-tag.side { background: rgba(183,124,255,0.15); color: var(--purple); }
-        .log-time { font-size: 10px; color: var(--text-muted); font-weight: 500; }
-        .log-value { font-size: 13px; font-weight: 800; color: var(--text-primary); }
-        .log-del { background: none; border: none; color: var(--text-muted); font-size: 14px; cursor: pointer; padding: 4px 6px; transition: color 0.2s; }
-        .log-del:active { color: var(--red); transform: scale(0.9); }
-        .log-empty { color: var(--text-muted); text-align: center; padding: 20px 0; font-size: 12px; }
+        .hint { font-size: 9px; color: var(--text-muted); margin: 4px 0 10px; }
+        .tags { display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; margin: 8px 0; }
+        .tag { background: var(--surface-light); border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 4px; border-radius: var(--radius-sm); font-size: 10px; font-weight: 700; text-align: center; cursor: pointer; transition: all 0.15s; }
+        .tag.active { background: var(--blue-dim); border-color: rgba(91,127,255,0.20); color: var(--text-primary); }
 
-        .toolbar { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-        .tool-btn { flex: 1; min-width: 60px; background: rgba(255,255,255,0.03); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.05); padding: 9px 6px; border-radius: var(--radius-sm); font-size: 10px; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.2s; }
-        .tool-btn:active { background: rgba(255,255,255,0.07); transform: scale(0.96); }
+        /* ── 按鈕 ── */
+        .btn { width: 100%; padding: 12px; border: none; border-radius: var(--radius-sm); font-size: 12px; font-weight: 800; color: #fff; cursor: pointer; transition: all 0.12s ease; display: flex; align-items: center; justify-content: center; gap: 6px; letter-spacing: 0.2px; }
+        .btn:active { transform: scale(0.97); opacity: 0.8; }
+        .btn-primary { background: var(--blue); }
+        .btn-success { background: var(--green); color: #0a0a0f; }
+        .btn-purple { background: var(--purple); }
+
+        /* ── 篩選 ── */
+        .filter-group { margin-bottom: 12px; }
+        .filter-row { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 4px; }
+        .filter-row:last-child { margin-bottom: 0; }
+        .filter-chip { background: rgba(255,255,255,0.02); color: var(--text-secondary); border: 1px solid var(--border); padding: 4px 14px; border-radius: 30px; font-size: 9.5px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+        .filter-chip.active { background: rgba(255,255,255,0.05); color: #fff; border-color: rgba(255,255,255,0.08); }
+        .filter-chip.time-active { background: var(--blue-dim); color: var(--blue); border-color: rgba(91,127,255,0.12); }
+        .filter-chip.time-active.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+        /* ── 日誌 ── */
+        .log-list { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; padding-right: 2px; }
+        .log-item { background: rgba(0,0,0,0.15); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+        .log-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .log-tag { font-size: 8px; font-weight: 800; padding: 2px 10px; border-radius: 30px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .log-tag.dose { background: var(--blue-dim); color: var(--blue); }
+        .log-tag.weight { background: var(--green-dim); color: var(--green); }
+        .log-tag.side { background: var(--purple-dim); color: var(--purple); }
+        .log-time { font-size: 9px; color: var(--text-muted); font-weight: 500; }
+        .log-value { font-size: 12px; font-weight: 800; color: var(--text-primary); }
+        .log-del { background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; padding: 2px 6px; transition: color 0.15s; }
+        .log-del:active { color: var(--red); }
+        .log-empty { color: var(--text-muted); text-align: center; padding: 16px 0; font-size: 11px; }
+
+        /* ── 工具列 ── */
+        .toolbar { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+        .tool-btn { flex: 1; min-width: 50px; background: var(--surface-light); color: var(--text-secondary); border: 1px solid var(--border); padding: 6px 4px; border-radius: var(--radius-sm); font-size: 9px; font-weight: 700; cursor: pointer; text-align: center; transition: background 0.12s; }
+        .tool-btn:active { background: rgba(255,255,255,0.04); }
         .tool-btn.danger { color: var(--red); }
-        .mt-1 { margin-top: 10px; }
-        .mb-1 { margin-bottom: 10px; }
+
+        .mt-1 { margin-top: 8px; }
+        .mb-1 { margin-bottom: 8px; }
         .flex { display: flex; justify-content: space-between; align-items: center; }
         .text-muted { color: var(--text-muted); }
-        .text-small { font-size: 10px; }
+        .text-small { font-size: 9px; }
         .panel { display: none; }
         .panel.open { display: block; }
-        @media (max-width:400px) { .grid-2 { grid-template-columns:1fr; } .stats { gap:6px; } .stat .value { font-size:16px; } .card { padding:16px 14px 18px; } .trend-grid { grid-template-columns: 1fr 1fr; } }
+        .inline-flex { display: inline-flex; align-items: center; gap: 4px; }
+
+        /* ── 目標體重區塊 ── */
+        .goal-block { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.04); }
+        .goal-block .goal-header { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-label); margin-bottom: 3px; }
+        .goal-block .goal-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+        .goal-block .goal-bar .fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; background: linear-gradient(90deg, var(--blue), var(--green)); }
+        .goal-block .goal-sub { font-size: 9px; color: var(--text-muted); margin-top: 3px; }
+        .goal-block .goal-speed { font-size: 10px; font-weight: 700; margin-top: 5px; color: var(--text-secondary); }
+        .goal-block .goal-speed .up { color: var(--green); }
+        .goal-block .goal-speed .down { color: var(--red); }
+        .goal-block .goal-set { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+        .goal-block .goal-set input { flex: 1; min-width: 60px; background: rgba(0,0,0,0.20); border: 1px solid var(--border); color: var(--text-primary); padding: 4px 8px; border-radius: 6px; font-size: 10px; outline: none; }
+        .goal-block .goal-set input:focus { border-color: var(--border-focus); }
+        .goal-block .goal-set .btn-goal { padding: 4px 14px; border: none; border-radius: 6px; font-size: 10px; font-weight: 700; color: #fff; cursor: pointer; background: var(--blue); }
+        .goal-block .goal-set .hint-text { font-size: 8px; color: var(--text-muted); align-self: center; }
+
+        /* ── 趨勢摘要三欄 ── */
+        .trend-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .trend-item { background: rgba(0,0,0,0.15); border-radius: var(--radius-sm); padding: 10px 6px; text-align: center; border: 1px solid rgba(255,255,255,0.02); }
+        .trend-item .label { font-size: 8px; color: var(--text-label); text-transform: uppercase; letter-spacing: 0.4px; }
+        .trend-item .number { font-size: 18px; font-weight: 800; margin-top: 2px; }
+        .trend-item .delta { font-size: 10px; font-weight: 700; }
+        .trend-item .delta.up { color: var(--green); }
+        .trend-item .delta.down { color: var(--red); }
+        .trend-item .delta.neutral { color: var(--text-muted); }
+
+        /* ── Toast ── */
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(16,16,24,0.92); backdrop-filter: blur(16px); color: #fff; padding: 10px 22px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 8px 32px rgba(0,0,0,0.6); opacity: 0; transition: opacity 0.25s ease; pointer-events: none; z-index: 999; max-width: 90%; }
+        .toast.show { opacity: 1; }
+
+        /* ── 歡迎畫面 ── */
+        .welcome-overlay {
+            position: fixed; inset: 0; background: var(--bg); z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 40px; text-align: center;
+        }
+        .welcome-overlay .logo { font-size: 42px; font-weight: 800; letter-spacing: 3px; color: #fff; opacity: 0.9; margin-bottom: 12px; }
+        .welcome-overlay p { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; max-width: 300px; }
+        .welcome-overlay input { background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: #fff; padding: 12px 18px; border-radius: var(--radius-sm); font-size: 17px; font-weight: 600; width: 100%; max-width: 280px; text-align: center; outline: none; }
+        .welcome-overlay input:focus { border-color: var(--border-focus); }
+        .welcome-overlay .btn { max-width: 280px; margin-top: 14px; }
+        .welcome-overlay .hint { font-size: 11px; color: var(--text-muted); margin-top: 10px; }
+
+        /* ── 初始設定彈窗 ── */
+        .setup-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            z-index: 2000; display: none; align-items: center; justify-content: center; padding: 24px;
+        }
+        .setup-overlay.show { display: flex; }
+        .setup-modal {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 32px 24px 28px; max-width: 360px; width: 100%;
+            box-shadow: var(--shadow);
+        }
+        .setup-modal .modal-title { font-size: 22px; font-weight: 800; text-align: center; margin-bottom: 2px; }
+        .setup-modal .modal-sub { font-size: 12px; color: var(--text-secondary); text-align: center; margin-bottom: 20px; }
+        .setup-modal .field { margin-bottom: 14px; }
+        .setup-modal .field label { font-size: 10px; font-weight: 700; color: var(--text-label); text-transform: uppercase; letter-spacing: 0.4px; }
+        .setup-modal .field input { width: 100%; background: rgba(0,0,0,0.20); border: 1px solid var(--border); color: #fff; padding: 12px 14px; border-radius: var(--radius-sm); font-size: 18px; font-weight: 700; text-align: center; outline: none; }
+        .setup-modal .field input:focus { border-color: var(--border-focus); }
+        .setup-modal .field .unit { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 2px; }
+        .setup-modal .field .error { font-size: 10px; color: var(--red); margin-top: 3px; display: none; }
+        .setup-modal .field .error.show { display: block; }
+        .setup-modal .btn { margin-top: 6px; }
+
+        /* ── RWD ── */
+        @media (max-width:400px) {
+            .grid-2 { grid-template-columns:1fr; }
+            .stats { gap:4px; }
+            .stat .value { font-size:15px; }
+            .card { padding:16px 14px 18px; }
+            .stat-row { grid-template-columns: 1fr 1fr; }
+            .trend-grid { grid-template-columns: 1fr 1fr; }
+            .tags { grid-template-columns: repeat(2,1fr); }
+        }
         @media (min-width:600px) { .app { max-width:520px; } }
-        @supports (padding:max(0px)) { body { padding-left:max(20px, env(safe-area-inset-left)); padding-right:max(20px, env(safe-area-inset-right)); padding-top:max(20px, env(safe-area-inset-top)); padding-bottom:max(30px, env(safe-area-inset-bottom)); } }
+        @supports (padding:max(0px)) { body { padding-left:max(16px, env(safe-area-inset-left)); padding-right:max(16px, env(safe-area-inset-right)); padding-top:max(16px, env(safe-area-inset-top)); padding-bottom:max(16px, env(safe-area-inset-bottom)); } }
     </style>
 </head>
 <body>
-    <div class="app">
 
-        <!-- 仪表板 + 用户切换 -->
+    <!-- 歡迎畫面 -->
+    <div class="welcome-overlay" id="welcomeOverlay">
+        <div class="logo">MOUNFLOW</div>
+        <p>個人用藥記錄器<br>請輸入您的暱稱開始</p>
+        <input type="text" id="welcomeName" placeholder="暱稱" maxlength="20" autofocus>
+        <button class="btn btn-primary" onclick="createFirstUser()" style="max-width:280px;">開始使用</button>
+        <div class="hint">所有資料僅儲存於此瀏覽器</div>
+    </div>
+
+    <!-- 初始設定彈窗 -->
+    <div class="setup-overlay" id="setupOverlay">
+        <div class="setup-modal">
+            <div class="modal-title">初始設定</div>
+            <div class="modal-sub">請輸入您的起始數據</div>
+            <div class="field">
+                <label>目前體重</label>
+                <input type="number" step="0.1" min="0" inputmode="decimal" id="setupStartWeight" placeholder="請輸入體重" autofocus>
+                <div class="unit">公斤 (kg)</div>
+                <div class="error" id="setupError">目標體重必須小於目前體重</div>
+            </div>
+            <div class="field">
+                <label>目標體重</label>
+                <input type="number" step="0.1" min="0" inputmode="decimal" id="setupTargetWeight" placeholder="請輸入目標體重">
+                <div class="unit">公斤 (kg)</div>
+            </div>
+            <button class="btn btn-primary" onclick="confirmSetup()">確認開始</button>
+        </div>
+    </div>
+
+    <!-- 修改目標體重彈窗 -->
+    <div class="setup-overlay" id="goalOverlay" onclick="if(event.target===this) closeGoalModal()">
+        <div class="setup-modal">
+            <div class="modal-title" style="font-size:18px;">修改目標體重</div>
+            <div class="modal-sub">起始體重自動抓取第一筆紀錄</div>
+            <div class="field">
+                <label>目標體重</label>
+                <input type="number" step="0.1" min="0" inputmode="decimal" id="goalModalInput" placeholder="請輸入目標體重" autofocus>
+                <div class="unit">公斤 (kg)</div>
+                <div class="error" id="goalModalError">目標須小於起始體重</div>
+            </div>
+            <button class="btn btn-primary" onclick="confirmGoalModal()">儲存</button>
+            <button class="btn" style="margin-top:8px;background:rgba(255,255,255,0.06);color:var(--text-secondary);" onclick="closeGoalModal()">取消</button>
+        </div>
+    </div>
+
+    <div class="app" id="mainApp">
+        <div class="toast" id="toast"></div>
+
+        <!-- ─── 儀表板 ─── -->
         <div class="card">
             <div class="header">
                 <span class="brand">MOUNFLOW</span>
-                <span class="version" onclick="location.reload()">v7.3</span>
+                <span class="version" onclick="location.reload()">v9.6</span>
             </div>
-            <div class="user-area">
-                <span class="user-label">使用者</span>
-                <input type="text" id="usernameInput" placeholder="輸入名稱" value="">
-                <button class="btn-sm" onclick="switchUser()">切換</button>
-                <span class="user-label" id="currentUserDisplay" style="font-weight:700;color:var(--text-secondary);">--</span>
+            <div class="user-bar">
+                <select id="userSelect" onchange="switchUser(this.value)"></select>
+                <button class="btn-sm" onclick="addUser()">新增</button>
+                <button class="btn-sm danger" onclick="deleteUser()">刪除</button>
             </div>
+
             <div class="stats">
-                <div class="stat">
-                    <div class="label">血藥濃度</div>
-                    <div class="value blue" id="currentLevel">0.00 mg</div>
-                </div>
-                <div class="stat">
-                    <div class="label">針筆剩餘</div>
-                    <div class="value orange" id="penRemain">-- mg</div>
-                </div>
-                <div class="stat">
-                    <div class="label">下劑倒數</div>
-                    <div class="value purple" id="nextDoseCountdown">-- 天</div>
-                </div>
+                <div class="stat"><div class="label">血藥濃度</div><div class="value blue" id="currentLevel">0.00 mg</div></div>
+                <div class="stat"><div class="label">針筆剩餘</div><div class="value orange" id="penRemain">-- mg</div></div>
+                <div class="stat"><div class="label">下劑倒數</div><div class="value purple" id="nextDoseCountdown">-- 天</div></div>
+            </div>
+
+            <div class="alert-banner" id="alertBanner"><span id="alertText"></span></div>
+
+            <div class="stat-row">
+                <div class="stat-mini"><div class="label">總注射</div><div class="value" style="color:var(--blue);" id="totalDoses">0</div></div>
+                <div class="stat-mini"><div class="label">總花費</div><div class="value" style="color:var(--orange);" id="totalCost">0</div></div>
+                <div class="stat-mini"><div class="label">平均劑量</div><div class="value" style="color:var(--purple);" id="avgDose">0 mg</div></div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="weightChart"></canvas>
+            </div>
+
+            <div class="site-stats">
+                <span class="label">注射部位</span>
+                <span class="site-pill">左腹 <span class="num" id="siteLeft">0</span></span>
+                <span class="site-pill">右腹 <span class="num" id="siteRight">0</span></span>
+                <span class="site-pill">大腿 <span class="num" id="siteLeg">0</span></span>
+                <span class="site-pill">手臂 <span class="num" id="siteArm">0</span></span>
             </div>
         </div>
 
-        <!-- 输入面板 -->
+        <!-- ─── 輸入面板 ─── -->
         <div class="card">
             <div class="seg">
                 <button class="seg-btn active" onclick="switchTab('dose')" id="tabDose">注射</button>
@@ -161,550 +323,14 @@
                 <button class="seg-btn" onclick="switchTab('side')" id="tabSide">體感</button>
             </div>
 
+            <!-- 注射 -->
             <div id="panelDose" class="panel open">
                 <div class="grid-2">
-                    <div class="field">
-                        <label>日期時間</label>
-                        <input type="datetime-local" id="doseTime">
-                    </div>
-                    <div class="field">
-                        <label>劑量 (mg)</label>
+                    <div class="field"><label>日期</label><input type="datetime-local" id="doseTime"></div>
+                    <div class="field"><label>劑量</label>
                         <select id="doseMg">
-                            <option value="2.5">2.5</option>
-                            <option value="5.0" selected>5.0</option>
-                            <option value="7.5">7.5</option>
-                            <option value="10.0">10.0</option>
-                            <option value="12.5">12.5</option>
-                            <option value="15.0">15.0</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="field mb-1">
-                    <label>注射部位</label>
-                    <select id="doseSite">
-                        <option value="左腹部">左腹部</option>
-                        <option value="右腹部">右腹部</option>
-                        <option value="左大腿">左大腿</option>
-                        <option value="右大腿">右大腿</option>
-                        <option value="手臂">手臂</option>
-                    </select>
-                </div>
-                <div class="pen-state" id="penState">
-                    <span class="label">使用中針筆</span>
-                    <span class="remain" id="penRemainLabel">剩餘 -- mg</span>
-                </div>
-                <div id="penNewGroup">
-                    <div class="grid-2">
-                        <div class="field">
-                            <label>新筆容量 (mg)</label>
-                            <input type="number" step="0.1" id="penTotalCap" placeholder="例 50">
-                        </div>
-                        <div class="field">
-                            <label>價格 (NTD)</label>
-                            <input type="number" step="1" id="penPrice" placeholder="例 13000">
-                        </div>
-                    </div>
-                    <div class="hint">輸入後自動記憶，直至容量歸零</div>
-                </div>
-                <button class="btn btn-primary mt-1" onclick="addDose()">儲存注射</button>
-            </div>
-
-            <div id="panelWeight" class="panel">
-                <div class="grid-2">
-                    <div class="field">
-                        <label>測量日期</label>
-                        <input type="date" id="weightDate">
-                    </div>
-                    <div class="field">
-                        <label>體重 (kg)</label>
-                        <input type="number" step="0.01" id="weightVal" placeholder="">
-                    </div>
-                </div>
-                <div class="field mb-1">
-                    <label>體脂率 (%)</label>
-                    <input type="number" step="0.01" id="pFat" placeholder="">
-                </div>
-                <button class="btn btn-success mt-1" onclick="addWeight()">儲存體組成</button>
-            </div>
-
-            <div id="panelSide" class="panel">
-                <div class="text-small text-muted" style="margin-bottom:6px;">選擇今日體感（可複選，亦可自訂）</div>
-                <div class="tags" id="sideTags">
-                    <button class="tag" data-tag="胃脹排空慢">胃脹排空慢</button>
-                    <button class="tag" data-tag="餐後頭痛">餐後頭痛</button>
-                    <button class="tag" data-tag="食慾極低">食慾極低</button>
-                    <button class="tag" data-tag="輕微飢餓">輕微飢餓</button>
-                    <button class="tag" data-tag="精神充沛">精神充沛</button>
-                    <button class="tag" data-tag="口乾需補水">口乾需補水</button>
-                </div>
-                <div class="field mb-1">
-                    <label>自訂體感</label>
-                    <input type="text" id="customSide" placeholder="輸入您想記錄的體感">
-                </div>
-                <button class="btn btn-purple" onclick="saveSide()">儲存體感</button>
-            </div>
-        </div>
-
-        <!-- 趋势摘要 -->
-        <div class="card">
-            <div class="flex" style="margin-bottom:6px;">
-                <span class="text-small text-muted" style="font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">趨勢摘要</span>
-                <span class="text-small text-muted" id="trendUpdateTime">最近更新：--</span>
-            </div>
-            <div class="trend-grid" id="trendGrid">
-                <div class="trend-item">
-                    <div class="trend-label">體重</div>
-                    <div class="trend-number" id="trendWeight">--</div>
-                    <div class="trend-delta" id="trendWeightDelta">--</div>
-                    <div class="trend-bar"><div class="trend-bar-fill" id="trendWeightBar" style="width:0%;background:var(--blue);"></div></div>
-                    <div class="trend-sub">上次記錄</div>
-                </div>
-                <div class="trend-item">
-                    <div class="trend-label">體脂率</div>
-                    <div class="trend-number" id="trendFat">--</div>
-                    <div class="trend-delta" id="trendFatDelta">--</div>
-                    <div class="trend-bar"><div class="trend-bar-fill" id="trendFatBar" style="width:0%;background:var(--orange);"></div></div>
-                    <div class="trend-sub">上次記錄</div>
-                </div>
-                <div class="trend-item">
-                    <div class="trend-label">血藥狀態</div>
-                    <div class="trend-number" id="trendPk" style="color:var(--blue);">--</div>
-                    <div class="trend-delta neutral" id="trendPkDelta">峰值 --</div>
-                    <div class="trend-bar"><div class="trend-bar-fill" id="trendPkBar" style="width:0%;background:var(--blue);"></div></div>
-                    <div class="trend-sub">距上次注射</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 历史记录 -->
-        <div class="card">
-            <div class="flex mb-1">
-                <span class="text-small text-muted" style="font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">日誌</span>
-                <div style="display:flex;gap:6px;">
-                    <button class="tool-btn" style="flex:0;padding:4px 12px;font-size:10px;" onclick="exportData()">匯出</button>
-                    <button class="tool-btn" style="flex:0;padding:4px 12px;font-size:10px;" onclick="document.getElementById('importFile').click()">匯入</button>
-                    <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
-                    <button class="tool-btn danger" style="flex:0;padding:4px 12px;font-size:10px;" onclick="clearAll()">清空</button>
-                </div>
-            </div>
-            <div class="filter-bar">
-                <button class="filter-chip active" onclick="setLogFilter('all',this)">全部</button>
-                <button class="filter-chip" onclick="setLogFilter('dose',this)">注射</button>
-                <button class="filter-chip" onclick="setLogFilter('weight',this)">體組成</button>
-                <button class="filter-chip" onclick="setLogFilter('side',this)">體感</button>
-            </div>
-            <div class="log-list" id="logList"></div>
-        </div>
-
-    </div>
-
-    <script>
-        // ============================================================
-        //  用户管理（首次打开弹窗引导）
-        // ============================================================
-        let currentUser = localStorage.getItem('mf_currentUser') || '';
-
-        if (!currentUser) {
-            const name = prompt('歡迎使用 MOUNFLOW，請輸入您的名稱（例如：小明）以建立個人資料：', '');
-            if (name && name.trim() !== '') {
-                currentUser = name.trim();
-                localStorage.setItem('mf_currentUser', currentUser);
-            } else {
-                currentUser = 'default';
-                localStorage.setItem('mf_currentUser', currentUser);
-            }
-        }
-
-        document.getElementById('usernameInput').value = currentUser;
-        document.getElementById('currentUserDisplay').textContent = currentUser;
-
-        function switchUser() {
-            const newUser = document.getElementById('usernameInput').value.trim();
-            if (!newUser) {
-                alert('請輸入使用者名稱');
-                return;
-            }
-            currentUser = newUser;
-            localStorage.setItem('mf_currentUser', currentUser);
-            document.getElementById('currentUserDisplay').textContent = currentUser;
-            loadUserData();
-        }
-
-        function getUserKey(base) {
-            return 'mf_' + currentUser + '_' + base;
-        }
-
-        // ============================================================
-        //  数据层
-        // ============================================================
-        let doses = [];
-        let weights = [];
-        let sides = [];
-        let selectedTags = [];
-        let currentLogFilter = 'all';
-
-        function loadUserData() {
-            doses = JSON.parse(localStorage.getItem(getUserKey('doses')) || '[]');
-            weights = JSON.parse(localStorage.getItem(getUserKey('weights')) || '[]');
-            sides = JSON.parse(localStorage.getItem(getUserKey('sides')) || '[]');
-            refresh();
-        }
-
-        function saveUserData() {
-            localStorage.setItem(getUserKey('doses'), JSON.stringify(doses));
-            localStorage.setItem(getUserKey('weights'), JSON.stringify(weights));
-            localStorage.setItem(getUserKey('sides'), JSON.stringify(sides));
-        }
-
-        // ============================================================
-        //  Tab 切换
-        // ============================================================
-        function switchTab(tab) {
-            ['dose','weight','side'].forEach(t => {
-                const panel = document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1));
-                const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
-                if (t === tab) { panel.classList.add('open'); btn.classList.add('active'); }
-                else { panel.classList.remove('open'); btn.classList.remove('active'); }
-            });
-        }
-
-        // ============================================================
-        //  针笔管理
-        // ============================================================
-        function getActivePen() {
-            let cap = 0, price = 0, used = 0, active = false;
-            for (let d of doses) {
-                if (d.penTotalCap > 0) { cap = d.penTotalCap; price = d.penPrice || 0; active = true; }
-                used += d.mg;
-            }
-            const remain = Math.max(0, cap - used);
-            if (remain <= 0) active = false;
-            return { active, cap, price, remain };
-        }
-
-        function updatePenUI() {
-            const state = getActivePen();
-            const el = document.getElementById('penState');
-            const remainLabel = document.getElementById('penRemainLabel');
-            const remainStat = document.getElementById('penRemain');
-            const newGroup = document.getElementById('penNewGroup');
-            if (state.active) {
-                el.classList.add('show');
-                remainLabel.textContent = '剩餘 ' + state.remain.toFixed(1) + ' mg';
-                remainStat.textContent = state.remain.toFixed(1) + ' mg';
-                newGroup.style.display = 'none';
-            } else {
-                el.classList.remove('show');
-                remainStat.textContent = '-- mg';
-                newGroup.style.display = 'block';
-            }
-        }
-
-        // ============================================================
-        //  注射储存
-        // ============================================================
-        function addDose() {
-            const time = document.getElementById('doseTime').value;
-            const mg = parseFloat(document.getElementById('doseMg').value);
-            const site = document.getElementById('doseSite').value;
-            if (!time) return alert('請選擇注射時間');
-            const state = getActivePen();
-            let penTotalCap = null, penPrice = null;
-            if (!state.active) {
-                penTotalCap = parseFloat(document.getElementById('penTotalCap').value) || null;
-                penPrice = parseFloat(document.getElementById('penPrice').value) || null;
-            }
-            doses.push({ id: Date.now(), time: new Date(time).getTime(), mg, site, penTotalCap: penTotalCap || state.cap || null, penPrice: penPrice || state.price || null });
-            doses.sort((a,b) => a.time - b.time);
-            saveUserData();
-            document.getElementById('penTotalCap').value = '';
-            document.getElementById('penPrice').value = '';
-            refresh();
-        }
-
-        // ============================================================
-        //  体组成储存
-        // ============================================================
-        function addWeight() {
-            const date = document.getElementById('weightDate').value;
-            const val = parseFloat(document.getElementById('weightVal').value);
-            if (!date || isNaN(val)) return alert('請輸入日期與體重');
-            const pFat = parseFloat(document.getElementById('pFat').value) || null;
-            weights = weights.filter(w => w.date !== date);
-            weights.push({ id: Date.now(), date, val, extra: { pFat }, time: new Date(date).getTime() });
-            weights.sort((a,b) => a.time - b.time);
-            saveUserData();
-            refresh();
-        }
-
-        // ============================================================
-        //  体感储存
-        // ============================================================
-        function saveSide() {
-            const custom = document.getElementById('customSide').value.trim();
-            const allTags = [...selectedTags];
-            if (custom) allTags.push(custom);
-            if (allTags.length === 0) return alert('請至少選擇一個標籤或輸入自訂體感');
-            const date = new Date().toISOString().slice(0, 10);
-            sides = sides.filter(s => s.date !== date);
-            sides.push({ id: Date.now(), date, tags: allTags, time: Date.now() });
-            saveUserData();
-            document.querySelectorAll('#sideTags .tag').forEach(el => el.classList.remove('active'));
-            selectedTags = [];
-            document.getElementById('customSide').value = '';
-            refresh();
-        }
-
-        // ============================================================
-        //  删除 & 清空
-        // ============================================================
-        function deleteLog(type, id) {
-            if (!confirm('確定刪除？')) return;
-            if (type === 'dose') doses = doses.filter(d => d.id !== id);
-            if (type === 'weight') weights = weights.filter(w => w.id !== id);
-            if (type === 'side') sides = sides.filter(s => s.id !== id);
-            saveUserData();
-            refresh();
-        }
-
-        function clearAll() {
-            if (!confirm('確定清空當前用戶的所有資料？')) return;
-            doses = []; weights = []; sides = [];
-            saveUserData();
-            refresh();
-        }
-
-        // ============================================================
-        //  篩選
-        // ============================================================
-        function setLogFilter(filter, el) {
-            currentLogFilter = filter;
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            renderLogs();
-        }
-
-        // ============================================================
-        //  更新趨勢摘要
-        // ============================================================
-        function updateTrend() {
-            const sortedWeights = [...weights].sort((a,b) => a.time - b.time);
-            const latestW = sortedWeights.length ? sortedWeights[sortedWeights.length-1] : null;
-            const prevW = sortedWeights.length > 1 ? sortedWeights[sortedWeights.length-2] : null;
-
-            const wEl = document.getElementById('trendWeight');
-            const wDelta = document.getElementById('trendWeightDelta');
-            const wBar = document.getElementById('trendWeightBar');
-            const fEl = document.getElementById('trendFat');
-            const fDelta = document.getElementById('trendFatDelta');
-            const fBar = document.getElementById('trendFatBar');
-
-            if (latestW) {
-                wEl.textContent = latestW.val.toFixed(1) + ' kg';
-                fEl.textContent = (latestW.extra.pFat != null ? latestW.extra.pFat.toFixed(1) : '--') + ' %';
-                if (prevW) {
-                    const wDiff = latestW.val - prevW.val;
-                    const fDiff = (latestW.extra.pFat != null && prevW.extra.pFat != null) ? latestW.extra.pFat - prevW.extra.pFat : null;
-                    wDelta.innerHTML = (wDiff > 0 ? '↑' : wDiff < 0 ? '↓' : '→') + ' ' + Math.abs(wDiff).toFixed(1) + ' kg';
-                    wDelta.className = 'trend-delta ' + (wDiff > 0 ? 'up' : wDiff < 0 ? 'down' : 'neutral');
-                    const allW = sortedWeights.map(w => w.val);
-                    const minW = Math.min(...allW);
-                    const maxW = Math.max(...allW);
-                    const rangeW = maxW - minW || 1;
-                    const pct = ((latestW.val - minW) / rangeW) * 100;
-                    wBar.style.width = Math.min(100, Math.max(0, pct)) + '%';
-                    wBar.style.background = wDiff < 0 ? 'var(--green)' : wDiff > 0 ? 'var(--red)' : 'var(--blue)';
-
-                    if (fDiff !== null) {
-                        fDelta.innerHTML = (fDiff > 0 ? '↑' : fDiff < 0 ? '↓' : '→') + ' ' + Math.abs(fDiff).toFixed(1) + '%';
-                        fDelta.className = 'trend-delta ' + (fDiff > 0 ? 'up' : fDiff < 0 ? 'down' : 'neutral');
-                        const allF = sortedWeights.filter(w => w.extra.pFat != null).map(w => w.extra.pFat);
-                        if (allF.length) {
-                            const minF = Math.min(...allF);
-                            const maxF = Math.max(...allF);
-                            const rangeF = maxF - minF || 1;
-                            const pctF = ((latestW.extra.pFat - minF) / rangeF) * 100;
-                            fBar.style.width = Math.min(100, Math.max(0, pctF)) + '%';
-                            fBar.style.background = fDiff < 0 ? 'var(--green)' : fDiff > 0 ? 'var(--red)' : 'var(--orange)';
-                        }
-                    } else {
-                        fDelta.textContent = '--';
-                        fDelta.className = 'trend-delta neutral';
-                    }
-                } else {
-                    wDelta.textContent = '首次記錄';
-                    wDelta.className = 'trend-delta neutral';
-                    fDelta.textContent = '首次記錄';
-                    fDelta.className = 'trend-delta neutral';
-                    wBar.style.width = '50%';
-                    wBar.style.background = 'var(--blue)';
-                    fBar.style.width = '50%';
-                    fBar.style.background = 'var(--orange)';
-                }
-                document.getElementById('trendUpdateTime').textContent = '最近更新：' + new Date(latestW.time).toLocaleString('zh-TW', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'});
-            } else {
-                wEl.textContent = '--';
-                fEl.textContent = '--';
-                wDelta.textContent = '無數據';
-                wDelta.className = 'trend-delta neutral';
-                fDelta.textContent = '無數據';
-                fDelta.className = 'trend-delta neutral';
-                wBar.style.width = '0%';
-                fBar.style.width = '0%';
-                document.getElementById('trendUpdateTime').textContent = '最近更新：--';
-            }
-
-            // 血藥狀態
-            const pkEl = document.getElementById('trendPk');
-            const pkDelta = document.getElementById('trendPkDelta');
-            const pkBar = document.getElementById('trendPkBar');
-            if (doses.length) {
-                const now = Date.now();
-                const ka = 0.04, ke = 0.00578;
-                let curPk = 0, peakVal = 0;
-                for (const d of doses) {
-                    if (now >= d.time) {
-                        const hrs = (now - d.time) / 3600000;
-                        const v = Math.max(0, d.mg * (ka / (ka - ke)) * (Math.exp(-ke * hrs) - Math.exp(-ka * hrs)));
-                        curPk += v;
-                        const tPeak = Math.log(ka/ke) / (ka - ke);
-                        const peak = d.mg * (ka / (ka - ke)) * (Math.exp(-ke * tPeak) - Math.exp(-ka * tPeak));
-                        peakVal += peak;
-                    }
-                }
-                pkEl.textContent = curPk.toFixed(2) + ' mg';
-                pkEl.style.color = 'var(--blue)';
-                const last = doses[doses.length - 1];
-                const hrsSince = (now - last.time) / 3600000;
-                pkDelta.textContent = '峰值約 ' + peakVal.toFixed(2) + ' mg ｜ ' + (hrsSince < 24 ? '已過 ' + hrsSince.toFixed(1) + ' 小時' : '已過 ' + (hrsSince/24).toFixed(1) + ' 天');
-                pkDelta.className = 'trend-delta neutral';
-                const pctPk = peakVal > 0 ? Math.min(100, (curPk / peakVal) * 100) : 0;
-                pkBar.style.width = pctPk + '%';
-                pkBar.style.background = 'var(--blue)';
-            } else {
-                pkEl.textContent = '--';
-                pkDelta.textContent = '無注射記錄';
-                pkDelta.className = 'trend-delta neutral';
-                pkBar.style.width = '0%';
-            }
-        }
-
-        // ============================================================
-        //  渲染日志
-        // ============================================================
-        function renderLogs() {
-            const list = [];
-            if (currentLogFilter === 'all' || currentLogFilter === 'dose') {
-                for (const d of doses) list.push({ type: 'dose', id: d.id, time: d.time, label: '注射', value: d.mg + ' mg ' + (d.site || ''), tagClass: 'dose' });
-            }
-            if (currentLogFilter === 'all' || currentLogFilter === 'weight') {
-                for (const w of weights) list.push({ type: 'weight', id: w.id, time: w.time, label: '體組成', value: w.val + ' kg ｜體脂 ' + (w.extra.pFat ?? '--') + '%', tagClass: 'weight' });
-            }
-            if (currentLogFilter === 'all' || currentLogFilter === 'side') {
-                for (const s of sides) list.push({ type: 'side', id: s.id, time: s.time, label: '體感', value: s.tags.join(' · '), tagClass: 'side' });
-            }
-            list.sort((a,b) => b.time - a.time);
-            const container = document.getElementById('logList');
-            if (!list.length) { container.innerHTML = `<div class="log-empty">尚無紀錄</div>`; return; }
-            container.innerHTML = list.map(item => `
-                <div class="log-item">
-                    <div class="log-left">
-                        <span class="log-tag ${item.tagClass}">${item.label}</span>
-                        <span class="log-time">${new Date(item.time).toLocaleString('zh-TW', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'})}</span>
-                        <span class="log-value">${item.value}</span>
-                    </div>
-                    <button class="log-del" onclick="deleteLog('${item.type}', ${item.id})">✕</button>
-                </div>
-            `).join('');
-        }
-
-        // ============================================================
-        //  导出 / 导入
-        // ============================================================
-        function exportData() {
-            const data = { doses, weights, sides, user: currentUser, exportedAt: new Date().toISOString() };
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `mounflow_${currentUser}_${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (!data.doses || !data.weights || !data.sides) return alert('無效的資料檔案');
-                    if (!confirm(`即將匯入用戶「${data.user || '未知'}」的資料，確定覆蓋目前「${currentUser}」的所有數據？`)) return;
-                    doses = data.doses;
-                    weights = data.weights;
-                    sides = data.sides;
-                    saveUserData();
-                    refresh();
-                    alert('匯入成功！');
-                } catch(err) {
-                    alert('檔案解析失敗，請確認是正確的 JSON 檔案。');
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = '';
-        }
-
-        // ============================================================
-        //  体感标签点击（必须放在 DOM 加载后）
-        // ============================================================
-        document.querySelectorAll('#sideTags .tag').forEach(el => {
-            el.addEventListener('click', function() {
-                const tag = this.dataset.tag;
-                const idx = selectedTags.indexOf(tag);
-                if (idx > -1) {
-                    selectedTags.splice(idx, 1);
-                    this.classList.remove('active');
-                } else {
-                    selectedTags.push(tag);
-                    this.classList.add('active');
-                }
-            });
-        });
-
-        // ============================================================
-        //  刷新全部
-        // ============================================================
-        function refresh() {
-            updatePenUI();
-            updateTrend();
-            renderLogs();
-            // 更新仪表板
-            if (doses.length) {
-                const now = Date.now();
-                const ka = 0.04, ke = 0.00578;
-                let curPk = 0;
-                for (const d of doses) {
-                    if (now >= d.time) {
-                        const hrs = (now - d.time) / 3600000;
-                        curPk += Math.max(0, d.mg * (ka / (ka - ke)) * (Math.exp(-ke * hrs) - Math.exp(-ka * hrs)));
-                    }
-                }
-                document.getElementById('currentLevel').textContent = curPk.toFixed(2) + ' mg';
-                const last = doses[doses.length - 1];
-                const nextTime = last.time + 7 * 24 * 3600 * 1000;
-                const diff = (nextTime - now) / (24 * 3600 * 1000);
-                document.getElementById('nextDoseCountdown').textContent = diff > 0 ? diff.toFixed(1) + ' 天' : '今日應打';
-            } else {
-                document.getElementById('currentLevel').textContent = '0.00 mg';
-                document.getElementById('nextDoseCountdown').textContent = '-- 天';
-            }
-        }
-
-        // ============================================================
-        //  启动
-        // ============================================================
-        loadUserData();
-    </script>
-</body>
-</html>
+                            <option value="2.5">2.5 mg</option>
+                            <option value="5.0" selected>5.0 mg</option>
+                            <option value="7.5">7.5 mg</option>
+                            <option value="10.0">10.0 mg</option>
+                            <option value="12.5">12.5 mg</option>
