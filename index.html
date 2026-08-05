@@ -1,4 +1,4 @@
-[source: 1]<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
@@ -1062,7 +1062,7 @@
                     doses = data.doses; 
                     weights = data.weights; 
                     sides = data.sides;
-                    saveAll(); // 修正：匯入後立即持久化存入 localStorage
+                    saveAll();
                     showToast(`匯入成功 (${data.user || '未知'})`);
                     refresh();
                 } else { showToast('無效的備份檔案'); }
