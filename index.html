@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MOUNFLOW · v9.7</title>
+    <title>MOUNFLOW · v9.8</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b0b10">
@@ -33,6 +33,7 @@
             --purple-dim: rgba(168,124,255,0.10);
             --red: #e86060;
             --red-dim: rgba(232,96,96,0.10);
+            --threshold: #e86060;
         }
         html, body { height: 100%; background: var(--bg); color: var(--text-primary); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif; font-weight: 450; -webkit-font-smoothing: antialiased; padding: 16px; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 2px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
@@ -67,7 +68,7 @@
         .alert-banner.show { display: flex; }
 
         .chart-container { margin-top: 14px; background: rgba(0,0,0,0.15); border-radius: var(--radius-sm); padding: 6px; }
-        canvas#doseChart { width: 100%; height: 130px; display: block; border-radius: 6px; }
+        canvas#pkChart { width: 100%; height: 130px; display: block; border-radius: 6px; }
 
         .site-stats { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.03); }
         .site-stats .label { font-size: 8px; color: var(--text-label); text-transform: uppercase; letter-spacing: 0.4px; }
@@ -259,7 +260,7 @@
         <div class="card">
             <div class="header">
                 <span class="brand">MOUNFLOW</span>
-                <span class="version" onclick="location.reload()">v9.7</span>
+                <span class="version" onclick="location.reload()">v9.8</span>
             </div>
             <div class="user-bar">
                 <select id="userSelect" onchange="switchUser(this.value)"></select>
@@ -281,9 +282,9 @@
                 <div class="stat-mini"><div class="label">平均劑量</div><div class="value" style="color:var(--purple);" id="avgDose">0 mg</div></div>
             </div>
 
-            <!-- 劑量變化圖 -->
+            <!-- 血藥濃度圖 -->
             <div class="chart-container">
-                <canvas id="doseChart"></canvas>
+                <canvas id="pkChart"></canvas>
             </div>
 
             <div class="site-stats">
@@ -536,6 +537,34 @@
     function getTimeLabel() {
         const map = { week: '本週', month: '本月', year: '今年' };
         return map[currentTimeFilter] || '全部';
+    }
+
+    // ============================================================
+    //  藥動學參數
+    // ============================================================
+    const KA = 0.04;   // 吸收速率 (1/hr)
+    const KE = 0.00578; // 消除速率 (1/hr)
+
+    function calcConcentration(doseMg, hoursAfter) {
+        if (hoursAfter < 0) return 0;
+        return Math.max(0, doseMg * (KA / (KA - KE)) * (Math.exp(-KE * hoursAfter) - Math.exp(-KA * hoursAfter)));
+    }
+
+    function getCurrentPk() {
+        const now = Date.now();
+        let total = 0;
+        for (const d of doses) {
+            if (now >= d.time) {
+                const hrs = (now - d.time) / 3600000;
+                total += calcConcentration(d.mg, hrs);
+            }
+        }
+        return total;
+    }
+
+    function getPeakForDose(doseMg) {
+        const tPeak = Math.log(KA/KE) / (KA - KE);
+        return doseMg * (KA / (KA - KE)) * (Math.exp(-KE * tPeak) - Math.exp(-KA * tPeak));
     }
 
     // ============================================================
@@ -809,39 +838,71 @@
     }
 
     // ============================================================
-    //  劑量變化圖（簡單好看版）
+    //  血藥濃度曲線圖（核心！）
     // ============================================================
-    function renderDoseChart() {
-        const canvas = document.getElementById('doseChart');
+    function renderPkChart() {
+        const canvas = document.getElementById('pkChart');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        const sorted = [...doses].sort((a,b) => a.time - b.time);
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
         ctx.scale(dpr, dpr);
         const W = rect.width, H = rect.height;
-        const pad = { top: 20, bottom: 22, left: 26, right: 8 };
+
+        const pad = { top: 18, bottom: 20, left: 28, right: 10 };
         const chartW = W - pad.left - pad.right;
         const chartH = H - pad.top - pad.bottom;
 
         ctx.clearRect(0, 0, W, H);
 
-        if (sorted.length === 0) {
+        // 如果沒有注射紀錄
+        if (doses.length === 0) {
             ctx.fillStyle = '#55576b';
             ctx.font = '11px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('尚無注射紀錄', W/2, H/2 + 4);
+            ctx.fillText('尚無注射紀錄，無法繪製濃度曲線', W/2, H/2 + 4);
             return;
         }
 
-        const maxDose = Math.max(15, ...sorted.map(d => d.mg));
-        const yMax = Math.ceil(maxDose / 2.5) * 2.5;
-        const barWidth = Math.min(32, chartW / sorted.length * 0.55);
-        const gap = (chartW - barWidth * sorted.length) / (sorted.length + 1);
+        // ---- 決定時間範圍 ----
+        const now = Date.now();
+        let startTime = now;
+        // 根據篩選器決定時間範圍
+        const range = getTimeRange();
+        // 但濃度曲線需要從最近一次注射開始往前推，不適合直接用篩選起點
+        // 改用「最近一次注射前 7 天」到「現在 + 未來 7 天」作為顯示範圍
+        const lastDose = doses.reduce((a,b) => a.time > b.time ? a : b);
+        const earliest = Math.min(lastDose.time - 7*24*3600*1000, range.start);
+        const latest = now + 7*24*3600*1000; // 往後看 7 天，顯示未來趨勢
 
-        // 網格線 + Y軸標籤
+        const totalHours = (latest - earliest) / 3600000;
+        const hoursStep = Math.max(0.5, totalHours / 200);
+
+        // ---- 計算濃度數據點 ----
+        const dataPoints = [];
+        let maxConc = 0;
+        let timeMs = earliest;
+        while (timeMs <= latest) {
+            const hrs = (timeMs - earliest) / 3600000;
+            let conc = 0;
+            for (const d of doses) {
+                if (timeMs >= d.time) {
+                    const hrsAfter = (timeMs - d.time) / 3600000;
+                    conc += calcConcentration(d.mg, hrsAfter);
+                }
+            }
+            dataPoints.push({ time: timeMs, conc });
+            if (conc > maxConc) maxConc = conc;
+            timeMs += hoursStep * 3600000;
+        }
+
+        if (dataPoints.length < 2) return;
+
+        const yMax = Math.max(0.5, Math.ceil(maxConc / 0.5) * 0.5 + 0.5);
+
+        // ---- 繪製網格 ----
         ctx.strokeStyle = 'rgba(255,255,255,0.04)';
         ctx.lineWidth = 0.5;
         for (let i = 0; i <= 4; i++) {
@@ -853,59 +914,106 @@
             ctx.fillStyle = '#4a4c60';
             ctx.font = '7px sans-serif';
             ctx.textAlign = 'right';
-            const val = (yMax / 4 * i);
-            ctx.fillText(val.toFixed(1), pad.left - 4, y + 2);
+            ctx.fillText((yMax / 4 * i).toFixed(1), pad.left - 4, y + 2);
         }
 
-        // 畫長條
-        sorted.forEach((d, i) => {
-            const x = pad.left + gap + i * (barWidth + gap);
-            const h = (d.mg / yMax) * chartH;
-            const y = pad.top + chartH - h;
-
-            // 長條漸層
-            const grad = ctx.createLinearGradient(0, y, 0, pad.top + chartH);
-            grad.addColorStop(0, '#5b7fff');
-            grad.addColorStop(1, 'rgba(91,127,255,0.15)');
-            ctx.fillStyle = grad;
-
-            // 圓角長條 (相容性寫法)
-            const r = 3;
+        // ---- 繪製療效閾值線 (1.5 mg) ----
+        const thresholdY = pad.top + chartH - (1.5 / yMax) * chartH;
+        if (thresholdY >= pad.top && thresholdY <= pad.top + chartH) {
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = 'rgba(232,96,96,0.5)';
+            ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.moveTo(x + r, y);
-            ctx.lineTo(x + barWidth - r, y);
-            ctx.quadraticCurveTo(x + barWidth, y, x + barWidth, y + r);
-            ctx.lineTo(x + barWidth, pad.top + chartH);
-            ctx.lineTo(x, pad.top + chartH);
-            ctx.lineTo(x, y + r);
-            ctx.quadraticCurveTo(x, y, x + r, y);
-            ctx.closePath();
-            ctx.fill();
-
-            // 長條邊框
-            ctx.strokeStyle = 'rgba(91,127,255,0.20)';
-            ctx.lineWidth = 0.5;
+            ctx.moveTo(pad.left, thresholdY);
+            ctx.lineTo(W - pad.right, thresholdY);
             ctx.stroke();
-
-            // 數值標示（長條上方）
-            ctx.fillStyle = '#9a9bb0';
-            ctx.font = '7px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(d.mg.toFixed(1), x + barWidth/2, y - 4);
-
-            // X軸日期
-            const date = new Date(d.time);
-            ctx.fillStyle = '#4a4c60';
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#e86060';
             ctx.font = '6px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(`${date.getMonth()+1}/${date.getDate()}`, x + barWidth/2, H - 3);
+            ctx.textAlign = 'left';
+            ctx.fillText('療效閾值', W - pad.right - 48, thresholdY - 3);
+        }
+
+        // ---- 繪製濃度曲線 ----
+        const minTime = dataPoints[0].time;
+        const maxTime = dataPoints[dataPoints.length-1].time;
+        const timeRange = maxTime - minTime || 1;
+
+        ctx.beginPath();
+        ctx.strokeStyle = '#5b7fff';
+        ctx.lineWidth = 2;
+        ctx.shadowColor = 'rgba(91,127,255,0.15)';
+        ctx.shadowBlur = 4;
+
+        dataPoints.forEach((p, i) => {
+            const x = pad.left + ((p.time - minTime) / timeRange) * chartW;
+            const y = pad.top + chartH - (p.conc / yMax) * chartH;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // ---- 標示「目前濃度」位置 ----
+        const currentConc = getCurrentPk();
+        const currentX = pad.left + ((now - minTime) / timeRange) * chartW;
+        const currentY = pad.top + chartH - (currentConc / yMax) * chartH;
+
+        // 亮點
+        const grad = ctx.createRadialGradient(currentX, currentY, 0, currentX, currentY, 12);
+        grad.addColorStop(0, 'rgba(91,127,255,0.8)');
+        grad.addColorStop(1, 'rgba(91,127,255,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(currentX, currentY, 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(currentX, currentY, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.strokeStyle = '#5b7fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 標示數值
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '7px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(`現在 ${currentConc.toFixed(2)} mg`, currentX + 8, currentY + 3);
+
+        // ---- 標示每次注射的劑量（在曲線底部用短標記） ----
+        const sortedDoses = [...doses].sort((a,b) => a.time - b.time);
+        sortedDoses.forEach(d => {
+            const x = pad.left + ((d.time - minTime) / timeRange) * chartW;
+            if (x >= pad.left && x <= W - pad.right) {
+                ctx.fillStyle = 'rgba(91,127,255,0.3)';
+                ctx.fillRect(x - 1, pad.top + chartH - 6, 2, 6);
+                // 劑量標示（小字）
+                ctx.fillStyle = '#4a4c60';
+                ctx.font = '5px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(d.mg.toFixed(1), x, pad.top + chartH - 8);
+            }
         });
 
-        // Y軸單位標示
+        // ---- X軸日期標籤 ----
+        ctx.fillStyle = '#4a4c60';
+        ctx.font = '6px sans-serif';
+        ctx.textAlign = 'center';
+        const labelCount = 6;
+        for (let i = 0; i <= labelCount; i++) {
+            const t = minTime + (timeRange / labelCount) * i;
+            const x = pad.left + ((t - minTime) / timeRange) * chartW;
+            const d = new Date(t);
+            ctx.fillText(`${d.getMonth()+1}/${d.getDate()}`, x, H - 3);
+        }
+
+        // ---- Y軸單位 ----
         ctx.fillStyle = '#4a4c60';
         ctx.font = '6px sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText('mg', pad.left + 2, pad.top - 2);
+        ctx.fillText('mg/L', pad.left + 2, pad.top - 2);
     }
 
     // ============================================================
@@ -1083,6 +1191,7 @@
         renderLogs();
         const latestW = weights.length ? [...weights].sort((a,b)=>b.time-a.time)[0] : null;
         if (latestW) updateGoalSpeed(latestW.val);
+        renderPkChart(); // 重新繪製濃度圖
     }
 
     function setTypeFilter(filter, el) {
@@ -1131,33 +1240,27 @@
         renderUserSelect();
         updatePenUI();
 
-        let curPk = 0, peakVal = 0;
+        // 血藥濃度（儀表板）
+        const currentConc = getCurrentPk();
+        document.getElementById('currentLevel').textContent = currentConc.toFixed(2) + ' mg';
+
+        // 下劑倒數
         if (doses.length) {
-            const now = Date.now();
-            const ka = 0.04, ke = 0.00578;
-            doses.forEach(d => {
-                if (now >= d.time) {
-                    const hrs = (now - d.time) / 3600000;
-                    curPk += Math.max(0, d.mg * (ka / (ka - ke)) * (Math.exp(-ke * hrs) - Math.exp(-ka * hrs)));
-                    const tPeak = Math.log(ka/ke) / (ka - ke);
-                    peakVal += d.mg * (ka / (ka - ke)) * (Math.exp(-ke * tPeak) - Math.exp(-ka * tPeak));
-                }
-            });
-            document.getElementById('currentLevel').textContent = curPk.toFixed(2) + ' mg';
             const last = doses[doses.length-1];
             const diff = (last.time + 7*24*3600*1000 - Date.now()) / (24*3600*1000);
             document.getElementById('nextDoseCountdown').textContent = diff > 0 ? diff.toFixed(1) + ' 天' : '今日應打';
         } else {
-            document.getElementById('currentLevel').textContent = '0.00 mg';
             document.getElementById('nextDoseCountdown').textContent = '-- 天';
         }
 
+        // 統計
         document.getElementById('totalDoses').textContent = doses.length;
         const totalCost = doses.reduce((sum, d) => sum + (d.penTotalCap && d.penPrice ? d.penPrice : 0), 0);
         document.getElementById('totalCost').textContent = totalCost.toLocaleString();
         const totalMg = doses.reduce((s,d)=>s+d.mg, 0);
         document.getElementById('avgDose').textContent = doses.length ? (totalMg/doses.length).toFixed(1)+' mg' : '0 mg';
 
+        // 趨勢摘要 - 體重
         const sortedW = [...weights].sort((a,b)=>a.time-b.time);
         const latestW = sortedW.length ? sortedW[sortedW.length-1] : null;
         const prevW = sortedW.length > 1 ? sortedW[sortedW.length-2] : null;
@@ -1196,12 +1299,20 @@
             document.getElementById('goalSpeed').textContent = '尚無體重數據';
         }
 
-        document.getElementById('trendPk').textContent = curPk ? curPk.toFixed(2)+' mg' : '--';
-        document.getElementById('trendPkDelta').textContent = peakVal ? '峰值 '+peakVal.toFixed(2)+' mg' : '無注射';
+        // 趨勢摘要 - 血藥狀態
+        if (doses.length) {
+            let peakSum = 0;
+            doses.forEach(d => { peakSum += getPeakForDose(d.mg); });
+            document.getElementById('trendPk').textContent = currentConc.toFixed(2) + ' mg';
+            document.getElementById('trendPkDelta').textContent = '峰值約 ' + peakSum.toFixed(2) + ' mg';
+        } else {
+            document.getElementById('trendPk').textContent = '--';
+            document.getElementById('trendPkDelta').textContent = '無注射';
+        }
 
-        updateSmartAlert(curPk);
+        updateSmartAlert(currentConc);
         updateSiteStats();
-        setTimeout(renderDoseChart, 50);
+        setTimeout(renderPkChart, 50);
         renderLogs();
     }
 
@@ -1227,7 +1338,7 @@
         refresh();
     }
 
-    window.addEventListener('resize', () => { setTimeout(renderDoseChart, 100); });
+    window.addEventListener('resize', () => { setTimeout(renderPkChart, 100); });
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && document.getElementById('setupOverlay').classList.contains('show')) {
             confirmSetup();
