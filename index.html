@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MOUNFLOW · v9.11</title>
+    <title>MOUNFLOW · v9.12</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b0b10">
@@ -147,16 +147,6 @@
         .panel.open { display: block; }
         .inline-flex { display: inline-flex; align-items: center; gap: 4px; }
 
-        .report-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 10px; }
-        .report-item { background: rgba(0,0,0,0.15); border-radius: var(--radius-sm); padding: 8px 4px; text-align: center; }
-        .report-item .label { font-size: 7px; color: var(--text-label); text-transform: uppercase; letter-spacing: 0.3px; }
-        .report-item .number { font-size: 15px; font-weight: 800; margin-top: 1px; }
-        .report-item .number.blue { color: var(--blue); }
-        .report-item .number.green { color: var(--green); }
-        .report-item .number.orange { color: var(--orange); }
-        .report-item .number.purple { color: var(--purple); }
-        .report-item .number.red { color: var(--red); }
-
         .goal-block { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.04); }
         .goal-block .goal-header { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-label); margin-bottom: 3px; }
         .goal-block .goal-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
@@ -179,6 +169,18 @@
         .trend-item .delta.up { color: var(--green); }
         .trend-item .delta.down { color: var(--red); }
         .trend-item .delta.neutral { color: var(--text-muted); }
+
+        /* 四週總結 + 療程對比（共用卡片內區塊） */
+        .insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+        .insight-box { background: rgba(0,0,0,0.15); border-radius: var(--radius-sm); padding: 12px 10px; border: 1px solid rgba(255,255,255,0.02); }
+        .insight-box .box-title { font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-label); margin-bottom: 6px; }
+        .insight-box .row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .insight-box .row:last-child { border-bottom: none; }
+        .insight-box .row .lbl { font-size: 9px; color: var(--text-muted); }
+        .insight-box .row .val { font-size: 11px; font-weight: 700; color: var(--text-primary); }
+        .insight-box .row .val.up { color: var(--green); }
+        .insight-box .row .val.down { color: var(--red); }
+        .insight-box .row .val.neutral { color: var(--text-muted); }
 
         .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(16,16,24,0.95); backdrop-filter: blur(16px); color: #fff; padding: 10px 22px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 8px 32px rgba(0,0,0,0.6); opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; z-index: 3000; max-width: 90%; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -242,7 +244,7 @@
             .stat-row { grid-template-columns: 1fr 1fr; }
             .trend-grid { grid-template-columns: 1fr 1fr; }
             .tags { grid-template-columns: repeat(2,1fr); }
-            .report-grid { grid-template-columns: 1fr 1fr; }
+            .insight-grid { grid-template-columns: 1fr; }
         }
         @media (min-width:600px) { .app { max-width:520px; } }
         @supports (padding:max(0px)) { body { padding-left:max(16px, env(safe-area-inset-left)); padding-right:max(16px, env(safe-area-inset-right)); padding-top:max(16px, env(safe-area-inset-top)); padding-bottom:max(16px, env(safe-area-inset-bottom)); } }
@@ -310,7 +312,7 @@
         <div class="card">
             <div class="header">
                 <span class="brand">MOUNFLOW</span>
-                <span class="version" onclick="location.reload()">v9.11</span>
+                <span class="version" onclick="location.reload()">v9.12</span>
             </div>
             <div class="user-bar">
                 <select id="userSelect" onchange="switchUser(this.value)"></select>
@@ -420,7 +422,7 @@
             </div>
         </div>
 
-        <!-- ─── 趨勢摘要 + 目標體重 ─── -->
+        <!-- ─── 趨勢摘要 + 四週總結 + 療程對比 ─── -->
         <div class="card">
             <div class="flex" style="margin-bottom:6px;">
                 <span class="card-title"><span class="icon">◆</span> 趨勢摘要</span>
@@ -444,12 +446,23 @@
                 </div>
             </div>
 
-            <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.04);">
-                <div class="card-title" style="margin-bottom:6px;"><span class="icon">◇</span> <span id="reportTitle">本週總結</span></div>
-                <div class="report-grid" id="reportGrid">
-                    <div class="report-item"><div class="label">注射次數</div><div class="number blue" id="reportDoses">0</div></div>
-                    <div class="report-item"><div class="label">總劑量</div><div class="number purple" id="reportTotalMg">0 mg</div></div>
-                    <div class="report-item"><div class="label">體重變化</div><div class="number" id="reportWeightChange" style="color:var(--text-muted);">--</div></div>
+            <!-- ★ 四週總結 + 本次療程對比 ★ -->
+            <div class="insight-grid" id="insightGrid">
+                <!-- 左：四週總結 -->
+                <div class="insight-box">
+                    <div class="box-title">▣ 四週總結</div>
+                    <div class="row"><span class="lbl">總劑量</span><span class="val" id="i4wDose">-- mg</span></div>
+                    <div class="row"><span class="lbl">注射次數</span><span class="val" id="i4wCount">--</span></div>
+                    <div class="row"><span class="lbl">體重變化</span><span class="val" id="i4wWeight">--</span></div>
+                    <div class="row"><span class="lbl">平均濃度</span><span class="val" id="i4wAvgPk">-- mg</span></div>
+                </div>
+                <!-- 右：本次療程對比 -->
+                <div class="insight-box">
+                    <div class="box-title">▣ 本次療程對比</div>
+                    <div class="row"><span class="lbl">已過天數</span><span class="val" id="iCycleDays">-- 天</span></div>
+                    <div class="row"><span class="lbl">體重變化</span><span class="val" id="iCycleWeight">--</span></div>
+                    <div class="row"><span class="lbl">濃度變化</span><span class="val" id="iCyclePk">--</span></div>
+                    <div class="row"><span class="lbl">目前濃度</span><span class="val" id="iCycleCurrentPk">-- mg</span></div>
                 </div>
             </div>
 
@@ -624,6 +637,18 @@
             const effTime = getEffectiveTime(d);
             if (now >= effTime) {
                 const hrs = (now - effTime) / 3600000;
+                total += calcConcentration(d.mg, hrs);
+            }
+        }
+        return total;
+    }
+
+    function getPkAtTime(targetTime) {
+        let total = 0;
+        for (const d of doses) {
+            const effTime = getEffectiveTime(d);
+            if (targetTime >= effTime) {
+                const hrs = (targetTime - effTime) / 3600000;
                 total += calcConcentration(d.mg, hrs);
             }
         }
@@ -1014,7 +1039,7 @@
     }
 
     // ============================================================
-    //  血藥濃度曲線圖（修復版：X軸只以數據為準）
+    //  血藥濃度曲線圖
     // ============================================================
     function renderPkChart() {
         const canvas = document.getElementById('pkChart');
@@ -1043,7 +1068,6 @@
 
         const now = Date.now();
 
-        // ★ 修復：X軸範圍只以數據為準，不受篩選器影響
         let earliestEff = Infinity;
         let latestEff = 0;
         for (const d of doses) {
@@ -1052,7 +1076,6 @@
             if (t > latestEff) latestEff = t;
         }
 
-        // 左邊界 = 最早數據 - 7天，右邊界 = 現在 + 7天
         const rangeStart = earliestEff - 7 * 24 * 3600 * 1000;
         const rangeEnd = now + 7 * 24 * 3600 * 1000;
 
@@ -1080,7 +1103,6 @@
 
         const yMax = Math.max(0.5, Math.ceil(maxConc / 0.5) * 0.5 + 0.5);
 
-        // ---- 網格 ----
         ctx.strokeStyle = 'rgba(255,255,255,0.04)';
         ctx.lineWidth = 0.5;
         for (let i = 0; i <= 4; i++) {
@@ -1095,7 +1117,6 @@
             ctx.fillText((yMax / 4 * i).toFixed(1), pad.left - 4, y + 2);
         }
 
-        // ---- 低於閾值區間 ----
         const thresholdY = pad.top + chartH - (THRESHOLD / yMax) * chartH;
         if (thresholdY >= pad.top && thresholdY <= pad.top + chartH) {
             let inLow = false;
@@ -1121,7 +1142,6 @@
             }
         }
 
-        // ---- 閾值線 ----
         if (thresholdY >= pad.top && thresholdY <= pad.top + chartH) {
             ctx.setLineDash([4, 4]);
             ctx.strokeStyle = 'rgba(232,96,96,0.5)';
@@ -1137,7 +1157,6 @@
             ctx.fillText('閾值 1.5 mg', W - pad.right - 60, thresholdY - 3);
         }
 
-        // ---- 濃度曲線 ----
         const minTime = dataPoints[0].time;
         const timeRange = dataPoints[dataPoints.length-1].time - minTime || 1;
 
@@ -1156,7 +1175,6 @@
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        // ---- 目前濃度亮點 ----
         const currentConc = getCurrentPk();
         const currentX = pad.left + ((now - minTime) / timeRange) * chartW;
         const currentY = pad.top + chartH - (currentConc / yMax) * chartH;
@@ -1182,7 +1200,6 @@
         ctx.textAlign = 'left';
         ctx.fillText(`現在 ${currentConc.toFixed(2)} mg`, currentX + 8, currentY + 3);
 
-        // ---- 預測 ----
         const crossTime = predictThresholdCross();
         if (crossTime) {
             const crossX = pad.left + ((crossTime - minTime) / timeRange) * chartW;
@@ -1203,7 +1220,6 @@
             }
         }
 
-        // ---- 注射標記 ----
         const sortedDoses = [...doses].sort((a,b) => getEffectiveTime(a) - getEffectiveTime(b));
         sortedDoses.forEach(d => {
             const effT = getEffectiveTime(d);
@@ -1218,7 +1234,6 @@
             }
         });
 
-        // ---- X軸日期（只顯示 5 個關鍵時間點） ----
         ctx.fillStyle = '#4a4c60';
         ctx.font = '6px sans-serif';
         ctx.textAlign = 'center';
@@ -1230,13 +1245,11 @@
             ctx.fillText(`${d.getMonth()+1}/${d.getDate()}`, x, H - 3);
         }
 
-        // ---- Y軸單位 ----
         ctx.fillStyle = '#4a4c60';
         ctx.font = '6px sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText('mg/L', pad.left + 2, pad.top - 2);
 
-        // ---- 圖例 ----
         ctx.fillStyle = 'rgba(232,96,96,0.15)';
         ctx.fillRect(W - pad.right - 38, pad.top + 2, 10, 8);
         ctx.fillStyle = '#4a4c60';
@@ -1246,43 +1259,118 @@
     }
 
     // ============================================================
-    //  總結報告
+    //  ★ 四週總結 + 本次療程對比
     // ============================================================
-    function updateReport() {
-        const range = getTimeRange();
+    function updateInsights() {
         const now = Date.now();
+        const fourWeeksAgo = now - 28 * 24 * 3600 * 1000;
 
-        const rangeDoses = doses.filter(d => {
-            const t = getEffectiveTime(d);
-            return t >= range.start && t <= now;
-        });
-        const rangeWeights = weights.filter(w => w.time >= range.start && w.time <= now).sort((a,b) => a.time - b.time);
+        // --- 四週總結 ---
+        const recentDoses = doses.filter(d => getEffectiveTime(d) >= fourWeeksAgo && getEffectiveTime(d) <= now);
+        const recentWeights = weights.filter(w => w.time >= fourWeeksAgo && w.time <= now).sort((a,b) => a.time - b.time);
 
-        document.getElementById('reportTitle').textContent = range.label + '總結';
+        const totalDose = recentDoses.reduce((s, d) => s + d.mg, 0);
+        document.getElementById('i4wDose').textContent = totalDose.toFixed(1) + ' mg';
+        document.getElementById('i4wCount').textContent = recentDoses.length + ' 次';
 
-        document.getElementById('reportDoses').textContent = rangeDoses.length;
-        const totalMg = rangeDoses.reduce((s,d) => s + d.mg, 0);
-        document.getElementById('reportTotalMg').textContent = totalMg.toFixed(1) + ' mg';
-
-        if (rangeWeights.length >= 2) {
-            const first = rangeWeights[0];
-            const last = rangeWeights[rangeWeights.length - 1];
+        // 四週體重變化
+        if (recentWeights.length >= 2) {
+            const first = recentWeights[0];
+            const last = recentWeights[recentWeights.length - 1];
             const diff = last.val - first.val;
-            const el = document.getElementById('reportWeightChange');
+            const el = document.getElementById('i4wWeight');
             if (Math.abs(diff) < 0.01) {
                 el.textContent = '持平';
-                el.style.color = 'var(--text-muted)';
+                el.className = 'val neutral';
             } else if (diff < 0) {
                 el.textContent = `↓ ${Math.abs(diff).toFixed(1)} kg`;
-                el.style.color = 'var(--green)';
+                el.className = 'val up';
             } else {
                 el.textContent = `↑ ${diff.toFixed(1)} kg`;
-                el.style.color = 'var(--red)';
+                el.className = 'val down';
             }
         } else {
-            const el = document.getElementById('reportWeightChange');
+            const el = document.getElementById('i4wWeight');
             el.textContent = '數據不足';
-            el.style.color = 'var(--text-muted)';
+            el.className = 'val neutral';
+        }
+
+        // 四週平均濃度
+        let totalPk = 0;
+        let countPk = 0;
+        for (let t = fourWeeksAgo; t <= now; t += 6 * 3600000) { // 每6小時取樣
+            totalPk += getPkAtTime(t);
+            countPk++;
+        }
+        const avgPk = countPk > 0 ? totalPk / countPk : 0;
+        document.getElementById('i4wAvgPk').textContent = avgPk.toFixed(2) + ' mg';
+
+        // --- 本次療程對比 ---
+        if (doses.length > 0) {
+            // 找最近一次有效注射
+            let lastDose = null;
+            let lastEffTime = 0;
+            for (const d of doses) {
+                const t = getEffectiveTime(d);
+                if (t > lastEffTime) { lastEffTime = t; lastDose = d; }
+            }
+
+            if (lastDose) {
+                const daysSince = (now - lastEffTime) / (24 * 3600 * 1000);
+                document.getElementById('iCycleDays').textContent = daysSince.toFixed(1) + ' 天';
+
+                // 體重變化：找注射日當天或最近的體重 vs 今天
+                const weightsOnOrAfter = weights.filter(w => w.time >= lastEffTime - 24*3600*1000).sort((a,b) => a.time - b.time);
+                const todayWeights = weights.filter(w => w.time >= now - 24*3600*1000).sort((a,b) => a.time - b.time);
+
+                const wAtInjection = weightsOnOrAfter.length > 0 ? weightsOnOrAfter[0] : null;
+                const wToday = todayWeights.length > 0 ? todayWeights[todayWeights.length - 1] : null;
+
+                if (wAtInjection && wToday) {
+                    const diff = wToday.val - wAtInjection.val;
+                    const el = document.getElementById('iCycleWeight');
+                    if (Math.abs(diff) < 0.01) {
+                        el.textContent = '持平';
+                        el.className = 'val neutral';
+                    } else if (diff < 0) {
+                        el.textContent = `↓ ${Math.abs(diff).toFixed(1)} kg`;
+                        el.className = 'val up';
+                    } else {
+                        el.textContent = `↑ ${diff.toFixed(1)} kg`;
+                        el.className = 'val down';
+                    }
+                } else {
+                    const el = document.getElementById('iCycleWeight');
+                    el.textContent = '數據不足';
+                    el.className = 'val neutral';
+                }
+
+                // 濃度變化
+                const pkAtInjection = getPkAtTime(lastEffTime);
+                const pkNow = getCurrentPk();
+                const pkDiff = pkNow - pkAtInjection;
+                const elPk = document.getElementById('iCyclePk');
+                if (Math.abs(pkDiff) < 0.01) {
+                    elPk.textContent = '持平';
+                    elPk.className = 'val neutral';
+                } else if (pkDiff < 0) {
+                    elPk.textContent = `↓ ${Math.abs(pkDiff).toFixed(2)} mg`;
+                    elPk.className = 'val down';
+                } else {
+                    elPk.textContent = `↑ ${pkDiff.toFixed(2)} mg`;
+                    elPk.className = 'val up';
+                }
+
+                document.getElementById('iCycleCurrentPk').textContent = pkNow.toFixed(2) + ' mg';
+            }
+        } else {
+            // 無注射記錄
+            document.getElementById('iCycleDays').textContent = '-- 天';
+            document.getElementById('iCycleWeight').textContent = '--';
+            document.getElementById('iCycleWeight').className = 'val neutral';
+            document.getElementById('iCyclePk').textContent = '--';
+            document.getElementById('iCyclePk').className = 'val neutral';
+            document.getElementById('iCycleCurrentPk').textContent = '-- mg';
         }
     }
 
@@ -1320,7 +1408,7 @@
     }
 
     // ============================================================
-    //  注射儲存（含補填）
+    //  注射儲存
     // ============================================================
     function addDose() {
         const time = document.getElementById('doseTime').value;
@@ -1490,7 +1578,7 @@
         renderLogs();
         const latestW = weights.length ? [...weights].sort((a,b)=>b.time-a.time)[0] : null;
         if (latestW) updateGoalSpeed(latestW.val);
-        updateReport();
+        updateInsights();
         renderPkChart();
     }
 
@@ -1623,7 +1711,7 @@
 
         updateSmartAlert(currentConc);
         updateSiteStats();
-        updateReport();
+        updateInsights();
         setTimeout(renderPkChart, 50);
         renderLogs();
     }
